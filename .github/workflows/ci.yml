@@ -1,0 +1,239 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go:
+    name: Go quality gates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run deterministic quality gates
+        run: scripts/check.sh
+
+      - name: Run advisory NilAway analysis
+        run: scripts/nilaway.sh
+
+      - name: Run API fuzz smoke test
+        env:
+          FUZZ_TIME: 10s
+        run: scripts/fuzz-smoke.sh
+
+      - name: Run bounded load benchmark smoke tests
+        env:
+          BENCH_COUNT: 1
+          GOMAXPROCS: 1
+        run: scripts/benchmarks.sh
+
+      - name: Scan reachable Go vulnerabilities
+        run: scripts/security-scan.sh
+
+      - name: Mutation-test administrative decisions
+        run: scripts/mutation.sh
+
+      - name: Check public Go API compatibility
+        run: scripts/api-compatibility.sh
+
+  postgres:
+    name: PostgreSQL ${{ matrix.version }} integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [16, 17, 18]
+    services:
+      postgres:
+        image: postgres:${{ matrix.version }}-alpine
+        env:
+          POSTGRES_DB: control_plane_test
+          POSTGRES_USER: control_plane_test
+          POSTGRES_PASSWORD: control_plane_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U control_plane_test -d control_plane_test"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run real PostgreSQL integration
+        env:
+          TEST_DATABASE_URL: >-
+            postgres://control_plane_test:control_plane_test@127.0.0.1:5432/control_plane_test?sslmode=disable
+        run: scripts/integration-postgres.sh
+
+  queue:
+    name: Real go-queue backend integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      redis:
+        image: redis:6.2.22@sha256:3b477db2f54035771360d023c9aff4c6255ba833834511b8eedc5ba8c10d0bce
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+      valkey:
+        image: valkey/valkey:9.1.0@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
+        ports:
+          - 6380:6379
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run real backends through go-queue management
+        env:
+          TEST_REDIS_ADDRESS: 127.0.0.1:6379
+          TEST_VALKEY_ADDRESS: 127.0.0.1:6380
+        run: scripts/integration-queue.sh
+
+  browser:
+    name: Browser security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24.18.0
+          cache: npm
+          cache-dependency-path: _browser/package-lock.json
+
+      - name: Install browser test dependencies
+        run: npm ci
+        working-directory: _browser
+
+      - name: Audit browser dependencies
+        run: npm audit --audit-level=high
+        working-directory: _browser
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: _browser
+
+      - name: Check browser test sources
+        run: npm run check:browser
+        working-directory: _browser
+
+      - name: Run browser security tests
+        run: npm run test:browser
+        working-directory: _browser
+
+      - name: Upload browser failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: browser-security-artifacts
+          path: |
+            _browser/playwright-report/
+            _browser/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  disaster-recovery:
+    name: PostgreSQL disaster recovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Prove PostgreSQL backup and restore
+        run: scripts/disaster-recovery-postgres.sh
+
+  container:
+    name: Multi-platform container
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Configure Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
+
+      - name: Validate Dockerfile
+        run: docker buildx build --check .
+
+      - name: Build server OCI image
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        with:
+          context: .
+          target: server
+          platforms: linux/amd64,linux/arm64
+          outputs: type=oci,dest=/tmp/go-queue-control-plane.oci
+          sbom: true
+          provenance: mode=max
+          build-args: |
+            VERSION=ci
+            COMMIT=${{ github.sha }}
+            BUILT_AT=1970-01-01T00:00:00Z
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Upload OCI image
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: go-queue-control-plane-oci
+          path: /tmp/go-queue-control-plane.oci
+          if-no-files-found: error
+          retention-days: 7
