@@ -103,6 +103,7 @@ func TestBoundedMetricCountSaturates(t *testing.T) {
 	t.Parallel()
 
 	if boundedMetricCount(1) != 1 ||
+		boundedMetricCount(math.MaxInt64-1) != math.MaxInt64-1 ||
 		boundedMetricCount(math.MaxInt64) != math.MaxInt64 ||
 		boundedMetricCount(math.MaxUint64) != math.MaxInt64 {
 		t.Fatal("boundedMetricCount() did not preserve or saturate the count")
