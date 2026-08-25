@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
+      "gremlins_version": "v0.6.0",
+      "module_directory": ".",
+      "package_directory": "ui",
+      "reason": "The embedded static handler consists of direct security-header and file-server calls; the complete enabled Gremlins operator set discovers no viable transformations, so response and header tests remain mandatory.",
+      "source_digest": "0d05922ea78b21749e36422f283ca1e792a177ba18dfdb5d489717b155e05631"
+    }
+  ]
+}

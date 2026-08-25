@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	identifierulid "github.com/faustbrian/golib/pkg/identifier/ulid"
+	identifierulid "github.com/faustbrian/go-identifier/ulid"
 )
 
 // NewCommandID allocates one opaque lowercase ULID operation identifier.

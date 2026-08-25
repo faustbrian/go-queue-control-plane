@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

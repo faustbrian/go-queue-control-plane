@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 func TestControllerDispatcherTranslatesBoundedCommandsAndAcknowledgements(t *testing.T) {

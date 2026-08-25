@@ -52,7 +52,7 @@ ARG BUILT_AT=
 
 LABEL org.opencontainers.image.title="queue-control" \
       org.opencontainers.image.description="Administrative CLI for queue-control-plane" \
-      org.opencontainers.image.source="https://github.com/faustbrian/golib/pkg/queue-control-plane" \
+      org.opencontainers.image.source="https://github.com/faustbrian/go-queue-control-plane" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${COMMIT}" \
       org.opencontainers.image.created="${BUILT_AT}" \
@@ -70,7 +70,7 @@ ARG BUILT_AT=
 
 LABEL org.opencontainers.image.title="queue-control-plane" \
       org.opencontainers.image.description="Operational control plane for queue" \
-      org.opencontainers.image.source="https://github.com/faustbrian/golib/pkg/queue-control-plane" \
+      org.opencontainers.image.source="https://github.com/faustbrian/go-queue-control-plane" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${COMMIT}" \
       org.opencontainers.image.created="${BUILT_AT}" \

@@ -12,15 +12,15 @@ import (
 	"testing"
 	"time"
 
-	goqueue "github.com/faustbrian/golib/pkg/queue"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/control"
-	"github.com/faustbrian/golib/pkg/queue/core"
-	"github.com/faustbrian/golib/pkg/queue/job"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
-	"github.com/faustbrian/golib/pkg/queue/managementhttp"
-	redisstream "github.com/faustbrian/golib/pkg/queue/redisstream"
-	"github.com/faustbrian/golib/pkg/queue/valkeystream"
+	goqueue "github.com/faustbrian/go-queue"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/control"
+	"github.com/faustbrian/go-queue/core"
+	"github.com/faustbrian/go-queue/job"
+	queue "github.com/faustbrian/go-queue/management"
+	"github.com/faustbrian/go-queue/managementhttp"
+	redisstream "github.com/faustbrian/go-queue/redisstream"
+	"github.com/faustbrian/go-queue/valkeystream"
 )
 
 func TestRealGoQueueBackendsThroughManagementHTTP(t *testing.T) {

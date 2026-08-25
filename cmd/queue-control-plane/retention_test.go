@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	controlpostgres "github.com/faustbrian/golib/pkg/queue-control-plane/postgres"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
 )
 
 func TestLoadRetentionPoliciesAcceptsBoundedLegalHoldPlan(t *testing.T) {

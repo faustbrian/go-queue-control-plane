@@ -8,11 +8,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	authentication "github.com/faustbrian/golib/pkg/authentication"
-	"github.com/faustbrian/golib/pkg/authentication/apikey"
-	authorization "github.com/faustbrian/golib/pkg/authorization"
-	"github.com/faustbrian/golib/pkg/authorization/acl"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
+	authentication "github.com/faustbrian/go-authentication"
+	"github.com/faustbrian/go-authentication/apikey"
+	authorization "github.com/faustbrian/go-authorization"
+	"github.com/faustbrian/go-authorization/acl"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 )
 
 func TestStaticAccessRejectsInvalidKeysAndACL(t *testing.T) {

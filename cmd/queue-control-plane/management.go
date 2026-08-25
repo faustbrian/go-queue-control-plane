@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/apihttp"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/control"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/dataplane"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
-	"github.com/faustbrian/golib/pkg/queue/managementhttp"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/control"
+	"github.com/faustbrian/go-queue-control-plane/dataplane"
+	queue "github.com/faustbrian/go-queue/management"
+	"github.com/faustbrian/go-queue/managementhttp"
 )
 
 const (

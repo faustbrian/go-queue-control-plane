@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	authentication "github.com/faustbrian/golib/pkg/authentication"
+	authentication "github.com/faustbrian/go-authentication"
 )
 
 var ErrInvalidSecurityConfiguration = errors.New("apihttp: invalid security configuration")

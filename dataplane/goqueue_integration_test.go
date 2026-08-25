@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	goqueue "github.com/faustbrian/golib/pkg/queue"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue/core"
-	"github.com/faustbrian/golib/pkg/queue/job"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
-	"github.com/faustbrian/golib/pkg/queue/managementhttp"
-	redisstream "github.com/faustbrian/golib/pkg/queue/redisstream"
+	goqueue "github.com/faustbrian/go-queue"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue/core"
+	"github.com/faustbrian/go-queue/job"
+	queue "github.com/faustbrian/go-queue/management"
+	"github.com/faustbrian/go-queue/managementhttp"
+	redisstream "github.com/faustbrian/go-queue/redisstream"
 )
 
 func TestRedisDeadLettersFlowThroughControlPlaneContracts(t *testing.T) {

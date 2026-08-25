@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	gopostgres "github.com/faustbrian/golib/pkg/postgres"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/apihttp"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/control"
-	controlpostgres "github.com/faustbrian/golib/pkg/queue-control-plane/postgres"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/server"
+	gopostgres "github.com/faustbrian/go-postgresql"
+	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
+	"github.com/faustbrian/go-queue-control-plane/server"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

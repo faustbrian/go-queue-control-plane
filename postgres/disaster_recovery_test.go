@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/golib/pkg/postgres"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/control"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/history"
-	controlpostgres "github.com/faustbrian/golib/pkg/queue-control-plane/postgres"
+	gopostgres "github.com/faustbrian/go-postgresql"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/control"
+	"github.com/faustbrian/go-queue-control-plane/history"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

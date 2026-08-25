@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/golib/pkg/postgres"
-	controlpostgres "github.com/faustbrian/golib/pkg/queue-control-plane/postgres"
+	gopostgres "github.com/faustbrian/go-postgresql"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
 	"github.com/jackc/pgx/v5"
 )
 

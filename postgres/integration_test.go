@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
-	identifierulid "github.com/faustbrian/golib/pkg/identifier/ulid"
-	gopostgres "github.com/faustbrian/golib/pkg/postgres"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/control"
-	controlpostgres "github.com/faustbrian/golib/pkg/queue-control-plane/postgres"
+	identifierulid "github.com/faustbrian/go-identifier/ulid"
+	gopostgres "github.com/faustbrian/go-postgresql"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
 	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )

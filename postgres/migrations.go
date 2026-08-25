@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	migrations "github.com/faustbrian/golib/pkg/migrations"
-	migrationpostgres "github.com/faustbrian/golib/pkg/migrations/postgres"
+	migrations "github.com/faustbrian/go-migrations"
+	migrationpostgres "github.com/faustbrian/go-migrations/postgres"
 )
 
 const (

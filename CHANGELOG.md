@@ -6,6 +6,8 @@ Versioning.
 
 ## Unreleased
 
+## 1.0.0 - 2026-08-25
+
 ### Fixed
 
 - Enforce exact fleet capacity, runtime accumulation, rejection aggregation,
@@ -34,6 +36,7 @@ Versioning.
 
 ### Changed
 
+- Publish the module from its standalone `github.com/faustbrian/go-queue-control-plane` identity while preserving its documented API and behavior.
 - Require each CLI connection credential independently, with mutation-precise
   regression coverage for every missing environment value.
 - Replace obsolete owned-module pseudo-version pins with the monorepo's local

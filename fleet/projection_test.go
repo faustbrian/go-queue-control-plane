@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	queue "github.com/faustbrian/golib/pkg/queue"
+	queue "github.com/faustbrian/go-queue"
 )
 
 func TestProjectionBoundsQueueCardinality(t *testing.T) {

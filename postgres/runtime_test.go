@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	gopostgres "github.com/faustbrian/golib/pkg/postgres"
+	gopostgres "github.com/faustbrian/go-postgresql"
 )
 
 func TestNewRuntimeRejectsMissingPool(t *testing.T) {

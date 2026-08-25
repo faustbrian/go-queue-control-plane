@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/faustbrian/golib/pkg/queue-control-plane/apihttp"
-	telemetry "github.com/faustbrian/golib/pkg/telemetry"
+	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	telemetry "github.com/faustbrian/go-telemetry"
 )
 
 func TestProductionTelemetryConfigUsesExplicitSecureRuntime(t *testing.T) {

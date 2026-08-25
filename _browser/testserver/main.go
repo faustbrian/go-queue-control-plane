@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/queue-control-plane/apihttp"
-	controlui "github.com/faustbrian/golib/pkg/queue-control-plane/ui"
+	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	controlui "github.com/faustbrian/go-queue-control-plane/ui"
 )
 
 const (

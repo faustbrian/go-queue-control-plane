@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/queue-control-plane/client"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	"github.com/faustbrian/go-queue-control-plane/client"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 func ExampleClient_DesiredStateReader() {

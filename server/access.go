@@ -1,12 +1,12 @@
 package server
 
 import (
-	authentication "github.com/faustbrian/golib/pkg/authentication"
-	"github.com/faustbrian/golib/pkg/authentication/apikey"
-	"github.com/faustbrian/golib/pkg/authentication/authhttp"
-	authorization "github.com/faustbrian/golib/pkg/authorization"
-	"github.com/faustbrian/golib/pkg/authorization/acl"
-	controlauthz "github.com/faustbrian/golib/pkg/queue-control-plane/authz"
+	authentication "github.com/faustbrian/go-authentication"
+	"github.com/faustbrian/go-authentication/apikey"
+	"github.com/faustbrian/go-authentication/authhttp"
+	authorization "github.com/faustbrian/go-authorization"
+	"github.com/faustbrian/go-authorization/acl"
+	controlauthz "github.com/faustbrian/go-queue-control-plane/authz"
 )
 
 const (

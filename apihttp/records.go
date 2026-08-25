@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	authentication "github.com/faustbrian/golib/pkg/authentication"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	authentication "github.com/faustbrian/go-authentication"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 const (

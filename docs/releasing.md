@@ -46,15 +46,14 @@ repository does not currently publish or sign those artifacts.
 
 ## Versioning and changelog
 
-The module is unreleased. Its first public version will be `v1.0.0`, represented
-by the monorepo tag `pkg/queue-control-plane/v1.0.0`. Update `CHANGELOG.md` in
+The module starts its public release history at `v1.0.0`. Update `CHANGELOG.md` in
 the same pull request as every user-visible change. Before release, move
 Unreleased entries into a dated version section, verify upgrade and rollback
 guidance, and confirm `/version` reports the tag, commit, and RFC3339 build time.
 
-Run `make release-dry-run MODULES=pkg/queue-control-plane` from the repository
+Run `make release-dry-run MODULES=.` from the repository
 root to validate the module archive, clean consumer, dependency order, and
-proposed tag. `make release-public MODULES=pkg/queue-control-plane` performs
+proposed tag. `make release-public MODULES=.` performs
 public-resolution verification only; `scripts/release.sh` deliberately refuses
 to create tags or publish artifacts.
 

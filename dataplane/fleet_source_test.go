@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/golib/pkg/queue-control-plane/fleet"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	"github.com/faustbrian/go-queue-control-plane/fleet"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 func TestFleetSourceBuildsBoundedTenantSnapshotAcrossStatusPages(t *testing.T) {

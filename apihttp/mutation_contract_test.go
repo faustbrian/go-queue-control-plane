@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	authentication "github.com/faustbrian/golib/pkg/authentication"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/fleet"
-	controlkubernetes "github.com/faustbrian/golib/pkg/queue-control-plane/kubernetes"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	authentication "github.com/faustbrian/go-authentication"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/fleet"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/kubernetes"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 func TestAdministrativeEndpointsRejectExplicitAnonymousPrincipal(t *testing.T) {

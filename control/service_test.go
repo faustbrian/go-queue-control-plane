@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 	"go.opentelemetry.io/otel/attribute"
 	otelmetric "go.opentelemetry.io/otel/metric"
 	metricnoop "go.opentelemetry.io/otel/metric/noop"

@@ -10,7 +10,7 @@ report="$(mktemp)"
 trap 'rm -rf "${tool_dir}" "${current}" "${report}"' EXIT
 
 version="v0.0.0-20260709172345-9ea1abe57597"
-module="github.com/faustbrian/golib/pkg/queue-control-plane"
+module="github.com/faustbrian/go-queue-control-plane"
 baseline="api/control-plane.api"
 
 GOBIN="${tool_dir}" go install "golang.org/x/exp/cmd/apidiff@${version}"

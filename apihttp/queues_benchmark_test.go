@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 func BenchmarkQueuePageTwoHundredMeasurements(b *testing.B) {

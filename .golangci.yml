@@ -1,59 +1,27 @@
 version: "2"
 
+run:
+  timeout: 10m
+
 linters:
   default: standard
   enable:
-    - asasalint
-    - asciicheck
-    - bidichk
     - bodyclose
-    - durationcheck
     - errorlint
-    - exptostd
-    - fatcontext
-    - gocheckcompilerdirectives
-    - godoclint
-    - gomoddirectives
-    - goprintffuncname
+    - exhaustive
+    - gocritic
     - gosec
-    - intrange
-    - iotamixing
-    - loggercheck
-    - makezero
-    - mirror
-    - misspell
-    - musttag
     - nilerr
-    - nilnesserr
     - noctx
-    - nolintlint
-    - nosprintfhostport
-    - perfsprint
-    - predeclared
-    - reassign
-    - recvcheck
+    - prealloc
+    - revive
     - rowserrcheck
-    - sloglint
-    - spancheck
     - sqlclosecheck
+    - testifylint
     - unconvert
-    - usestdlibvars
+    - unparam
     - wastedassign
-    - whitespace
-  exclusions:
-    generated: strict
-    warn-unused: true
-    rules:
-      - path: _test\.go
-        linters:
-          - gosec
-          - noctx
-          - sloglint
 
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-
-run:
-  timeout: 10m
-  relative-path-mode: gomod

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/fleet"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/fleet"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 func TestEvaluateReturnsOnlyHonestThresholdBreaches(t *testing.T) {

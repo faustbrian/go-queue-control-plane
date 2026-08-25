@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	authentication "github.com/faustbrian/golib/pkg/authentication"
-	authorization "github.com/faustbrian/golib/pkg/authorization"
-	"github.com/faustbrian/golib/pkg/authorization/authn"
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
+	authentication "github.com/faustbrian/go-authentication"
+	authorization "github.com/faustbrian/go-authorization"
+	"github.com/faustbrian/go-authorization/authn"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 )
 
 func TestAuthorizerMapsAuthenticatedPrincipalToTenantDecision(t *testing.T) {

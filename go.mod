@@ -1,16 +1,16 @@
-module github.com/faustbrian/golib/pkg/queue-control-plane
+module github.com/faustbrian/go-queue-control-plane
 
 go 1.26.6
 
 require (
 	github.com/alicebob/miniredis/v2 v2.38.0
-	github.com/faustbrian/golib/pkg/authentication v0.0.0
-	github.com/faustbrian/golib/pkg/authorization v0.0.0
-	github.com/faustbrian/golib/pkg/identifier v0.0.0
-	github.com/faustbrian/golib/pkg/migrations v0.0.0
-	github.com/faustbrian/golib/pkg/postgres v0.0.0
-	github.com/faustbrian/golib/pkg/queue v0.0.0
-	github.com/faustbrian/golib/pkg/telemetry v0.0.0
+	github.com/faustbrian/go-authentication v1.0.0
+	github.com/faustbrian/go-authorization v1.0.0
+	github.com/faustbrian/go-identifier v1.0.0
+	github.com/faustbrian/go-migrations v1.0.0
+	github.com/faustbrian/go-postgresql v1.0.0
+	github.com/faustbrian/go-queue v1.0.0
+	github.com/faustbrian/go-telemetry v1.0.0
 	github.com/jackc/pgx/v5 v5.10.0
 	go.opentelemetry.io/otel v1.44.0
 	go.opentelemetry.io/otel/metric v1.44.0
@@ -29,7 +29,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
-	github.com/faustbrian/golib/pkg/clock v0.0.0 // indirect
+	github.com/faustbrian/go-clock v1.0.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect

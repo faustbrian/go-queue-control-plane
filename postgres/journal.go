@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/history"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/history"
 )
 
 // ErrResultNotTerminal rejects accepted results at the completion boundary.

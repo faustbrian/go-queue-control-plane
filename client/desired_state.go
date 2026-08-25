@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 // ErrInvalidResponse reports malformed or mismatched successful API output.

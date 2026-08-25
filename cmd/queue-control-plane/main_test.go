@@ -10,7 +10,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/faustbrian/golib/pkg/queue-control-plane/server"
+	"github.com/faustbrian/go-queue-control-plane/server"
 )
 
 func TestMainUsesSignalLifecycleAndExitStatus(t *testing.T) {

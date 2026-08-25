@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )

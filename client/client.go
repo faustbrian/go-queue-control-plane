@@ -15,11 +15,11 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/apihttp"
-	"github.com/faustbrian/golib/pkg/queue-control-plane/fleet"
-	controlkubernetes "github.com/faustbrian/golib/pkg/queue-control-plane/kubernetes"
-	queue "github.com/faustbrian/golib/pkg/queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
+	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/fleet"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/kubernetes"
+	queue "github.com/faustbrian/go-queue/management"
 )
 
 const defaultMaxResponseBytes int64 = 4 << 20

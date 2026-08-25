@@ -5,7 +5,7 @@ import (
 	"math"
 	"time"
 
-	controlplane "github.com/faustbrian/golib/pkg/queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 )
 
 var (

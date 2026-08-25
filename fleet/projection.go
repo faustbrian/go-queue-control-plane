@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	queue "github.com/faustbrian/golib/pkg/queue"
+	queue "github.com/faustbrian/go-queue"
 )
 
 // QueueMetrics is a bounded current-state projection of lifecycle events.
