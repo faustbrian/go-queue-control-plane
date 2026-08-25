@@ -7,7 +7,7 @@
       "module_directory": ".",
       "package_directory": "ui",
       "reason": "The embedded static handler consists of direct security-header and file-server calls; the complete enabled Gremlins operator set discovers no viable transformations, so response and header tests remain mandatory.",
-      "source_digest": "0d05922ea78b21749e36422f283ca1e792a177ba18dfdb5d489717b155e05631"
+      "source_digest": "f3b63290272d44ad1fe4d769dfdc55269fdd4c21fdc238ec1bdfef04e4e03b50"
     }
   ]
 }

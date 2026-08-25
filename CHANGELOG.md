@@ -6,6 +6,11 @@ Versioning.
 
 ## Unreleased
 
+### Fixed
+
+- Bind the reviewed zero-mutant embedded UI handler to its exact standalone
+  source identity.
+
 ### Changed
 
 - Exclude intentional nested modules from root local-proxy archives so local,
