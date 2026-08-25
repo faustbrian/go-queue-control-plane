@@ -6,6 +6,8 @@ Versioning.
 
 ## Unreleased
 
+## 1.0.0 - 2026-08-25
+
 ### Fixed
 
 - Bind the reviewed zero-mutant embedded UI handler to its exact standalone
@@ -32,8 +34,6 @@ Versioning.
 
 - Correct stale package, standalone, and authoritative-source links in public
   documentation.
-
-## 1.0.0 - 2026-08-25
 
 ### Fixed
 
