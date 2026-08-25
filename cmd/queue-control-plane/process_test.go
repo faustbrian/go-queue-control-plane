@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgresql"
+	gopostgres "github.com/faustbrian/go-postgres"
 	controlplane "github.com/faustbrian/go-queue-control-plane"
 	"github.com/faustbrian/go-queue-control-plane/apihttp"
 	"github.com/faustbrian/go-queue-control-plane/control"

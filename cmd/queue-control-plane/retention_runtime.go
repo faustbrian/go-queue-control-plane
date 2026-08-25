@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgresql"
+	gopostgres "github.com/faustbrian/go-postgres"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
 )
 

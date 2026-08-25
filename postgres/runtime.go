@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	gopostgres "github.com/faustbrian/go-postgresql"
+	gopostgres "github.com/faustbrian/go-postgres"
 )
 
 // ErrInvalidRuntimePool reports a missing or uninitialized PostgreSQL pool.

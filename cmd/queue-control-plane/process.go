@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	gopostgres "github.com/faustbrian/go-postgresql"
+	gopostgres "github.com/faustbrian/go-postgres"
 	"github.com/faustbrian/go-queue-control-plane/apihttp"
 	"github.com/faustbrian/go-queue-control-plane/control"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
