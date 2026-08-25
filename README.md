@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 `queue-control-plane` is the administrative control plane for
-[`queue`](../queue). It provides durable,
+[`queue`](https://pkg.go.dev/github.com/faustbrian/go-queue). It provides durable,
 tenant-scoped commands, desired state, audit history, an HTTP API, an
 administrative CLI, and an optional narrow Kubernetes Deployment adapter.
 
