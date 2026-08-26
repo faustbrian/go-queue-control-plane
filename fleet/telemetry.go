@@ -61,5 +61,8 @@ func (r *Registry) RegisterTelemetry(
 }
 
 func boundedMetricCount(value uint64) int64 {
-	return int64(min(value, uint64(math.MaxInt64)))
+	bounded := min(value, uint64(math.MaxInt64))
+
+	// #nosec G115 -- min bounds the conversion to the signed integer range.
+	return int64(bounded)
 }
