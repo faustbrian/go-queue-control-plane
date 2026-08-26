@@ -61,9 +61,5 @@ func (r *Registry) RegisterTelemetry(
 }
 
 func boundedMetricCount(value uint64) int64 {
-	if value > math.MaxInt64 {
-		return math.MaxInt64
-	}
-
-	return int64(value)
+	return int64(min(value, uint64(math.MaxInt64)))
 }
