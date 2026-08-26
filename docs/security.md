@@ -175,5 +175,5 @@ and an unprotected backup. Restrict database writes, export verification
 results, protect backups separately, and investigate any chain failure as a
 security incident.
 
-See the [hardening evidence and threat matrix](hardening.md) for exact test and
+See the [resilience and threat matrix](resilience.md) for exact test and
 release-gate ownership.

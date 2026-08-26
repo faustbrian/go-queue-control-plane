@@ -78,6 +78,6 @@ commands. Do not delete rows directly.
 
 ## Where is the hardening evidence?
 
-The [hardening matrix](hardening.md) maps partitions, crash boundaries,
+The [resilience matrix](resilience.md) maps partitions, crash boundaries,
 authorization threats, scale limits, and release gates to exact tests and
 operator behavior.

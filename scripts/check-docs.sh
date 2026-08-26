@@ -13,7 +13,7 @@ required=(
     docs/compatibility.md
     docs/deployment.md
     docs/faq.md
-    docs/hardening.md
+    docs/resilience.md
     docs/horizon-migration.md
     docs/kubernetes.md
     docs/operations.md

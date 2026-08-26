@@ -1,4 +1,4 @@
-# Hardening evidence and release gates
+# Resilience and failure boundaries
 
 This document maps the control plane's security, failure-isolation, mutation,
 and scale claims to executable evidence. A green unit test is not by itself a

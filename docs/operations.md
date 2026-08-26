@@ -136,4 +136,4 @@ delete newer command records without an explicit compatibility assessment.
 Kubernetes scaling remains independent from worker protocol negotiation.
 
 The complete fault and protocol response table is in the
-[hardening evidence matrix](hardening.md).
+[resilience matrix](resilience.md).

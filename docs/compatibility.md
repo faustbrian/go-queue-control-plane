@@ -80,6 +80,6 @@ current worker-status contract does not carry them. The
 `retention_configure` permission is reserved but no mutation endpoint is
 advertised or accepted.
 
-The [hardening evidence matrix](hardening.md) records the safe behavior and
+The [resilience matrix](resilience.md) records the safe behavior and
 test owner for absent, stale, duplicate, reordered, malformed, partitioned,
 older, newer, unavailable, and ambiguous protocol observations.

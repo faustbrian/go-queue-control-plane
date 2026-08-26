@@ -221,4 +221,4 @@ Stable codes include:
 Do not automatically retry `outcome_unknown`. Read the command result first.
 An idempotent retry must reuse the identical command envelope and key.
 The complete protocol, mutation, and fault evidence is maintained in the
-[hardening matrix](hardening.md).
+[resilience matrix](resilience.md).

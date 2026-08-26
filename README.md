@@ -15,12 +15,11 @@
 tenant-scoped commands, desired state, audit history, an HTTP API, an
 administrative CLI, and an optional narrow Kubernetes Deployment adapter.
 
-The project is under active development. A backend-neutral adapter now maps
-tenant-scoped commands and acknowledgements through published `queue`
-management contracts. The optional tenant management document now enables the
-authenticated status, command, and record transport; endpoints supply the
-managed root `queue` as their native lifecycle controller and a native
-`management.RecordReader` for failure workflows.
+The stable v1 surface maps tenant-scoped commands and acknowledgements through
+published `queue` management contracts. The optional tenant management
+document enables the authenticated status, command, and record transport;
+endpoints supply the managed root `queue` as their native lifecycle controller
+and a native `management.RecordReader` for failure workflows.
 Kubernetes scale commands work only when the in-cluster adapter is configured.
 Redis Streams and Valkey Streams workers can publish native worker and queue
 status through the same `queue` management HTTP handler. Managed queues can
@@ -80,22 +79,8 @@ starting serving replicas.
 
 ## Documentation
 
-- [Architecture and trust boundaries](docs/architecture.md)
-- [HTTP API reference](docs/api.md)
-- [CLI reference](docs/cli.md)
-- [Embedded web UI guide](docs/ui.md)
-- [Deployment and configuration](docs/deployment.md)
-- [Compatibility and current capability status](docs/compatibility.md)
-- [Hardening evidence and release gates](docs/hardening.md)
-- [Security and privacy](docs/security.md)
-- [Operations, retention, backup, and incidents](docs/operations.md)
-- [Performance and load benchmarks](docs/performance.md)
-- [Kubernetes, HPA, and KEDA](docs/kubernetes.md)
-- [Laravel Horizon migration matrix](docs/horizon-migration.md)
-- [Troubleshooting and FAQ](docs/faq.md)
-- [Release process](docs/releasing.md)
-- [Security reporting](SECURITY.md)
-- [Changelog](CHANGELOG.md)
+Use the [documentation index](docs/README.md) for APIs, deployment,
+resilience, security, operations, Kubernetes, and Horizon migration guidance.
 
 ## Development
 
@@ -144,8 +129,3 @@ the reviewed baseline and fails on compatible or incompatible drift.
 This project is licensed under the [MIT License](LICENSE). A production release
 is not ready until all release gates described in the project objective are
 complete.
-
-## Ecosystem
-
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.
