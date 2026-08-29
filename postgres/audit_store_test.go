@@ -98,6 +98,25 @@ func TestAuditStoreListsBoundedTenantPage(t *testing.T) {
 	}
 }
 
+func TestAuditStoreDoesNotPaginateAnExactTenantPage(t *testing.T) {
+	t.Parallel()
+
+	entry := history.Seal(history.HashBytes([]byte("retained")), auditEventForStore(5, time.Unix(5, 0)))
+	tx := &pgxTransactionStub{rowSets: []*rowsStub{{records: [][]any{auditEntryRow(entry)}}}}
+	store, err := NewAuditStore(&beginnerStub{tx: tx})
+	if err != nil {
+		t.Fatalf("NewAuditStore() error = %v", err)
+	}
+
+	page, err := store.ListTenant(context.Background(), "tenant-1", 4, 1)
+	if err != nil {
+		t.Fatalf("ListTenant() error = %v", err)
+	}
+	if len(page.Entries) != 1 || page.Entries[0] != entry || page.NextSequence != 0 {
+		t.Fatalf("ListTenant() = %+v, want one complete page without a continuation cursor", page)
+	}
+}
+
 func TestAuditStoreListValidatesRequestAndChain(t *testing.T) {
 	t.Parallel()
 

@@ -351,6 +351,31 @@ func TestSQLJournalTransactionBoundsDesiredRevisionToBigint(t *testing.T) {
 	}
 }
 
+func TestSQLJournalTransactionAcceptsMaximumBigintDesiredRevision(t *testing.T) {
+	t.Parallel()
+
+	command := journalCommand()
+	tx := &pgxTransactionStub{
+		rows: []*rowStub{{values: []any{
+			command.TenantID,
+			string(command.Target.Kind),
+			command.Target.Name,
+			"draining",
+			int64(math.MaxInt64 - 1),
+			"previous-command",
+			command.RequestedAt.Add(-time.Second),
+		}}},
+		execSteps: []execStep{{tag: pgconn.NewCommandTag("INSERT 0 1")}},
+	}
+
+	if err := (&sqlJournalTransaction{tx: tx}).ApplyDesired(context.Background(), command); err != nil {
+		t.Fatalf("ApplyDesired() error = %v", err)
+	}
+	if len(tx.execCalls) != 1 || tx.execCalls[0].args[4] != int64(math.MaxInt64) {
+		t.Fatalf("stored desired revision = %#v, want %d", tx.execCalls, int64(math.MaxInt64))
+	}
+}
+
 func TestSQLJournalTransactionDesiredStateFailsClosed(t *testing.T) {
 	t.Parallel()
 
