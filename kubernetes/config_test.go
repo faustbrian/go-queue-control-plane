@@ -85,6 +85,18 @@ func TestLoadTenantResolverEnforcesByteBoundaries(t *testing.T) {
 	}
 }
 
+func TestLoadTenantResolverDoesNotRejectPositiveByteLimitEarly(t *testing.T) {
+	t.Parallel()
+
+	reader := &countingReader{reader: strings.NewReader(`{}`)}
+	if _, err := LoadTenantResolver(reader, 1, func(string) DeploymentClient { return &deploymentClient{} }); !errors.Is(err, ErrInvalidTenantDocument) {
+		t.Fatalf("LoadTenantResolver() error = %v, want ErrInvalidTenantDocument", err)
+	}
+	if reader.reads == 0 {
+		t.Fatal("LoadTenantResolver() did not read a document with a positive byte limit")
+	}
+}
+
 func TestLoadTenantResolverRejectsReaderErrorWithValidDocument(t *testing.T) {
 	t.Parallel()
 
@@ -104,6 +116,17 @@ func (failingTenantReader) Read([]byte) (int, error) {
 type readerWithError struct {
 	content []byte
 	read    bool
+}
+
+type countingReader struct {
+	reader io.Reader
+	reads  int
+}
+
+func (reader *countingReader) Read(target []byte) (int, error) {
+	reader.reads++
+
+	return reader.reader.Read(target)
 }
 
 func (reader *readerWithError) Read(target []byte) (int, error) {
