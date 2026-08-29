@@ -139,6 +139,35 @@ func TestCommandStoreRejectsInvalidListRequests(t *testing.T) {
 	}
 }
 
+func TestCommandStoreAcceptsMaximumListAndRetentionBounds(t *testing.T) {
+	t.Parallel()
+
+	listRows := &rowsStub{}
+	listTx := &pgxTransactionStub{rowSets: []*rowsStub{listRows}}
+	listStore, err := NewCommandStore(&beginnerStub{tx: listTx})
+	if err != nil {
+		t.Fatalf("NewCommandStore() error = %v", err)
+	}
+	if _, err := listStore.ListTenant(
+		context.Background(), "tenant-1", "", MaxCommandPageSize,
+	); err != nil {
+		t.Fatalf("ListTenant(max) error = %v", err)
+	}
+
+	retentionTx := &pgxTransactionStub{
+		execSteps: []execStep{{tag: pgconn.NewCommandTag("DELETE 0")}},
+	}
+	retentionStore, err := NewCommandStore(&beginnerStub{tx: retentionTx})
+	if err != nil {
+		t.Fatalf("NewCommandStore() error = %v", err)
+	}
+	if _, err := retentionStore.RetainCommandsBefore(
+		context.Background(), "tenant-1", time.Unix(1, 0), MaxCommandRetentionBatch,
+	); err != nil {
+		t.Fatalf("RetainCommandsBefore(max) error = %v", err)
+	}
+}
+
 func TestCommandStoreFailsClosedOnInvalidCommandPages(t *testing.T) {
 	t.Parallel()
 

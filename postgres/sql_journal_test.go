@@ -715,6 +715,48 @@ func TestSQLJournalTransactionRoundTripsOptionalCommandFields(t *testing.T) {
 	}
 }
 
+func TestScanStoredCommandPreservesOneSidedOptionalFields(t *testing.T) {
+	t.Parallel()
+
+	baseCommand := journalCommand()
+	baseResult := journalResult()
+	tests := map[string]func([]any){
+		"replay destination": func(row []any) {
+			row[14] = sql.NullString{String: "recovery", Valid: true}
+		},
+		"replay policy": func(row []any) {
+			row[15] = sql.NullString{
+				String: string(controlplane.ReplayRejectDuplicate), Valid: true,
+			}
+		},
+		"protocol major": func(row []any) {
+			row[21] = sql.NullInt64{Int64: 1, Valid: true}
+		},
+	}
+	for name, mutate := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			row := storedCommandRow(baseCommand, baseResult)
+			mutate(row)
+			command, result, err := scanStoredCommand(&rowStub{values: row})
+			if err != nil {
+				t.Fatalf("scanStoredCommand() error = %v", err)
+			}
+			switch name {
+			case "replay destination", "replay policy":
+				if command.Replay == nil {
+					t.Fatal("scanStoredCommand() dropped one-sided replay state")
+				}
+			case "protocol major":
+				if result.Protocol != nil {
+					t.Fatal("scanStoredCommand() accepted an incomplete protocol")
+				}
+			}
+		})
+	}
+}
+
 func TestLoadCommandRejectsOverflowingStoredValues(t *testing.T) {
 	t.Parallel()
 
@@ -798,6 +840,11 @@ func TestCommandComparisonHandlesOptionalValues(t *testing.T) {
 
 	left := journalCommand()
 	right := left
+	right.IdempotencyKey = "different-request"
+	if commandsEqual(left, right) {
+		t.Fatal("different idempotency keys should differ")
+	}
+	right = left
 	if !selectionsEqual(nil, nil) || !replaysEqual(nil, nil) || !scalesEqual(nil, nil) {
 		t.Fatal("nil optional values should be equal")
 	}
@@ -838,6 +885,43 @@ func TestCommandComparisonHandlesOptionalValues(t *testing.T) {
 	left.Scale.Replicas = 2
 	if !scalesEqual(left.Scale, right.Scale) {
 		t.Fatal("matching scale options should be equal")
+	}
+}
+
+func TestResultComparisonRejectsDifferencesInLeadingFields(t *testing.T) {
+	t.Parallel()
+
+	base := journalResult()
+	tests := map[string]func(*controlplane.CommandResult){
+		"command id":      func(result *controlplane.CommandResult) { result.CommandID = "other-command" },
+		"idempotency key": func(result *controlplane.CommandResult) { result.IdempotencyKey = "other-request" },
+		"tenant":          func(result *controlplane.CommandResult) { result.TenantID = "other-tenant" },
+		"status":          func(result *controlplane.CommandResult) { result.Status = controlplane.CommandFailed },
+	}
+	for name, mutate := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			other := base
+			mutate(&other)
+			if resultsEqual(base, other) {
+				t.Fatalf("resultsEqual() accepted different %s", name)
+			}
+		})
+	}
+}
+
+func TestOptionalResultComparisonsHandleNilAndValueBoundaries(t *testing.T) {
+	t.Parallel()
+
+	value := true
+	if !protocolsEqual(nil, nil) || protocolsEqual(nil, &controlplane.ProtocolVersion{}) ||
+		!protocolsEqual(&controlplane.ProtocolVersion{}, &controlplane.ProtocolVersion{}) {
+		t.Fatal("protocolsEqual() mishandled nil and equal values")
+	}
+	if !optionalBoolsEqual(nil, nil) || optionalBoolsEqual(nil, &value) ||
+		!optionalBoolsEqual(&value, &value) {
+		t.Fatal("optionalBoolsEqual() mishandled nil and equal values")
 	}
 }
 

@@ -20,6 +20,9 @@ func TestCheckedNumericConversionsRejectOverflow(t *testing.T) {
 	if _, ok := uint64FromInt64(-1); ok {
 		t.Fatal("uint64FromInt64() accepted a negative value")
 	}
+	if value, ok := uint64FromInt64(0); !ok || value != 0 {
+		t.Fatalf("uint64FromInt64(zero) = (%d, %t)", value, ok)
+	}
 	if value, ok := uint32FromInt64(math.MaxUint32); !ok || value != math.MaxUint32 {
 		t.Fatalf("uint32FromInt64(max) = (%d, %t)", value, ok)
 	}
@@ -27,6 +30,9 @@ func TestCheckedNumericConversionsRejectOverflow(t *testing.T) {
 		if _, ok := uint32FromInt64(value); ok {
 			t.Fatalf("uint32FromInt64(%d) accepted overflow", value)
 		}
+	}
+	if value, ok := uint32FromInt64(0); !ok || value != 0 {
+		t.Fatalf("uint32FromInt64(zero) = (%d, %t)", value, ok)
 	}
 	if value, ok := uint16FromInt64(math.MaxUint16); !ok || value != math.MaxUint16 {
 		t.Fatalf("uint16FromInt64(max) = (%d, %t)", value, ok)
@@ -36,10 +42,16 @@ func TestCheckedNumericConversionsRejectOverflow(t *testing.T) {
 			t.Fatalf("uint16FromInt64(%d) accepted overflow", value)
 		}
 	}
+	if value, ok := uint16FromInt64(0); !ok || value != 0 {
+		t.Fatalf("uint16FromInt64(zero) = (%d, %t)", value, ok)
+	}
 	if value, ok := uint16FromInt16(math.MaxInt16); !ok || value != math.MaxInt16 {
 		t.Fatalf("uint16FromInt16(max) = (%d, %t)", value, ok)
 	}
 	if _, ok := uint16FromInt16(-1); ok {
 		t.Fatal("uint16FromInt16() accepted a negative value")
+	}
+	if value, ok := uint16FromInt16(0); !ok || value != 0 {
+		t.Fatalf("uint16FromInt16(zero) = (%d, %t)", value, ok)
 	}
 }

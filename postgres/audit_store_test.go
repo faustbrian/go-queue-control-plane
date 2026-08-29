@@ -93,6 +93,9 @@ func TestAuditStoreListsBoundedTenantPage(t *testing.T) {
 	if tx.commits != 1 || tx.rollbacks != 0 || len(tx.queryCalls) != 1 {
 		t.Fatalf("calls = commit:%d rollback:%d query:%d", tx.commits, tx.rollbacks, len(tx.queryCalls))
 	}
+	if args := tx.queryCalls[0].args; len(args) != 3 || args[2] != int64(2) {
+		t.Fatalf("query args = %#v, want limit+1", args)
+	}
 }
 
 func TestAuditStoreListValidatesRequestAndChain(t *testing.T) {
@@ -373,6 +376,47 @@ func TestAuditStoreRetentionFailsClosed(t *testing.T) {
 				t.Fatalf("RetainBefore() error = %v, want %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func TestAuditStoreRetentionAcceptsZeroAndMaximumBoundaries(t *testing.T) {
+	t.Parallel()
+
+	anchor := history.HashBytes([]byte("retained"))
+	for name, result := range map[string][]any{
+		"zero state":       {int64(0), anchor[:], time.Unix(4, 0), int64(0)},
+		"maximum deletion": {int64(4), anchor[:], time.Unix(4, 0), int64(10)},
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			store, err := NewAuditStore(retentionBeginner(anchor, result))
+			if err != nil {
+				t.Fatalf("NewAuditStore() error = %v", err)
+			}
+			got, err := store.RetainBefore(context.Background(), "tenant-1", time.Unix(10, 0), 10)
+			if err != nil {
+				t.Fatalf("RetainBefore() error = %v", err)
+			}
+			if got.Deleted != uint32(result[3].(int64)) {
+				t.Fatalf("RetainBefore() deleted = %d, want %d", got.Deleted, result[3])
+			}
+		})
+	}
+}
+
+func TestValidAuditBatchAcceptsOnlyInclusiveBounds(t *testing.T) {
+	t.Parallel()
+
+	for _, size := range []uint32{1, MaxAuditBatch} {
+		if !validAuditBatch(size) {
+			t.Fatalf("validAuditBatch(%d) = false, want true", size)
+		}
+	}
+	for _, size := range []uint32{0, MaxAuditBatch + 1} {
+		if validAuditBatch(size) {
+			t.Fatalf("validAuditBatch(%d) = true, want false", size)
+		}
 	}
 }
 
