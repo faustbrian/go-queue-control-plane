@@ -1,0 +1,76 @@
+schema_version: 1
+tool_version: v1.0.6
+tool_checksums_sha256: d43e6a07573371e95d5fcf47c94e78f9983e903ef4eaab8e39f9bfc5dc224525
+
+manifest:
+  modules: modules.json
+  packages: packages.json
+
+evidence:
+  root: .verification
+
+mutation:
+  root: .verification/mutation
+  imports:
+    - module: .
+      archive: .verification/mutation/bootstrap/root.zip
+      ledger: .verification/mutation/migration-ledger.json
+
+api:
+  baselines:
+    - module: .
+      mode: apidiff
+      path: api/control-plane.api
+
+operations:
+  - module: .
+    gate: test
+    steps:
+      - type: make
+        makefile: verification/package.mk
+        target: integration-postgres
+        timeout: 20m
+      - type: make
+        makefile: verification/package.mk
+        target: integration-queue
+        timeout: 20m
+      - type: make
+        makefile: verification/package.mk
+        target: disaster-recovery-postgres
+        timeout: 20m
+      - type: make
+        makefile: verification/package.mk
+        target: browser
+        timeout: 20m
+  - module: .
+    gate: docs
+    steps:
+      - type: make
+        makefile: verification/package.mk
+        target: docs
+        timeout: 20m
+  - module: .
+    gate: fuzz
+    steps:
+      - type: go-test
+        packages: [./apihttp]
+        fuzz: '^FuzzCommandHandlerFailsClosed$'
+        budget: 10000x
+        timeout: 2m
+      - type: go-test
+        packages: [./apihttp]
+        fuzz: '^FuzzRecordHandlerFailsClosed$'
+        budget: 10000x
+        timeout: 2m
+      - type: go-test
+        packages: [./apihttp]
+        fuzz: '^FuzzQueueHandlerFailsClosed$'
+        budget: 10000x
+        timeout: 2m
+  - module: .
+    gate: benchmark
+    steps:
+      - type: make
+        makefile: verification/package.mk
+        target: benchmarks
+        timeout: 20m
