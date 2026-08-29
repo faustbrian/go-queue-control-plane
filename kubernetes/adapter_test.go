@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	controlplane "github.com/faustbrian/go-queue-control-plane"
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -116,6 +117,28 @@ func TestAdapterListsBoundedDeploymentStatus(t *testing.T) {
 	}
 	if len(page.Items) != 1 || page.Items[0].Name != "workers" || page.Items[0].ReadyReplicas != 1 {
 		t.Fatalf("List() items = %#v", page.Items)
+	}
+}
+
+func TestAdapterAcceptsListBoundaryValues(t *testing.T) {
+	t.Parallel()
+
+	client := &deploymentClient{
+		list: func(_ context.Context, options metav1.ListOptions) (*appsv1.DeploymentList, error) {
+			if options.Limit != MaxPageSize || len(options.Continue) != MaxContinueTokenBytes {
+				t.Fatalf("ListOptions = %#v", options)
+			}
+
+			return &appsv1.DeploymentList{}, nil
+		},
+	}
+	adapter, err := New("queues", client)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+
+	if _, err := adapter.List(context.Background(), MaxPageSize, strings.Repeat("x", MaxContinueTokenBytes)); err != nil {
+		t.Fatalf("List() at exact limits error = %v", err)
 	}
 }
 
@@ -262,6 +285,31 @@ func TestAdapterScalesThroughDeploymentScaleSubresource(t *testing.T) {
 	}
 	if result != want {
 		t.Fatalf("Scale() = %#v, want %#v", result, want)
+	}
+}
+
+func TestAdapterAcceptsMaximumReplicaCount(t *testing.T) {
+	t.Parallel()
+
+	client := &deploymentClient{
+		getScale: func(context.Context, string, metav1.GetOptions) (*autoscalingv1.Scale, error) {
+			return &autoscalingv1.Scale{}, nil
+		},
+		updateScale: func(_ context.Context, _ string, scale *autoscalingv1.Scale, _ metav1.UpdateOptions) (*autoscalingv1.Scale, error) {
+			if scale.Spec.Replicas != int32(controlplane.MaxScaleReplicas) {
+				t.Fatalf("UpdateScale() replicas = %d, want %d", scale.Spec.Replicas, controlplane.MaxScaleReplicas)
+			}
+
+			return scale, nil
+		},
+	}
+	adapter, err := New("queues", client)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+
+	if _, err := adapter.Scale(context.Background(), "workers", controlplane.MaxScaleReplicas); err != nil {
+		t.Fatalf("Scale() at maximum replicas error = %v", err)
 	}
 }
 
