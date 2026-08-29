@@ -49,6 +49,7 @@ database_url() {
 start_database "${source_container}"
 start_database "${restored_container}"
 
+QUEUE_CONTROL_SHARED_INTEGRATION_DATABASE=true \
 TEST_DATABASE_URL="$(database_url "${source_container}")" \
     go test \
         -race \

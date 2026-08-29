@@ -62,6 +62,16 @@ func TestStaticTenantResolverAcceptsValueAdapter(t *testing.T) {
 	}
 }
 
+func TestStaticTenantResolverAcceptsMaximumTenantIdentityLength(t *testing.T) {
+	t.Parallel()
+
+	tenant := strings.Repeat("x", controlplane.MaxIdentityBytes)
+	resolver, err := NewStaticTenantResolver(map[string]TenantAdapter{tenant: valueTenantAdapter{}})
+	if err != nil || resolver == nil {
+		t.Fatalf("NewStaticTenantResolver() = (%v, %v), want resolver and nil", resolver, err)
+	}
+}
+
 func TestStaticTenantResolverRejectsUnknownTenantVisibility(t *testing.T) {
 	t.Parallel()
 

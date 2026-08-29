@@ -6,6 +6,12 @@ Versioning.
 
 ## Unreleased
 
+### Changed
+
+- Replace the copied repository verification implementation with the
+  checksum-verified `go-library-tools` v1.0.7 contract while retaining the
+  package-owned manifests, fixtures, browser checks, and mutation evidence.
+
 ## 1.0.0 - 2026-08-25
 
 ### Fixed

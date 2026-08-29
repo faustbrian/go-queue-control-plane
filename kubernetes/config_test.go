@@ -69,8 +69,72 @@ func TestLoadTenantResolverRejectsUnsafeDocuments(t *testing.T) {
 	}
 }
 
+func TestLoadTenantResolverEnforcesByteBoundaries(t *testing.T) {
+	t.Parallel()
+
+	document := `{"tenants":[{"id":"tenant-1","namespace":"workers"}]}`
+	factory := func(string) DeploymentClient { return &deploymentClient{} }
+	if _, err := LoadTenantResolver(strings.NewReader(document), int64(len(document)), factory); err != nil {
+		t.Fatalf("LoadTenantResolver() at exact byte limit error = %v", err)
+	}
+	if _, err := LoadTenantResolver(strings.NewReader(document+" "), int64(len(document)), factory); !errors.Is(err, ErrInvalidTenantDocument) {
+		t.Fatalf("LoadTenantResolver() over byte limit error = %v, want ErrInvalidTenantDocument", err)
+	}
+	if _, err := LoadTenantResolver(strings.NewReader(document), 0, factory); !errors.Is(err, ErrInvalidTenantDocument) {
+		t.Fatalf("LoadTenantResolver() with zero byte limit error = %v, want ErrInvalidTenantDocument", err)
+	}
+}
+
+func TestLoadTenantResolverDoesNotRejectPositiveByteLimitEarly(t *testing.T) {
+	t.Parallel()
+
+	reader := &countingReader{reader: strings.NewReader(`{}`)}
+	if _, err := LoadTenantResolver(reader, 1, func(string) DeploymentClient { return &deploymentClient{} }); !errors.Is(err, ErrInvalidTenantDocument) {
+		t.Fatalf("LoadTenantResolver() error = %v, want ErrInvalidTenantDocument", err)
+	}
+	if reader.reads == 0 {
+		t.Fatal("LoadTenantResolver() did not read a document with a positive byte limit")
+	}
+}
+
+func TestLoadTenantResolverRejectsReaderErrorWithValidDocument(t *testing.T) {
+	t.Parallel()
+
+	document := `{"tenants":[{"id":"tenant-1","namespace":"workers"}]}`
+	reader := &readerWithError{content: []byte(document)}
+	if _, err := LoadTenantResolver(reader, int64(len(document)), func(string) DeploymentClient { return &deploymentClient{} }); !errors.Is(err, ErrInvalidTenantDocument) {
+		t.Fatalf("LoadTenantResolver() error = %v, want ErrInvalidTenantDocument", err)
+	}
+}
+
 type failingTenantReader struct{}
 
 func (failingTenantReader) Read([]byte) (int, error) {
 	return 0, errors.New("read failed")
+}
+
+type readerWithError struct {
+	content []byte
+	read    bool
+}
+
+type countingReader struct {
+	reader io.Reader
+	reads  int
+}
+
+func (reader *countingReader) Read(target []byte) (int, error) {
+	reader.reads++
+
+	return reader.reader.Read(target)
+}
+
+func (reader *readerWithError) Read(target []byte) (int, error) {
+	if reader.read {
+		return 0, io.EOF
+	}
+	reader.read = true
+	copy(target, reader.content)
+
+	return len(reader.content), errors.New("read failed after content")
 }
