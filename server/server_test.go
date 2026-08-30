@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -29,12 +30,12 @@ func TestNewAppliesFiniteDefaultsAndRejectsInvalidConfiguration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
-	if server.http.ReadHeaderTimeout != defaultReadHeaderTimeout ||
-		server.http.ReadTimeout != defaultReadTimeout ||
-		server.http.WriteTimeout != defaultWriteTimeout ||
-		server.http.IdleTimeout != defaultIdleTimeout ||
-		server.http.MaxHeaderBytes != defaultMaxHeaderBytes ||
-		server.shutdownTimeout != defaultShutdownTimeout {
+	if server.http.ReadHeaderTimeout != 5*time.Second ||
+		server.http.ReadTimeout != 15*time.Second ||
+		server.http.WriteTimeout != 30*time.Second ||
+		server.http.IdleTimeout != 60*time.Second ||
+		server.http.MaxHeaderBytes != 1_048_576 ||
+		server.shutdownTimeout != 10*time.Second {
 		t.Fatalf("server defaults = %#v", server.http)
 	}
 
@@ -195,6 +196,8 @@ func TestServerBoundsSlowShutdown(t *testing.T) {
 	}
 	started := make(chan struct{})
 	release := make(chan struct{})
+	releaseHandler := sync.OnceFunc(func() { close(release) })
+	t.Cleanup(releaseHandler)
 	server, err := New(listener, http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
 		close(started)
 		<-release
@@ -208,22 +211,27 @@ func TestServerBoundsSlowShutdown(t *testing.T) {
 	requestDone := make(chan struct{})
 	go func() {
 		defer close(requestDone)
-		response, requestErr := (&http.Client{Timeout: time.Second}).Get("http://" + listener.Addr().String())
+		response, requestErr := (&http.Client{Timeout: 5 * time.Second}).Get("http://" + listener.Addr().String())
 		if requestErr == nil {
 			_ = response.Body.Close()
 		}
 	}()
 	<-started
 	cancel()
-	if err := <-result; !errors.Is(err, context.DeadlineExceeded) {
-		t.Fatalf("Run() error = %v, want shutdown deadline", err)
+	select {
+	case err := <-result:
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("Run() error = %v, want shutdown deadline", err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("Run() did not force-close connections after the shutdown deadline")
 	}
-	close(release)
 	select {
 	case <-requestDone:
 	case <-time.After(2 * time.Second):
-		t.Fatal("request did not finish after forced shutdown")
+		t.Fatal("client connection remained open after forced shutdown")
 	}
+	releaseHandler()
 }
 
 type handlerStub struct{}
