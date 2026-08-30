@@ -139,6 +139,38 @@ func TestCommandStoreRejectsInvalidListRequests(t *testing.T) {
 	}
 }
 
+func TestCommandStoreAcceptsExactCursorAndIdentityBounds(t *testing.T) {
+	t.Parallel()
+
+	plain := strings.Repeat("0", 766) + ":k"
+	cursor := base64.RawURLEncoding.EncodeToString([]byte(plain))
+	if len(cursor) != MaxCommandCursorBytes {
+		t.Fatalf("cursor length = %d, want %d", len(cursor), MaxCommandCursorBytes)
+	}
+	listTx := &pgxTransactionStub{rowSets: []*rowsStub{{}}}
+	listStore, err := NewCommandStore(&beginnerStub{tx: listTx})
+	if err != nil {
+		t.Fatalf("NewCommandStore() error = %v", err)
+	}
+	if _, err := listStore.ListTenant(context.Background(), "tenant-1", cursor, 1); err != nil {
+		t.Fatalf("ListTenant(maximum-length cursor) error = %v", err)
+	}
+	if args := listTx.queryCalls[0].args; args[1] != time.UnixMicro(0).UTC() || args[2] != "k" {
+		t.Fatalf("maximum-length cursor query args = %#v", args)
+	}
+
+	identity := strings.Repeat("x", controlplane.MaxIdentityBytes)
+	getStore, err := NewCommandStore(&beginnerStub{tx: &pgxTransactionStub{
+		rows: []*rowStub{{err: pgx.ErrNoRows}},
+	}})
+	if err != nil {
+		t.Fatalf("NewCommandStore() error = %v", err)
+	}
+	if _, err := getStore.Get(context.Background(), identity, "request-1"); !errors.Is(err, ErrCommandNotFound) {
+		t.Fatalf("Get(maximum-length identity) error = %v, want ErrCommandNotFound", err)
+	}
+}
+
 func TestCommandStoreAcceptsMaximumListAndRetentionBounds(t *testing.T) {
 	t.Parallel()
 

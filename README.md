@@ -144,8 +144,3 @@ the reviewed baseline and fails on compatible or incompatible drift.
 This project is licensed under the [MIT License](LICENSE). A production release
 is not ready until all release gates described in the project objective are
 complete.
-
-## Ecosystem
-
-Use the [Golib documentation portal](https://github.com/faustbrian/golib/blob/main/docs/index.md)
-to choose companion packages, supported stacks, recipes, and operations guidance.

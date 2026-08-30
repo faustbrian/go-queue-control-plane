@@ -33,6 +33,40 @@ func TestLoadStaticAccessParsesBoundedStrictDocument(t *testing.T) {
 	}
 }
 
+func TestLoadStaticAccessAcceptsDocumentAtExactLimit(t *testing.T) {
+	t.Parallel()
+
+	document := `{"keys":[{"id":"key-1","key":"secret-1","subject":"operator-1"}],"acl":[]}`
+	access, err := LoadStaticAccess(strings.NewReader(document), int64(len(document)))
+	if err != nil || access == nil {
+		t.Fatalf("LoadStaticAccess(exact limit) = (%v, %v), want access and nil", access, err)
+	}
+}
+
+func TestLoadStaticAccessConsumesPositiveOneByteLimit(t *testing.T) {
+	t.Parallel()
+
+	reader := strings.NewReader("{")
+	access, err := LoadStaticAccess(reader, 1)
+	if access != nil || !errors.Is(err, ErrInvalidAccessDocument) {
+		t.Fatalf("LoadStaticAccess(one-byte limit) = (%v, %v), want nil and stable error", access, err)
+	}
+	if remaining := reader.Len(); remaining != 0 {
+		t.Fatalf("reader has %d bytes remaining, want positive limit to be consumed", remaining)
+	}
+}
+
+func TestLoadStaticAccessRejectsReaderErrorAfterValidContent(t *testing.T) {
+	t.Parallel()
+
+	document := `{"keys":[{"id":"key-1","key":"secret-1","subject":"operator-1"}],"acl":[]}`
+	readErr := errors.New("read failed after content")
+	access, err := LoadStaticAccess(&contentErrorReader{content: []byte(document), err: readErr}, 1_000)
+	if access != nil || !errors.Is(err, ErrInvalidAccessDocument) {
+		t.Fatalf("LoadStaticAccess(reader error) = (%v, %v), want nil and stable error", access, err)
+	}
+}
+
 func TestLoadStaticAccessRejectsUnsafeDocumentsWithoutLeaking(t *testing.T) {
 	t.Parallel()
 
@@ -113,4 +147,20 @@ type failingReader struct{}
 
 func (failingReader) Read([]byte) (int, error) {
 	return 0, errors.New("read failed")
+}
+
+type contentErrorReader struct {
+	content []byte
+	err     error
+}
+
+func (reader *contentErrorReader) Read(destination []byte) (int, error) {
+	if len(reader.content) == 0 {
+		return 0, reader.err
+	}
+
+	read := copy(destination, reader.content)
+	reader.content = reader.content[read:]
+
+	return read, reader.err
 }

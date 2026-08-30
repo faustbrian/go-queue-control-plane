@@ -12,6 +12,11 @@ Versioning.
   checksum-verified `go-library-tools` v1.0.7 contract while retaining the
   package-owned manifests, fixtures, browser checks, and mutation evidence.
 
+### Documentation
+
+- Remove the archived monorepo documentation link; package guidance remains in
+  the repository-owned documentation.
+
 ## 1.0.0 - 2026-08-25
 
 ### Fixed

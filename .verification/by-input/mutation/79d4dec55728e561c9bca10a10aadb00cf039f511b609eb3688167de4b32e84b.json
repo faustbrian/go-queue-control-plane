@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "repository": "github.com/faustbrian/go-queue-control-plane",
+  "module": ".",
+  "package": "kubernetes",
+  "gate": "mutation",
+  "input_digest": "sha256:79d4dec55728e561c9bca10a10aadb00cf039f511b609eb3688167de4b32e84b",
+  "verifier_digest": "sha256:9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
+  "result": "passed",
+  "report_digest": "sha256:48bbbc66febe4495725fb9dfea8aee37bbec76cd07eafd2c09736063000887e4",
+  "environment": {
+    "CGO_ENABLED": "1",
+    "GOARCH": "arm64",
+    "GOOS": "darwin",
+    "GOVERSION": "go1.27.0",
+    "gremlins_binary_sha256": "sha256:6a2beddc477eb410f8a670b6c9049558563d3c4327498fe31604d31c773a959e"
+  },
+  "completed_at": "2026-08-29T23:37:02.883465Z"
+}
