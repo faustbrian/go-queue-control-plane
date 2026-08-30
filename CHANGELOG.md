@@ -61,7 +61,7 @@ Versioning.
 ### Documentation
 
 - Replace obsolete standalone-repository links and workflow claims with
-  monorepo-canonical targets and current release guidance.
+  standalone-repository targets and current release guidance.
 
 - Replace the invalid GitHub package URL with a portable repository-relative
   link to `queue`.
