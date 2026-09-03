@@ -97,6 +97,10 @@ starting serving replicas.
 - [Security reporting](SECURITY.md)
 - [Changelog](CHANGELOG.md)
 
+For ecosystem-wide package selection and ownership guidance, see the versioned
+[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/README.md)
+and its [Persistence and durability family](https://github.com/faustbrian/go-library-tools/blob/v1.3.0/docs/ecosystem/design-language.md#package-families-and-selection).
+
 ## Development
 
 Run the deterministic local gate with:
@@ -104,6 +108,8 @@ Run the deterministic local gate with:
 ```sh
 make check
 ```
+
+Run `make cohesion` to validate this repository's versioned ecosystem metadata.
 
 This checks formatting, module tidiness and checksums, vet, Staticcheck, strict
 golangci-lint, tests, the race detector, exact per-package 100% statement

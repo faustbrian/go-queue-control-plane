@@ -8,11 +8,20 @@ Versioning.
 
 ### Changed
 
+- Adopt the `go-library-tools` v1.3.0 schema-v2 cohesion contract and local
+  `make cohesion` gate without changing public APIs or runtime behavior.
+- Pin reusable CI to the immutable v1.3.0 workflow and enforce cohesion
+  metadata in the repository's required CI contract.
+
 - Replace the copied repository verification implementation with the
-  checksum-verified `go-library-tools` v1.0.13 contract while retaining the
+  checksum-verified `go-library-tools` v1.3.0 contract while retaining the
   package-owned manifests, fixtures, browser checks, and mutation evidence.
 
 ### Documentation
+
+- Publish family, capability, ownership, lifecycle, support, and package
+  selection metadata, with links to the immutable ecosystem index and family
+  guidance.
 
 - Remove the archived monorepo documentation link; package guidance remains in
   the repository-owned documentation.
