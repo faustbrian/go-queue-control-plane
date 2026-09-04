@@ -53,8 +53,21 @@ func TestHandlerUsesBoundedGoTelemetryInstrumentation(t *testing.T) {
 	if err := reader.Collect(context.Background(), &data); err != nil {
 		t.Fatalf("Collect() error = %v", err)
 	}
-	if len(data.ScopeMetrics) != 1 || len(data.ScopeMetrics[0].Metrics) != 2 {
-		t.Fatalf("metrics = %+v, want request count and duration", data.ScopeMetrics)
+	if len(data.ScopeMetrics) != 1 {
+		t.Fatalf("metric scopes = %+v, want one bounded HTTP server scope", data.ScopeMetrics)
+	}
+	wantMetrics := map[string]bool{
+		"http.server.active_requests":    true,
+		"http.server.request.body.size":  true,
+		"http.server.request.count":      true,
+		"http.server.request.duration":   true,
+		"http.server.response.body.size": true,
+	}
+	for _, measurement := range data.ScopeMetrics[0].Metrics {
+		delete(wantMetrics, measurement.Name)
+	}
+	if len(data.ScopeMetrics[0].Metrics) != 5 || len(wantMetrics) != 0 {
+		t.Fatalf("metrics = %+v, missing bounded HTTP server metrics %v", data.ScopeMetrics, wantMetrics)
 	}
 }
 

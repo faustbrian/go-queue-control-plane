@@ -12,10 +12,41 @@ Versioning.
   checksum-verified `go-library-tools` v1.0.7 contract while retaining the
   package-owned manifests, fixtures, browser checks, and mutation evidence.
 
+- Upgrade `go-telemetry` to v1.1.1 and select gRPC v1.83.1 for the
+  control-plane telemetry runtime.
+- Adopt the `go-library-tools` v1.3.0 schema-v2 cohesion contract and local
+  `make cohesion` gate without changing public APIs or runtime behavior.
+- Pin reusable CI to the immutable v1.3.0 workflow and enforce cohesion
+  metadata in the repository's required CI contract.
+
+- Upgrade the checksum-verified repository tooling to the `go-library-tools`
+  v1.3.0 contract while retaining the
+  package-owned manifests, fixtures, browser checks, and mutation evidence.
+
+- Advance repository tooling to the `go-library-tools` v1.4.0 schema-v2
+  cohesion contract, local `make cohesion` gate, and online specification
+  validation in `make ci`. This tooling-only adoption does not change public
+  APIs or runtime behavior.
+- Pin reusable CI to the immutable v1.4.0 workflow, prefer public module
+  releases before bootstrap-only fallbacks, and enforce cohesion
+  metadata in the repository's required CI contract.
+
+- Upgrade the checksum-verified repository tooling to the `go-library-tools`
+  v1.4.0 contract while retaining the
+  package-owned manifests, fixtures, browser checks, and mutation evidence.
+
 ### Documentation
 
+- Publish family, capability, ownership, lifecycle, support, and package
+  selection metadata, with links to the immutable ecosystem index and family
+  guidance.
 - Remove the archived monorepo documentation link; package guidance remains in
   the repository-owned documentation.
+
+### Security
+
+- Resolve the gRPC HTTP/2 DATA-frame fragmentation denial-of-service exposure
+  in the reachable OTLP/gRPC telemetry exporter path.
 
 ## 1.0.0 - 2026-08-25
 

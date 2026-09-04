@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "repository": "github.com/faustbrian/go-queue-control-plane",
   "go_version": "1.26.6",
   "modules": [
@@ -370,6 +370,123 @@
           "implementation_status": "implemented-requires-fresh-verification"
         }
       ],
+      "cohesion": {
+        "family": "persistence-and-durability",
+        "secondary_capabilities": [
+          "administration-and-control",
+          "database-and-storage",
+          "distributed-coordination",
+          "eventing-and-messaging",
+          "http-and-service-edge",
+          "identity-and-access",
+          "observability",
+          "scheduling-and-orchestration",
+          "transport-and-networking"
+        ],
+        "responsibility": "Provide an authenticated administrative control plane for durable queue commands, desired state, audit history, fleet visibility, and optional Kubernetes workload scaling.",
+        "non_goals": [
+          "Deliver, acknowledge, retry, reclaim, or serialize queue messages, or replace the queue data plane.",
+          "Issue raw Redis or Valkey commands, supervise worker processes, or hide backend-specific capability negotiation.",
+          "Own caller-provided PostgreSQL pools, queue controllers, Kubernetes clients, HTTP clients, or application lifecycle orchestration."
+        ],
+        "public_package_identifier": "controlplane",
+        "primary_entry_packages": [
+          "github.com/faustbrian/go-queue-control-plane"
+        ],
+        "package_selection": {
+          "github.com/faustbrian/go-queue-control-plane": "Use for stable administrative command, result, permission, target, and validation contracts.",
+          "github.com/faustbrian/go-queue-control-plane/alerts": "Use to derive bounded control-plane alerts and fixed-label telemetry from validated snapshots.",
+          "github.com/faustbrian/go-queue-control-plane/apihttp": "Use for the authenticated versioned administrative HTTP API, admission controls, and response protections.",
+          "github.com/faustbrian/go-queue-control-plane/authz": "Use to translate authenticated principals into exact authorization requests.",
+          "github.com/faustbrian/go-queue-control-plane/cli": "Use to embed the administrative command-line workflow against a typed control-plane client.",
+          "github.com/faustbrian/go-queue-control-plane/client": "Use for bounded typed access to a deployed control-plane HTTP API.",
+          "github.com/faustbrian/go-queue-control-plane/control": "Use to orchestrate authorization, durable idempotency, audit persistence, dispatch, and terminal outcomes.",
+          "github.com/faustbrian/go-queue-control-plane/dataplane": "Use to adapt tenant-resolved queue management contracts to control-plane commands and views.",
+          "github.com/faustbrian/go-queue-control-plane/fleet": "Use for bounded in-memory worker registration, protocol negotiation, and fleet projection.",
+          "github.com/faustbrian/go-queue-control-plane/history": "Use for tamper-evident tenant audit events, chain verification, and retention anchors.",
+          "github.com/faustbrian/go-queue-control-plane/kubernetes": "Use for explicitly configured namespace-scoped Kubernetes Deployment status and scale operations.",
+          "github.com/faustbrian/go-queue-control-plane/postgres": "Use for embedded migrations and durable PostgreSQL command, desired-state, and audit repositories.",
+          "github.com/faustbrian/go-queue-control-plane/server": "Use to compose static access control and run the bounded administrative HTTP lifecycle.",
+          "github.com/faustbrian/go-queue-control-plane/ui": "Use for the embedded read-only administrative web interface."
+        },
+        "lifecycle_status": "active",
+        "maturity": "stable",
+        "construction_styles": [
+          "load",
+          "new-config",
+          "plain-function"
+        ],
+        "lifecycle_styles": [
+          "run",
+          "stateless"
+        ],
+        "ownership": {
+          "configuration": "caller",
+          "mutable_inputs": [
+            "borrow",
+            "copy"
+          ],
+          "runtime_resources": "shared",
+          "background_work": "package"
+        },
+        "optional_owned_dependencies": [],
+        "adapters": [
+          "github.com/faustbrian/go-queue-control-plane/alerts",
+          "github.com/faustbrian/go-queue-control-plane/apihttp",
+          "github.com/faustbrian/go-queue-control-plane/authz",
+          "github.com/faustbrian/go-queue-control-plane/dataplane",
+          "github.com/faustbrian/go-queue-control-plane/kubernetes",
+          "github.com/faustbrian/go-queue-control-plane/postgres"
+        ],
+        "companions": [
+          "github.com/faustbrian/go-queue-control-plane/cli",
+          "github.com/faustbrian/go-queue-control-plane/client",
+          "github.com/faustbrian/go-queue-control-plane/control",
+          "github.com/faustbrian/go-queue-control-plane/fleet",
+          "github.com/faustbrian/go-queue-control-plane/history",
+          "github.com/faustbrian/go-queue-control-plane/server",
+          "github.com/faustbrian/go-queue-control-plane/ui"
+        ],
+        "supported_go": {
+          "minimum": "1.26.6",
+          "tested": [
+            "1.26.6"
+          ]
+        },
+        "supported_platforms": [
+          "portable-go"
+        ],
+        "supported_backends": [
+          "kubernetes",
+          "postgresql",
+          "redis-streams",
+          "valkey-streams"
+        ],
+        "supported_protocols": [
+          "http",
+          "json",
+          "queue-management"
+        ],
+        "documentation": {
+          "readme": "README.md",
+          "api": "docs/api.md",
+          "adoption": "README.md",
+          "security": "docs/security.md",
+          "compatibility": "docs/compatibility.md",
+          "performance": "docs/performance.md",
+          "examples": "README.md",
+          "faq": "docs/faq.md",
+          "changelog": "CHANGELOG.md",
+          "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane",
+          "ecosystem_index": "https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md"
+        },
+        "known_good_compatibility_sets": [],
+        "delivery": {
+          "implementation": "not-started",
+          "hardening": "not-started",
+          "release": "not-started"
+        }
+      },
       "gates": {
         "api_compatibility": true,
         "benchmarks": true,

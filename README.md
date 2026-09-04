@@ -97,15 +97,26 @@ starting serving replicas.
 - [Security reporting](SECURITY.md)
 - [Changelog](CHANGELOG.md)
 
+For ecosystem-wide package selection and ownership guidance, see the versioned
+[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
+and its [Persistence and durability family](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection).
+
 ## Development
 
-Run the deterministic local gate with:
+Run the complete local repository gate with:
 
 ```sh
-make check
+make ci
 ```
 
-This checks formatting, module tidiness and checksums, vet, Staticcheck, strict
+`make ci` validates the repository configuration, inventory, cohesion metadata,
+repository contract, online specification conformance, workflow contract, and
+the complete implementation check. Use `make check` for the implementation
+checks alone or `make cohesion` for a focused validation of versioned ecosystem
+metadata.
+
+The implementation check covers formatting, module tidiness and checksums, vet,
+Staticcheck, strict
 golangci-lint, tests, the race detector, exact per-package 100% statement
 coverage, and builds. `make nilaway` runs the pinned advisory NilAway profile,
 and `make fuzz` runs the bounded fuzz smoke suite. `make integration-postgres`
