@@ -482,9 +482,9 @@
         },
         "known_good_compatibility_sets": [],
         "delivery": {
-          "implementation": "not-started",
-          "hardening": "not-started",
-          "release": "not-started"
+          "implementation": "in-progress",
+          "hardening": "in-progress",
+          "release": "in-progress"
         }
       },
       "gates": {

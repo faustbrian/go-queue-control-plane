@@ -15,7 +15,9 @@
 tenant-scoped commands, desired state, audit history, an HTTP API, an
 administrative CLI, and an optional narrow Kubernetes Deployment adapter.
 
-The project is under active development. A backend-neutral adapter now maps
+The latest stable release is `v1.0.0`. It predates the unreleased gRPC security
+update recorded in the changelog and must not be used for deployment. A
+backend-neutral adapter maps
 tenant-scoped commands and acknowledgements through published `queue`
 management contracts. The optional tenant management document now enables the
 authenticated status, command, and record transport; endpoints supply the
@@ -27,10 +29,30 @@ status through the same `queue` management HTTP handler. Managed queues can
 also consume durable desired state through the typed client. See
 [Current capability status](docs/compatibility.md) before evaluating a rollout.
 
+## Install
+
+Add the module to an application with:
+
+```sh
+go get github.com/faustbrian/go-queue-control-plane@v1.0.0
+```
+
+Install the server and administrative CLI for local evaluation with:
+
+```sh
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@v1.0.0
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.0.0
+```
+
+The Go-installed server does not carry the release pipeline's commit and build
+time metadata, so its `/version` response uses the development build identity.
+Use the release process when deployment provenance is required.
+
 ## Five-minute local start
 
 Prerequisites: Go 1.26.6 or newer and an empty PostgreSQL database reachable
-through `DATABASE_URL`.
+through `DATABASE_URL`. The installed `queue-control-plane` and `queue-control`
+binaries must be on `PATH`.
 
 Create `/tmp/queue-control-access.json` outside version control:
 
@@ -59,7 +81,7 @@ Start the API and apply its embedded migration:
 export DATABASE_URL='postgres://user:password@localhost/control_plane?sslmode=disable'
 export QUEUE_CONTROL_ACCESS_FILE=/tmp/queue-control-access.json
 export QUEUE_CONTROL_RUN_MIGRATIONS=true
-go run ./cmd/queue-control-plane
+queue-control-plane
 ```
 
 In another shell, verify the public probes and authenticated CLI:
@@ -71,7 +93,7 @@ curl --fail http://localhost:8080/health/ready
 export QUEUE_CONTROL_URL=http://localhost:8080
 export QUEUE_CONTROL_KEY_ID=local-cli
 export QUEUE_CONTROL_KEY=replace-this-secret
-go run ./cmd/queue-control audit list --tenant tenant-1
+queue-control audit list --tenant tenant-1
 ```
 
 Do not commit the local access document. For production, inject it from a
@@ -152,6 +174,4 @@ the reviewed baseline and fails on compatible or incompatible drift.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE). A production release
-is not ready until all release gates described in the project objective are
-complete.
+This project is licensed under the [MIT License](LICENSE).

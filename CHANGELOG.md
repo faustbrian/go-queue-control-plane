@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file. The
-format follows Keep a Changelog, and stable releases will use Semantic
+format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
 ## Unreleased
@@ -36,6 +36,13 @@ Versioning.
   package-owned manifests, fixtures, browser checks, and mutation evidence.
 
 ### Documentation
+
+- Describe the supported stable `v1` release, add version-pinned installation
+  commands, make the local quick start independent of a source checkout, and
+  align release guidance with the published signed checksums, archive, SBOM,
+  and provenance assets while documenting the Go-installed server's build
+  identity boundary, the pending `v1.0.0` security update, and active delivery
+  work.
 
 - Publish family, capability, ownership, lifecycle, support, and package
   selection metadata, with links to the immutable ecosystem index and family
