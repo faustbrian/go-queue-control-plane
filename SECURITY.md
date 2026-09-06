@@ -2,9 +2,15 @@
 
 ## Supported versions
 
-No stable version has been released. Until a release is published, only the
-current default branch receives security fixes and the project must not be
-treated as production ready.
+| Release line | Status | End of support |
+| --- | --- | --- |
+| `v1.0.0` | Supported; security update pending | Not scheduled |
+
+Security fixes are developed on the default branch and shipped in a new `v1`
+release. Published `v1.0.0` does not include the gRPC denial-of-service fix
+recorded under Unreleased in the changelog and must not be treated as containing
+that fix. An advisory will identify affected versions and any change to the
+supported release lines.
 
 ## Reporting a vulnerability
 

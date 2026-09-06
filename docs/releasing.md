@@ -42,7 +42,9 @@ without a noisy hosted-runner latency threshold.
 The OCI build path can produce BuildKit SBOM and provenance attestations. It
 covers authenticated Redis Streams and Valkey Streams failure management, but
 not the remaining transport-level queue and failure load items above. The
-repository does not currently publish or sign those artifacts.
+published `v1.0.0` GitHub release includes a source archive, module file,
+CycloneDX SBOM, in-toto provenance statement, checksum manifest, SSH signature,
+and allowed-signer file.
 
 ## Versioning and changelog
 
@@ -51,14 +53,47 @@ the same pull request as every user-visible change. Before release, move
 Unreleased entries into a dated version section, verify upgrade and rollback
 guidance, and confirm `/version` reports the tag, commit, and RFC3339 build time.
 
-Run `make release-dry-run MODULES=.` from the repository
-root to validate the module archive, clean consumer, dependency order, and
-proposed tag. `make release-public MODULES=.` performs
-public-resolution verification only; `scripts/release.sh` deliberately refuses
-to create tags or publish artifacts.
+Install the checksum-verified `golib` v1.4.0 binary for the current platform
+from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v1.4.0).
+For example, on macOS arm64:
 
-No reviewed publishing workflow, GHCR image, release archive, checksum bundle,
-signature, or stable certificate identity exists yet. Release automation MUST
-define those artifact names and identities before this guide can provide
-copy-paste verification commands. Do not infer a package-local GitHub Actions
-workflow path or treat a locally built image as a signed public release.
+```sh
+TOOLING_VERSION=1.4.0
+TOOLING_ARCHIVE=golib_1.4.0_darwin_arm64.tar.gz
+TOOLING_DIR=$(mktemp -d)
+gh release download "v${TOOLING_VERSION}" \
+  --repo faustbrian/go-library-tools \
+  --pattern checksums.txt --pattern "$TOOLING_ARCHIVE" \
+  --dir "$TOOLING_DIR"
+awk -v archive="$TOOLING_ARCHIVE" '$2 == archive { print }' \
+  "$TOOLING_DIR/checksums.txt" | \
+  (cd "$TOOLING_DIR" && shasum -a 256 --check)
+tar -xzf "$TOOLING_DIR/$TOOLING_ARCHIVE" -C "$TOOLING_DIR" golib
+export PATH="$TOOLING_DIR:$PATH"
+golib --version
+```
+
+Choose the next semantic version and update the module `version` in
+`modules.json` and the changelog. Fetch current remote tags with
+`git fetch --tags origin`, then run `golib release check` and
+`golib release dry-run` from the repository root. The dry-run rejects an
+existing fetched tag. These commands validate release metadata, the module
+archive, clean consumer resolution, and the complete repository contract.
+Neither command publishes; publication is a separate operation bound to the
+reviewed commit and versioned, checksum-bound release assets.
+
+For `v1.0.0`, download every asset into an empty directory, check the release's
+signed checksum manifest, and verify every listed payload:
+
+```sh
+gh release download v1.0.0 --repo faustbrian/go-queue-control-plane
+ssh-keygen -Y verify -f ALLOWED_SIGNERS -I brian@cline.sh \
+  -n golib-release -s SHA256SUMS.sig < SHA256SUMS
+shasum -a 256 --check SHA256SUMS
+```
+
+The release assets and notes record the exact source identity and checksums.
+Because `ALLOWED_SIGNERS` is distributed with the release, this procedure
+checks integrity against the release-declared signer; it does not independently
+authenticate the publisher.
+Do not treat a locally built image as one of those signed public artifacts.
