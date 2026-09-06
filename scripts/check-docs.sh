@@ -6,7 +6,9 @@ required=(
     CHANGELOG.md
     CONTRIBUTING.md
     SECURITY.md
+    SUPPORT.md
     LICENSE
+    client/desired_state_example_test.go
     docs/api.md
     docs/architecture.md
     docs/cli.md
@@ -23,7 +25,7 @@ required=(
     docs/ui.md
 )
 
-markdown=(README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md docs/*.md)
+markdown=(README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md SUPPORT.md docs/*.md)
 
 for file in "${required[@]}"; do
     if [[ ! -s "${file}" ]]; then
@@ -59,3 +61,5 @@ perl -MFile::Basename=dirname -MFile::Spec -e '
         }
     }
 ' "${markdown[@]}"
+
+go test ./client -run '^ExampleClient_DesiredStateReader$' -count=1

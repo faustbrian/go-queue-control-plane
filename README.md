@@ -105,6 +105,7 @@ starting serving replicas.
 - [Architecture and trust boundaries](docs/architecture.md)
 - [HTTP API reference](docs/api.md)
 - [CLI reference](docs/cli.md)
+- [Compiler-checked desired-state client example](client/desired_state_example_test.go)
 - [Embedded web UI guide](docs/ui.md)
 - [Deployment and configuration](docs/deployment.md)
 - [Compatibility and current capability status](docs/compatibility.md)
@@ -116,6 +117,7 @@ starting serving replicas.
 - [Laravel Horizon migration matrix](docs/horizon-migration.md)
 - [Troubleshooting and FAQ](docs/faq.md)
 - [Release process](docs/releasing.md)
+- [Support](SUPPORT.md)
 - [Security reporting](SECURITY.md)
 - [Changelog](CHANGELOG.md)
 
