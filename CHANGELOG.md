@@ -37,6 +37,10 @@ Versioning.
 
 ### Documentation
 
+- Complete the public package, executable-example, and support navigation;
+  bind documentation checks and module metadata to the compiler-checked client
+  example; and publish direct issue and discussion routes.
+
 - Describe the supported stable `v1` release, add version-pinned installation
   commands, make the local quick start independent of a source checkout, and
   align release guidance with the published signed checksums, archive, SBOM,

@@ -116,5 +116,6 @@ delivery because workers remain independent of the control plane.
 - `kubernetes`: namespace-scoped Deployment status and scale adapter.
 - `client` and `cli`: typed automation client and command workflows.
 - `server`: authentication composition and bounded HTTP lifecycle.
+- `ui`: embedded administrative web assets and their HTTP handler.
 - `cmd/queue-control-plane`: deployable server process.
 - `cmd/queue-control`: administrative CLI.

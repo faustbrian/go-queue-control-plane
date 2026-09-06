@@ -474,7 +474,7 @@
           "security": "docs/security.md",
           "compatibility": "docs/compatibility.md",
           "performance": "docs/performance.md",
-          "examples": "README.md",
+          "examples": "client/desired_state_example_test.go",
           "faq": "docs/faq.md",
           "changelog": "CHANGELOG.md",
           "pkg_go_dev": "https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane",
