@@ -9,7 +9,7 @@ require (
 	github.com/faustbrian/go-identifier v1.0.0
 	github.com/faustbrian/go-migrations v1.0.0
 	github.com/faustbrian/go-postgres v1.0.1
-	github.com/faustbrian/go-queue v1.0.0
+	github.com/faustbrian/go-queue v1.1.0
 	github.com/faustbrian/go-telemetry v1.1.1
 	github.com/jackc/pgx/v5 v5.10.0
 	go.opentelemetry.io/otel v1.44.0
