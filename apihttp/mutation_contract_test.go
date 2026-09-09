@@ -11,8 +11,8 @@ import (
 
 	authentication "github.com/faustbrian/go-authentication"
 	controlplane "github.com/faustbrian/go-queue-control-plane"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes"
 	"github.com/faustbrian/go-queue-control-plane/fleet"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/kubernetes"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

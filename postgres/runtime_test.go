@@ -22,14 +22,14 @@ func TestNewRuntimeRejectsMissingPool(t *testing.T) {
 func TestNewRuntimeWiresControlPlanePersistence(t *testing.T) {
 	t.Parallel()
 
-	pool, err := gopostgres.New(context.Background(), gopostgres.Config{
+	pool, err := gopostgres.Connect(context.Background(), gopostgres.Config{
 		DSN:           "postgres://localhost/control_plane",
 		StartupPolicy: gopostgres.StartupLazy,
 	})
 	if err != nil {
-		t.Fatalf("postgres.New() error = %v", err)
+		t.Fatalf("postgres.Connect() error = %v", err)
 	}
-	t.Cleanup(func() { _ = pool.Close(context.Background()) })
+	t.Cleanup(func() { _ = pool.Shutdown(context.Background()) })
 
 	runtime, err := NewRuntime(pool)
 	if err != nil {

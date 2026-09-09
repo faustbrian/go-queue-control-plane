@@ -155,7 +155,7 @@ func runProcess(
 		return err
 	}
 	defer func() {
-		runErr = errors.Join(runErr, pool.Close(context.Background()))
+		runErr = errors.Join(runErr, pool.Shutdown(context.Background()))
 	}()
 	persistence, err := dependencies.buildPersistence(pool)
 	if err != nil {

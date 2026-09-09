@@ -8,7 +8,7 @@ import (
 
 	authentication "github.com/faustbrian/go-authentication"
 	controlplane "github.com/faustbrian/go-queue-control-plane"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/kubernetes"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes"
 )
 
 const defaultWorkloadPageSize int64 = 100

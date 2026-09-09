@@ -4,10 +4,12 @@ Kubernetes Deployments supervise control-plane and worker containers.
 Kubernetes restarts failed processes. `queue` owns worker goroutines and
 graceful drain. HPA or KEDA owns automatic pod scaling from exported metrics.
 
-The control plane's v1 Kubernetes adapter is deliberately smaller than an
-operator. It maps each tenant to one namespace, lists Deployments, reads the
+The control plane's `adapters/kubernetes` package is deliberately smaller than
+an operator. It maps each tenant to one namespace, lists Deployments, reads the
 scale subresource, and performs explicitly authorized scale updates. It has no
-reconcile loop and does not create, delete, patch, or watch workloads.
+reconcile loop and does not create, delete, patch, or watch workloads. The
+released `kubernetes` import path remains a deprecated compatibility path
+with the same types, sentinels, constructors, and runtime behavior.
 
 ## Recommended deployment
 

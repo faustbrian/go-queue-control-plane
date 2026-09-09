@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	authentication "github.com/faustbrian/go-authentication"
-	"github.com/faustbrian/go-authentication/authhttp"
+	authhttp "github.com/faustbrian/go-authentication/adapters/http"
 	"github.com/faustbrian/go-queue-control-plane/apihttp"
 )
 

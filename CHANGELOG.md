@@ -6,7 +6,20 @@ Versioning.
 
 ## Unreleased
 
+### Added
+
+- Add `adapters/kubernetes` as the target-oriented entry point for the narrow,
+  namespace-scoped Kubernetes Deployment status and scale integration.
+
 ### Changed
+
+- Adopt the public Authentication v1.2, Authorization v1.1, Migrations v1.1,
+  PostgreSQL v1.1, Queue v1.1, and Telemetry v1.2 contracts used by the
+  control-plane composition while retaining its existing domain behavior.
+- Use Authentication's canonical HTTP adapter, Queue's canonical Redis
+  Streams adapter, and PostgreSQL's explicit `Connect` and bounded `Shutdown`
+  lifecycle. Authentication's released `authhttp` aliases remain source
+  compatible even though API documentation now renders the canonical path.
 
 - Replace the copied repository verification implementation with the
   checksum-verified `go-library-tools` v1.0.7 contract while retaining the
@@ -53,6 +66,12 @@ Versioning.
   guidance.
 - Remove the archived monorepo documentation link; package guidance remains in
   the repository-owned documentation.
+
+### Deprecated
+
+- Retain `kubernetes` as a compatibility path for `adapters/kubernetes` so
+  existing v1 consumers keep the same public types, errors, construction, and
+  runtime behavior while new code uses the target-oriented path.
 
 ### Security
 

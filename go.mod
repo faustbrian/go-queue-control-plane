@@ -4,13 +4,13 @@ go 1.26.6
 
 require (
 	github.com/alicebob/miniredis/v2 v2.38.0
-	github.com/faustbrian/go-authentication v1.0.0
-	github.com/faustbrian/go-authorization v1.0.0
+	github.com/faustbrian/go-authentication v1.2.0
+	github.com/faustbrian/go-authorization v1.1.0
 	github.com/faustbrian/go-identifier v1.0.0
-	github.com/faustbrian/go-migrations v1.0.0
-	github.com/faustbrian/go-postgres v1.0.1
-	github.com/faustbrian/go-queue v1.0.0
-	github.com/faustbrian/go-telemetry v1.1.1
+	github.com/faustbrian/go-migrations v1.1.0
+	github.com/faustbrian/go-postgres v1.1.0
+	github.com/faustbrian/go-queue v1.1.0
+	github.com/faustbrian/go-telemetry v1.2.0
 	github.com/jackc/pgx/v5 v5.10.0
 	go.opentelemetry.io/otel v1.44.0
 	go.opentelemetry.io/otel/metric v1.44.0
@@ -29,7 +29,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
-	github.com/faustbrian/go-clock v1.0.0 // indirect
+	github.com/faustbrian/go-clock v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect

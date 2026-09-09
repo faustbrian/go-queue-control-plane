@@ -39,12 +39,12 @@ func TestPostgresDisasterRecoveryIntegration(t *testing.T) {
 		t.Fatalf("restored migration result = (%d records, %v)", len(result.Records()), err)
 	}
 
-	pool, err := gopostgres.New(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
 	if err != nil {
 		t.Fatalf("open restored runtime pool: %v", err)
 	}
 	t.Cleanup(func() {
-		if err := pool.Close(context.Background()); err != nil {
+		if err := pool.Shutdown(context.Background()); err != nil {
 			t.Errorf("close restored runtime pool: %v", err)
 		}
 	})

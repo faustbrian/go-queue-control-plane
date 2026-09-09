@@ -44,6 +44,10 @@ linters:
     generated: strict
     warn-unused: true
     rules:
+      - path: '^adapters/kubernetes/(compatibility_test|kubernetes)\.go$'
+        text: 'SA1019: "github.com/faustbrian/go-queue-control-plane/kubernetes" is deprecated'
+        linters:
+          - staticcheck
       - path: _test\.go
         linters:
           - gosec
