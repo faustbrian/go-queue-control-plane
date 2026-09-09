@@ -20,6 +20,8 @@ Versioning.
   Streams adapter, and PostgreSQL's explicit `Connect` and bounded `Shutdown`
   lifecycle. Authentication's released `authhttp` aliases remain source
   compatible even though API documentation now renders the canonical path.
+- Adopt `go-library-tools` v1.6.2 so declaration-only compatibility packages
+  with no viable mutants complete the repository gate without synthetic logic.
 
 - Replace the copied repository verification implementation with the
   checksum-verified `go-library-tools` v1.0.7 contract while retaining the
