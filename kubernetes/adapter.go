@@ -1,4 +1,7 @@
-// Package kubernetes exposes the deliberately narrow Kubernetes integration.
+// Package kubernetes preserves the released path for the deliberately narrow
+// Kubernetes integration.
+//
+// Deprecated: use github.com/faustbrian/go-queue-control-plane/adapters/kubernetes.
 package kubernetes
 
 import (

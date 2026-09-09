@@ -511,12 +511,12 @@ func validProcessDependencies(t *testing.T) processDependencies {
 func lazyProcessPool(t *testing.T) *gopostgres.Pool {
 	t.Helper()
 
-	pool, err := gopostgres.New(context.Background(), gopostgres.Config{
+	pool, err := gopostgres.Connect(context.Background(), gopostgres.Config{
 		DSN:           "postgres://localhost/control_plane",
 		StartupPolicy: gopostgres.StartupLazy,
 	})
 	if err != nil {
-		t.Fatalf("postgres.New() error = %v", err)
+		t.Fatalf("postgres.Connect() error = %v", err)
 	}
 
 	return pool

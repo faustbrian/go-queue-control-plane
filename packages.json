@@ -16,6 +16,18 @@
     },
     {
       "module_directory": ".",
+      "directory": "adapters/kubernetes",
+      "name": "kubernetes",
+      "import_path": "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes",
+      "kind": "public",
+      "production": true,
+      "executable": true,
+      "coverage_required": true,
+      "build_required": true,
+      "build_tags": []
+    },
+    {
+      "module_directory": ".",
       "directory": "alerts",
       "name": "alerts",
       "import_path": "github.com/faustbrian/go-queue-control-plane/alerts",

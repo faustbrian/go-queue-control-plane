@@ -4,9 +4,24 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
-## Unreleased
+## 1.1.0 - 2026-09-09
+
+### Added
+
+- Add `adapters/kubernetes` as the target-oriented entry point for the narrow,
+  namespace-scoped Kubernetes Deployment status and scale integration.
 
 ### Changed
+
+- Adopt the public Authentication v1.2, Authorization v1.1, Migrations v1.1,
+  PostgreSQL v1.1, Queue v1.1, and Telemetry v1.2 contracts used by the
+  control-plane composition while retaining its existing domain behavior.
+- Use Authentication's canonical HTTP adapter, Queue's canonical Redis
+  Streams adapter, and PostgreSQL's explicit `Connect` and bounded `Shutdown`
+  lifecycle. Authentication's released `authhttp` aliases remain source
+  compatible even though API documentation now renders the canonical path.
+- Adopt `go-library-tools` v1.6.2 so declaration-only compatibility packages
+  with no viable mutants complete the repository gate without synthetic logic.
 
 - Replace the copied repository verification implementation with the
   checksum-verified `go-library-tools` v1.0.7 contract while retaining the
@@ -45,7 +60,7 @@ Versioning.
   commands, make the local quick start independent of a source checkout, and
   align release guidance with the published signed checksums, archive, SBOM,
   and provenance assets while documenting the Go-installed server's build
-  identity boundary, the pending `v1.0.0` security update, and active delivery
+  identity boundary, the supported `v1.1` security line, and active delivery
   work.
 
 - Publish family, capability, ownership, lifecycle, support, and package
@@ -53,6 +68,12 @@ Versioning.
   guidance.
 - Remove the archived monorepo documentation link; package guidance remains in
   the repository-owned documentation.
+
+### Deprecated
+
+- Retain `kubernetes` as a compatibility path for `adapters/kubernetes` so
+  existing v1 consumers keep the same public types, errors, construction, and
+  runtime behavior while new code uses the target-oriented path.
 
 ### Security
 

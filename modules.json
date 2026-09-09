@@ -22,6 +22,18 @@
         },
         {
           "module_directory": ".",
+          "directory": "adapters/kubernetes",
+          "name": "kubernetes",
+          "import_path": "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes",
+          "kind": "public",
+          "production": true,
+          "executable": true,
+          "coverage_required": true,
+          "build_required": true,
+          "build_tags": []
+        },
+        {
+          "module_directory": ".",
           "directory": "alerts",
           "name": "alerts",
           "import_path": "github.com/faustbrian/go-queue-control-plane/alerts",
@@ -209,7 +221,7 @@
       "family_label": "Persistence And Durability",
       "family_description": "Durable state, delivery, coordination, recovery, and operational lifecycle.",
       "family_order": 4,
-      "version": "1.0.0",
+      "version": "1.1.0",
       "tag_prefix": "v",
       "owned_dependencies": [
         "github.com/faustbrian/go-authentication",
@@ -395,6 +407,7 @@
         ],
         "package_selection": {
           "github.com/faustbrian/go-queue-control-plane": "Use for stable administrative command, result, permission, target, and validation contracts.",
+          "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes": "Use for explicitly configured namespace-scoped Kubernetes Deployment status and scale operations.",
           "github.com/faustbrian/go-queue-control-plane/alerts": "Use to derive bounded control-plane alerts and fixed-label telemetry from validated snapshots.",
           "github.com/faustbrian/go-queue-control-plane/apihttp": "Use for the authenticated versioned administrative HTTP API, admission controls, and response protections.",
           "github.com/faustbrian/go-queue-control-plane/authz": "Use to translate authenticated principals into exact authorization requests.",
@@ -404,7 +417,7 @@
           "github.com/faustbrian/go-queue-control-plane/dataplane": "Use to adapt tenant-resolved queue management contracts to control-plane commands and views.",
           "github.com/faustbrian/go-queue-control-plane/fleet": "Use for bounded in-memory worker registration, protocol negotiation, and fleet projection.",
           "github.com/faustbrian/go-queue-control-plane/history": "Use for tamper-evident tenant audit events, chain verification, and retention anchors.",
-          "github.com/faustbrian/go-queue-control-plane/kubernetes": "Use for explicitly configured namespace-scoped Kubernetes Deployment status and scale operations.",
+          "github.com/faustbrian/go-queue-control-plane/kubernetes": "Use only as the deprecated compatibility path while migrating to adapters/kubernetes.",
           "github.com/faustbrian/go-queue-control-plane/postgres": "Use for embedded migrations and durable PostgreSQL command, desired-state, and audit repositories.",
           "github.com/faustbrian/go-queue-control-plane/server": "Use to compose static access control and run the bounded administrative HTTP lifecycle.",
           "github.com/faustbrian/go-queue-control-plane/ui": "Use for the embedded read-only administrative web interface."
@@ -431,6 +444,7 @@
         },
         "optional_owned_dependencies": [],
         "adapters": [
+          "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes",
           "github.com/faustbrian/go-queue-control-plane/alerts",
           "github.com/faustbrian/go-queue-control-plane/apihttp",
           "github.com/faustbrian/go-queue-control-plane/authz",

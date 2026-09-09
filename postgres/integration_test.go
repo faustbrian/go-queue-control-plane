@@ -169,12 +169,12 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 		t.Fatalf("migrate PostgreSQL: %v", err)
 	}
 
-	pool, err := gopostgres.New(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
 	if err != nil {
 		t.Fatalf("open runtime pool: %v", err)
 	}
 	t.Cleanup(func() {
-		if err := pool.Close(context.Background()); err != nil {
+		if err := pool.Shutdown(context.Background()); err != nil {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})
@@ -433,12 +433,12 @@ func TestPostgresRetentionJobResultIntegration(t *testing.T) {
 	if dsn == "" {
 		t.Fatal("TEST_DATABASE_URL is required for integration tests")
 	}
-	pool, err := gopostgres.New(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
 	if err != nil {
 		t.Fatalf("open runtime pool: %v", err)
 	}
 	t.Cleanup(func() {
-		if err := pool.Close(context.Background()); err != nil {
+		if err := pool.Shutdown(context.Background()); err != nil {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})

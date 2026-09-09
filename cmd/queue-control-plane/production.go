@@ -56,7 +56,7 @@ func productionDependencies() processDependencies {
 			})
 		},
 		retain:           executeProductionRetention,
-		openPool:         gopostgres.New,
+		openPool:         gopostgres.Connect,
 		buildPersistence: controlpostgres.NewRuntime,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return apihttp.NewFixedWindowRateLimiter(

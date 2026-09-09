@@ -13,10 +13,10 @@ import (
 	"time"
 
 	controlplane "github.com/faustbrian/go-queue-control-plane"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes"
 	"github.com/faustbrian/go-queue-control-plane/apihttp"
 	"github.com/faustbrian/go-queue-control-plane/client"
 	"github.com/faustbrian/go-queue-control-plane/fleet"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/kubernetes"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

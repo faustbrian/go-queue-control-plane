@@ -15,15 +15,15 @@
 tenant-scoped commands, desired state, audit history, an HTTP API, an
 administrative CLI, and an optional narrow Kubernetes Deployment adapter.
 
-The latest stable release is `v1.0.0`. It predates the unreleased gRPC security
-update recorded in the changelog and must not be used for deployment. A
-backend-neutral adapter maps
+The latest stable release is `v1.1.0`. A backend-neutral adapter maps
 tenant-scoped commands and acknowledgements through published `queue`
 management contracts. The optional tenant management document now enables the
 authenticated status, command, and record transport; endpoints supply the
 managed root `queue` as their native lifecycle controller and a native
 `management.RecordReader` for failure workflows.
-Kubernetes scale commands work only when the in-cluster adapter is configured.
+Kubernetes scale commands work only when the canonical
+`adapters/kubernetes` integration is configured. The released `kubernetes`
+path remains as a deprecated compatibility path.
 Redis Streams and Valkey Streams workers can publish native worker and queue
 status through the same `queue` management HTTP handler. Managed queues can
 also consume durable desired state through the typed client. See
@@ -34,14 +34,14 @@ also consume durable desired state through the typed client. See
 Add the module to an application with:
 
 ```sh
-go get github.com/faustbrian/go-queue-control-plane@v1.0.0
+go get github.com/faustbrian/go-queue-control-plane@v1.1.0
 ```
 
 Install the server and administrative CLI for local evaluation with:
 
 ```sh
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@v1.0.0
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.0.0
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@v1.1.0
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.1.0
 ```
 
 The Go-installed server does not carry the release pipeline's commit and build

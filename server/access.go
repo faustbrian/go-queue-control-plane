@@ -2,8 +2,8 @@ package server
 
 import (
 	authentication "github.com/faustbrian/go-authentication"
+	authhttp "github.com/faustbrian/go-authentication/adapters/http"
 	"github.com/faustbrian/go-authentication/apikey"
-	"github.com/faustbrian/go-authentication/authhttp"
 	authorization "github.com/faustbrian/go-authorization"
 	"github.com/faustbrian/go-authorization/acl"
 	controlauthz "github.com/faustbrian/go-queue-control-plane/authz"

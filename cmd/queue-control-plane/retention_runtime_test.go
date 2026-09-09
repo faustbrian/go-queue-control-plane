@@ -162,7 +162,7 @@ func TestBuildProductionRetentionAuditUsesRuntime(t *testing.T) {
 		t.Fatalf("buildProductionRetentionAudit(nil) = (%v, %v)", audit, err)
 	}
 	pool := lazyProcessPool(t)
-	t.Cleanup(func() { _ = pool.Close(context.Background()) })
+	t.Cleanup(func() { _ = pool.Shutdown(context.Background()) })
 	if audit, err := buildProductionRetentionAudit(pool); audit == nil || err != nil {
 		t.Fatalf("buildProductionRetentionAudit() = (%v, %v)", audit, err)
 	}

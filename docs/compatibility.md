@@ -6,6 +6,11 @@ data-plane transport exists; that does not make the operation operational.
 
 ## Current production wiring
 
+The control plane composes Authentication's canonical HTTP adapter, Queue's
+canonical Redis Streams adapter, and PostgreSQL's explicit `Connect` and
+bounded `Shutdown` lifecycle. Authentication retains its released `authhttp`
+aliases, so existing source that supplies those types remains compatible.
+
 | Capability | Status | Notes |
 | --- | --- | --- |
 | Health, readiness, version, capabilities | available | Public machine-readable endpoints. |

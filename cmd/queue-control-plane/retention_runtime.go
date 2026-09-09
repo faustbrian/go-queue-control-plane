@@ -38,7 +38,7 @@ func executeRetention(
 		return err
 	}
 	defer func() {
-		resultErr = errors.Join(resultErr, pool.Close(context.Background()))
+		resultErr = errors.Join(resultErr, pool.Shutdown(context.Background()))
 	}()
 	audit, err := buildAudit(pool)
 	if err != nil {
@@ -62,7 +62,7 @@ func executeProductionRetention(
 		func(path string) (io.ReadCloser, error) {
 			return os.Open(path) //nolint:gosec // The operator explicitly configures this policy path.
 		},
-		gopostgres.New,
+		gopostgres.Connect,
 		buildProductionRetentionAudit,
 		time.Now,
 	)

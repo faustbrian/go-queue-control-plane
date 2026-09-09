@@ -31,12 +31,12 @@ func TestPostgresProcessDeathRollbackIntegration(t *testing.T) {
 	if err := migrateProcessDeathDatabase(ctx, dsn); err != nil {
 		t.Fatalf("migrate PostgreSQL: %v", err)
 	}
-	pool, err := gopostgres.New(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
 	if err != nil {
 		t.Fatalf("open runtime pool: %v", err)
 	}
 	t.Cleanup(func() {
-		if err := pool.Close(context.Background()); err != nil {
+		if err := pool.Shutdown(context.Background()); err != nil {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})
@@ -149,11 +149,11 @@ func TestPostgresProcessDeathHelper(t *testing.T) {
 		t.Skip("process-death helper")
 	}
 	ctx := context.Background()
-	pool, err := gopostgres.New(ctx, gopostgres.Config{DSN: os.Getenv("TEST_DATABASE_URL")})
+	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: os.Getenv("TEST_DATABASE_URL")})
 	if err != nil {
 		t.Fatalf("open helper pool: %v", err)
 	}
-	defer func() { _ = pool.Close(context.Background()) }()
+	defer func() { _ = pool.Shutdown(context.Background()) }()
 	ready := os.Getenv("GO_QUEUE_CONTROL_PROCESS_DEATH_READY")
 	command := processDeathCommand(os.Getenv("GO_QUEUE_CONTROL_PROCESS_DEATH_TENANT"))
 	if phase == "authorization_boundary" || phase == "live_dispatch_boundary" {
