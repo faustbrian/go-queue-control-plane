@@ -4,13 +4,14 @@
 
 | Release line | Status | End of support |
 | --- | --- | --- |
-| `v1.0.0` | Supported; security update pending | Not scheduled |
+| `v1.1.x` | Supported | Not scheduled |
+| `v1.0.x` | Unsupported; security update required | 2026-09-09 |
 
 Security fixes are developed on the default branch and shipped in a new `v1`
-release. Published `v1.0.0` does not include the gRPC denial-of-service fix
-recorded under Unreleased in the changelog and must not be treated as containing
-that fix. An advisory will identify affected versions and any change to the
-supported release lines.
+release. Release `v1.1.0` includes the gRPC denial-of-service fix recorded in
+the changelog. Published `v1.0.0` does not include that fix and consumers must
+upgrade to the supported `v1.1` line. An advisory will identify affected
+versions and any later change to the supported release lines.
 
 ## Reporting a vulnerability
 

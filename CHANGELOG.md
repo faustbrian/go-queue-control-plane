@@ -60,7 +60,7 @@ Versioning.
   commands, make the local quick start independent of a source checkout, and
   align release guidance with the published signed checksums, archive, SBOM,
   and provenance assets while documenting the Go-installed server's build
-  identity boundary, the pending `v1.0.0` security update, and active delivery
+  identity boundary, the supported `v1.1` security line, and active delivery
   work.
 
 - Publish family, capability, ownership, lifecycle, support, and package
