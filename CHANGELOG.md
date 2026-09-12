@@ -6,6 +6,11 @@ Versioning.
 
 ## Unreleased
 
+### Changed
+
+- Register the maintained public API baseline and typed compatibility
+  operations while retaining the repository-owned API compatibility script.
+
 ### Documentation
 
 - Replace archived monorepo links and completed execution artifacts with a

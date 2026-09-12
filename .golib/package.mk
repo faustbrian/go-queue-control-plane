@@ -1,4 +1,7 @@
-.PHONY: api-compatibility benchmarks browser browser-check build check coverage disaster-recovery-postgres docs format-check fuzz integration-postgres integration-queue lint mutation nilaway race security staticcheck test tidy-check vet
+.PHONY: api api-compatibility benchmarks browser browser-check build check coverage disaster-recovery-postgres docs format-check fuzz integration-postgres integration-queue lint mutation nilaway race security staticcheck test tidy-check vet
+
+api:
+	$(MAKE) -f .golib/package.mk api-compatibility
 
 api-compatibility:
 	scripts/api-compatibility.sh
