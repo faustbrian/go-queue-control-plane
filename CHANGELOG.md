@@ -50,6 +50,11 @@ Versioning.
   v1.4.0 contract while retaining the
   package-owned manifests, fixtures, browser checks, and mutation evidence.
 
+### Changed
+
+- Register the maintained public API baseline and typed compatibility
+  operations while retaining the repository-owned API compatibility script.
+
 ### Documentation
 
 - Complete the public package, executable-example, and support navigation;
