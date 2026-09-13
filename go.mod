@@ -3,7 +3,7 @@ module github.com/faustbrian/go-queue-control-plane
 go 1.27.0
 
 require (
-	github.com/alicebob/miniredis/v2 v2.38.0
+	github.com/alicebob/miniredis/v2 v2.39.0
 	github.com/faustbrian/go-authentication v1.2.0
 	github.com/faustbrian/go-authorization v1.1.0
 	github.com/faustbrian/go-identifier v1.0.0
