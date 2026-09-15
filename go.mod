@@ -11,7 +11,7 @@ require (
 	github.com/faustbrian/go-postgres v1.1.0
 	github.com/faustbrian/go-queue v1.1.0
 	github.com/faustbrian/go-telemetry v1.2.0
-	github.com/jackc/pgx/v5 v5.10.0
+	github.com/jackc/pgx/v5 v5.11.0
 	go.opentelemetry.io/otel v1.46.0
 	go.opentelemetry.io/otel/metric v1.46.0
 	go.opentelemetry.io/otel/sdk v1.46.0
