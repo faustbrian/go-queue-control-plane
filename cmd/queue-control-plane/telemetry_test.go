@@ -92,3 +92,119 @@ func TestTLSMaterialReaderPreservesCancellationAfterStat(t *testing.T) {
 		t.Fatalf("ReadFile(cancelled during Stat) error = %v, want context canceled", err)
 	}
 }
+
+func TestTLSMaterialReaderRejectsInvalidLimitsAndMissingFiles(t *testing.T) {
+	t.Parallel()
+
+	path := filepath.Join(t.TempDir(), "ca.pem")
+	if err := os.WriteFile(path, []byte("certificate"), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	reader := tlsMaterialReader{}
+	for _, maxBytes := range []int{0, -1, maxTLSMaterialBytes + 1} {
+		if contents, err := reader.ReadFile(context.Background(), path, maxBytes); contents != nil || !errors.Is(err, errTLSMaterial) {
+			t.Errorf("ReadFile(maxBytes=%d) = (%q, %v), want invalid TLS material", maxBytes, contents, err)
+		}
+	}
+	if contents, err := reader.ReadFile(context.Background(), filepath.Join(t.TempDir(), "missing.pem"), 11); contents != nil || !errors.Is(err, errTLSMaterial) {
+		t.Errorf("ReadFile(missing) = (%q, %v), want invalid TLS material", contents, err)
+	}
+}
+
+func TestTLSMaterialReaderRejectsDirectory(t *testing.T) {
+	t.Parallel()
+
+	if contents, err := (tlsMaterialReader{}).ReadFile(context.Background(), t.TempDir(), maxTLSMaterialBytes); contents != nil || !errors.Is(err, errTLSMaterial) {
+		t.Fatalf("ReadFile(directory) = (%q, %v), want invalid TLS material", contents, err)
+	}
+}
+
+type cancelAfterInitialCheckContext struct {
+	context.Context
+	cancel  context.CancelFunc
+	checked bool
+}
+
+func (ctx *cancelAfterInitialCheckContext) Err() error {
+	err := ctx.Context.Err()
+	if !ctx.checked {
+		ctx.checked = true
+		ctx.cancel()
+	}
+	return err
+}
+
+func TestTLSMaterialReaderPreservesCancellationAfterOpenFailure(t *testing.T) {
+	t.Parallel()
+
+	base, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ctx := &cancelAfterInitialCheckContext{Context: base, cancel: cancel}
+	path := filepath.Join(t.TempDir(), "missing.pem")
+	if contents, err := (tlsMaterialReader{}).ReadFile(ctx, path, 11); contents != nil || !errors.Is(err, context.Canceled) {
+		t.Fatalf("ReadFile(cancelled during open) = (%q, %v), want context canceled", contents, err)
+	}
+}
+
+type sizeOverrideFileInfo struct {
+	os.FileInfo
+	size int64
+}
+
+func (info sizeOverrideFileInfo) Size() int64 { return info.size }
+
+type cancelOnSizeFileInfo struct {
+	os.FileInfo
+	cancel context.CancelFunc
+}
+
+func (info cancelOnSizeFileInfo) Size() int64 {
+	info.cancel()
+	return info.FileInfo.Size()
+}
+
+func TestTLSMaterialReaderRejectsChangedOrUnreadableFile(t *testing.T) {
+	t.Parallel()
+
+	path := filepath.Join(t.TempDir(), "ca.pem")
+	if err := os.WriteFile(path, []byte("certificate"), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	t.Run("oversize after stat", func(t *testing.T) {
+		reader := tlsMaterialReader{stat: func(file *os.File) (os.FileInfo, error) {
+			info, err := file.Stat()
+			return sizeOverrideFileInfo{FileInfo: info, size: 1}, err
+		}}
+		if contents, err := reader.ReadFile(context.Background(), path, 10); contents != nil || !errors.Is(err, errTLSMaterial) {
+			t.Fatalf("ReadFile(oversize after stat) = (%q, %v), want invalid TLS material", contents, err)
+		}
+	})
+	t.Run("read failure", func(t *testing.T) {
+		reader := tlsMaterialReader{stat: func(file *os.File) (os.FileInfo, error) {
+			info, err := file.Stat()
+			_ = file.Close()
+			return info, err
+		}}
+		if contents, err := reader.ReadFile(context.Background(), path, 11); contents != nil || !errors.Is(err, errTLSMaterial) {
+			t.Fatalf("ReadFile(closed before read) = (%q, %v), want invalid TLS material", contents, err)
+		}
+	})
+}
+
+func TestTLSMaterialReaderPreservesCancellationAfterSizeCheck(t *testing.T) {
+	t.Parallel()
+
+	path := filepath.Join(t.TempDir(), "ca.pem")
+	if err := os.WriteFile(path, []byte("certificate"), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	reader := tlsMaterialReader{stat: func(file *os.File) (os.FileInfo, error) {
+		info, err := file.Stat()
+		return cancelOnSizeFileInfo{FileInfo: info, cancel: cancel}, err
+	}}
+	if contents, err := reader.ReadFile(ctx, path, 11); contents != nil || !errors.Is(err, context.Canceled) {
+		t.Fatalf("ReadFile(cancelled after size check) = (%q, %v), want context canceled", contents, err)
+	}
+}
