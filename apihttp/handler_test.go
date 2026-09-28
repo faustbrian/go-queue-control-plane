@@ -17,11 +17,57 @@ import (
 	"github.com/faustbrian/go-queue-control-plane/authz"
 	"github.com/faustbrian/go-queue-control-plane/control"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 )
+
+type trustProbePropagator struct {
+	trusted   int
+	untrusted int
+}
+
+func (p *trustProbePropagator) Inject(context.Context, propagation.TextMapCarrier) {}
+
+func (p *trustProbePropagator) Extract(ctx context.Context, _ propagation.TextMapCarrier) context.Context {
+	p.untrusted++
+	return ctx
+}
+
+func (p *trustProbePropagator) ExtractTrusted(ctx context.Context, _ propagation.TextMapCarrier) context.Context {
+	p.trusted++
+	return ctx
+}
+
+func (p *trustProbePropagator) Fields() []string { return nil }
+
+func TestHandlerTrustsInboundOnlyForAuthenticatedRequest(t *testing.T) {
+	t.Parallel()
+
+	probe := &trustProbePropagator{}
+	handler, err := NewHandler(Config{
+		Commands:  &commandExecutorStub{},
+		Telemetry: &TelemetryConfig{TrustedInbound: true, Propagator: probe},
+	})
+	if err != nil {
+		t.Fatalf("NewHandler() error = %v", err)
+	}
+	for _, request := range []*http.Request{
+		httptest.NewRequest(http.MethodGet, "/health/live", nil),
+		authenticatedRequest(t, http.MethodGet, "/health/live", ""),
+	} {
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, request)
+		if response.Code != http.StatusOK {
+			t.Fatalf("status = %d, want 200", response.Code)
+		}
+	}
+	if probe.trusted != 1 || probe.untrusted != 1 {
+		t.Fatalf("propagation calls = trusted %d, untrusted %d, want 1 each", probe.trusted, probe.untrusted)
+	}
+}
 
 func TestHandlerUsesBoundedGoTelemetryInstrumentation(t *testing.T) {
 	t.Parallel()

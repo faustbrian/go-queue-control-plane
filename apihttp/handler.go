@@ -19,7 +19,7 @@ import (
 	"github.com/faustbrian/go-queue-control-plane/fleet"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
 	queue "github.com/faustbrian/go-queue/management"
-	telemetryhttp "github.com/faustbrian/go-telemetry/instrumentation/nethttp"
+	telemetryhttp "github.com/faustbrian/go-telemetry/v2/instrumentation/nethttp"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -319,6 +319,10 @@ func NewHandler(config Config) (http.Handler, error) {
 	return telemetryhttp.NewHandler(router, telemetryhttp.ServerConfig{
 		Operation:      "queue_control_plane.http.server",
 		TrustedInbound: config.Telemetry.TrustedInbound,
+		TrustInbound: func(request *http.Request) bool {
+			principal, ok := authentication.PrincipalFromContext(request.Context())
+			return ok && !principal.IsAnonymous()
+		},
 		TracerProvider: config.Telemetry.TracerProvider,
 		MeterProvider:  config.Telemetry.MeterProvider,
 		Propagator:     config.Telemetry.Propagator,

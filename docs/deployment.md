@@ -51,12 +51,20 @@ it requires an explicit Collector endpoint. TLS with system roots is the
 default; plaintext requires `QUEUE_CONTROL_OTLP_INSECURE=true`, while custom CA
 and mTLS files must be mounted read-only. A client certificate and private key
 must be configured together, and TLS settings cannot accompany plaintext mode.
+Each configured TLS file must be an operator-provisioned, local, read-only
+regular file no larger than 1 MiB. Network, FUSE, and UNC mounts are not
+supported for these paths: pathname lookup on them may block before Go can
+observe startup cancellation. Once opened, the reader bounds retained material
+and observes cancellation. A custom CA file replaces the system trust roots,
+so it must contain every required authority.
 
 The process owns a non-global `telemetry` runtime, supplies its standard
 OpenTelemetry providers directly to HTTP and command instrumentation, and
 performs bounded flush and shutdown when the server exits. Inbound trace
-context is ignored unless the deployment explicitly enables trust after its
-ingress strips untrusted propagation headers.
+context follows Telemetry's bounded untrusted policy. The production propagator
+does not admit inbound baggage. If a caller supplies a trusted-baggage policy,
+its ingress must strip untrusted propagation headers; the handler then grants
+trusted extraction only to authenticated requests.
 
 ## Static access document
 
