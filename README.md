@@ -15,7 +15,8 @@
 tenant-scoped commands, desired state, audit history, an HTTP API, an
 administrative CLI, and an optional narrow Kubernetes Deployment adapter.
 
-The latest stable release is `v1.1.0`. A backend-neutral adapter maps
+See [Releases](https://github.com/faustbrian/go-queue-control-plane/releases)
+for the latest published version. A backend-neutral adapter maps
 tenant-scoped commands and acknowledgements through published `queue`
 management contracts. The optional tenant management document now enables the
 authenticated status, command, and record transport; endpoints supply the
@@ -34,14 +35,22 @@ also consume durable desired state through the typed client. See
 Add the module to an application with:
 
 ```sh
-go get github.com/faustbrian/go-queue-control-plane@v1.1.0
+go get github.com/faustbrian/go-queue-control-plane@latest
 ```
 
 Install the server and administrative CLI for local evaluation with:
 
 ```sh
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@v1.1.0
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.1.0
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@latest
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@latest
+```
+
+After `v1.1.2` is published, pin that release exactly with:
+
+```sh
+go get github.com/faustbrian/go-queue-control-plane@v1.1.2
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@v1.1.2
+go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.1.2
 ```
 
 The Go-installed server does not carry the release pipeline's commit and build
