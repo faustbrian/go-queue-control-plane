@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
-## Unreleased
+## 1.1.2 - 2026-09-28
 
 ### Changed
 
@@ -12,6 +12,26 @@ Versioning.
   preserving non-global trace and metric export. TLS material reads are bounded,
   custom CA files replace system roots, and trusted inbound propagation now
   requires an authenticated request.
+
+## 1.1.1 - 2026-09-13
+
+### Changed
+
+- Require Go 1.27.0 for module consumers, local builds, and the container image
+  ([383c7561d3](https://github.com/faustbrian/go-queue-control-plane/commit/383c7561d35baf59b360264c5b1bbcdcff68e6e2)).
+- Document the maintained public API baseline and typed compatibility
+  operations while retaining the repository-owned API compatibility script
+  ([076c00db94](https://github.com/faustbrian/go-queue-control-plane/commit/076c00db940641c6dc7b1be8bcca4b8b122a604b)).
+- Update gRPC to 1.83.2, miniredis to 2.39.0, and OpenTelemetry SDK to 1.46.0
+  ([8bcd2669b2](https://github.com/faustbrian/go-queue-control-plane/commit/8bcd2669b26fe0ebda7286e516d2766a2741c328),
+  [6f86aa24d7](https://github.com/faustbrian/go-queue-control-plane/commit/6f86aa24d7cc28b4f67843029dd1938889f53b63),
+  [f17040c10d](https://github.com/faustbrian/go-queue-control-plane/commit/f17040c10d33327cbdc5e80d373022c587bcb923)).
+
+### Documentation
+
+- Adopt and scope proportional assurance policy for repository checks
+  ([db14e98948](https://github.com/faustbrian/go-queue-control-plane/commit/db14e98948be0593cbfa7c23e4c373905f59dca3),
+  [c432bc31da](https://github.com/faustbrian/go-queue-control-plane/commit/c432bc31dae82e690530936c123d41268a1d00e7)).
 
 ## 1.1.0 - 2026-09-09
 
@@ -58,11 +78,6 @@ Versioning.
 - Upgrade the checksum-verified repository tooling to the `go-library-tools`
   v1.4.0 contract while retaining the
   package-owned manifests, fixtures, browser checks, and mutation evidence.
-
-### Changed
-
-- Register the maintained public API baseline and typed compatibility
-  operations while retaining the repository-owned API compatibility script.
 
 ### Documentation
 
