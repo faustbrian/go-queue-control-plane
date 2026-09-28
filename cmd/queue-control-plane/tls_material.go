@@ -27,6 +27,7 @@ func (reader tlsMaterialReader) ReadFile(ctx context.Context, path string, maxBy
 
 	// Nonblocking open prevents a configured pipe or device path from hanging
 	// startup before the file can be rejected as non-regular.
+	// #nosec G304 -- Operator-owned local TLS path; type and size checked below.
 	file, err := os.OpenFile(path, os.O_RDONLY|syscall.O_NONBLOCK, 0)
 	if err != nil {
 		if ctx.Err() != nil {
@@ -34,7 +35,7 @@ func (reader tlsMaterialReader) ReadFile(ctx context.Context, path string, maxBy
 		}
 		return nil, errTLSMaterial
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	stop := context.AfterFunc(ctx, func() { _ = file.Close() })
 	defer stop()
 
