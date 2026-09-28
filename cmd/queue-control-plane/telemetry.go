@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/faustbrian/go-queue-control-plane/apihttp"
-	telemetry "github.com/faustbrian/go-telemetry"
+	telemetry "github.com/faustbrian/go-telemetry/v2"
 )
 
 const telemetryServiceName = "go-queue-control-plane"
@@ -14,10 +14,14 @@ func productionTelemetryConfig(config Config, build apihttp.BuildInfo) telemetry
 	settings.Service.Instance = config.TelemetryInstance
 	settings.Environment = config.TelemetryEnvironment
 	settings.RegisterGlobal = false
+	settings.Traces.Enabled = true
+	settings.Metrics.Enabled = true
 	settings.Traces.Exporter.Endpoint = config.TelemetryEndpoint
 	settings.Metrics.Exporter.Endpoint = config.TelemetryEndpoint
 	settings.Traces.Exporter.TLS.Insecure = config.TelemetryInsecure
 	settings.Metrics.Exporter.TLS.Insecure = config.TelemetryInsecure
+	settings.Traces.Exporter.TLS.FileReader = tlsMaterialReader{}
+	settings.Metrics.Exporter.TLS.FileReader = tlsMaterialReader{}
 	settings.Traces.Exporter.TLS.CAFile = config.TelemetryCAFile
 	settings.Metrics.Exporter.TLS.CAFile = config.TelemetryCAFile
 	settings.Traces.Exporter.TLS.CertificateFile = config.TelemetryCertificateFile

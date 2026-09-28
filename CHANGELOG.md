@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## Unreleased
+
+### Changed
+
+- Adopt Telemetry v2 for the owned OTLP runtime and HTTP instrumentation while
+  preserving non-global trace and metric export. TLS material reads are bounded,
+  custom CA files replace system roots, and trusted inbound propagation now
+  requires an authenticated request.
+
 ## 1.1.0 - 2026-09-09
 
 ### Added

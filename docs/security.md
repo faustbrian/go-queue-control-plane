@@ -14,10 +14,20 @@ expose the plain HTTP listener directly to an untrusted network.
 
 OTLP export uses TLS by default and supports custom CA and mTLS file mounts.
 Plaintext is explicit and should be limited to a protected same-pod or
-cluster-local path. Inbound trace context is untrusted by default; enable it
-only behind an ingress that removes attacker-supplied propagation headers.
+cluster-local path. Inbound trace context follows a bounded untrusted policy;
+trusted extraction additionally requires an authenticated request and an
+ingress that removes attacker-supplied propagation headers.
 Never put tenant, actor, target, reason, payload, key, or idempotency values in
 telemetry attributes.
+
+Custom TLS material paths are a trusted-operator deployment boundary. Their
+owner is the control-plane operator: provision local, read-only regular files
+and exclude network, FUSE, and UNC mounts. The reader caps retained material at
+1 MiB and closes an opened file on cancellation, but a blocked pathname lookup
+cannot be preempted before a file descriptor exists. This residual is accepted
+because the portable Go file API cannot cancel that lookup without an unowned
+worker; review it if nonlocal TLS mounts become a supported deployment need or
+the file-access implementation changes.
 
 ## Authentication and key handling
 

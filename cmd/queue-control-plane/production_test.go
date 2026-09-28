@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres"
 	controlplane "github.com/faustbrian/go-queue-control-plane"
@@ -27,19 +28,31 @@ func TestProductionDependenciesUseBoundedImplementations(t *testing.T) {
 	if err != nil || runtime != nil {
 		t.Fatalf("disabled buildTelemetry() = (%v, %v), want nil runtime", runtime, err)
 	}
-	cancelledTelemetry, cancelTelemetry := context.WithCancel(context.Background())
-	cancelTelemetry()
-	runtime, err = dependencies.buildTelemetry(cancelledTelemetry, Config{
+	telemetryConfig := Config{
 		TelemetryEnabled:  true,
 		TelemetryEndpoint: "127.0.0.1:4317",
 		TelemetryProtocol: "grpc",
 		TelemetryInsecure: true,
-	}, build)
-	if err != nil || runtime == nil {
-		t.Fatalf("buildTelemetry() = (%v, %v), want lazy runtime", runtime, err)
 	}
+	cancelledBuild, cancelBuild := context.WithCancel(context.Background())
+	cancelBuild()
+	runtime, err = dependencies.buildTelemetry(cancelledBuild, telemetryConfig, build)
+	if runtime != nil || !errors.Is(err, context.Canceled) {
+		t.Fatalf("buildTelemetry(cancelled) = (%v, %v), want context canceled", runtime, err)
+	}
+	runtime, err = dependencies.buildTelemetry(context.Background(), telemetryConfig, build)
+	if err != nil || runtime == nil {
+		t.Fatalf("buildTelemetry() = (%v, %v), want runtime", runtime, err)
+	}
+	cancelledTelemetry, cancelTelemetry := context.WithCancel(context.Background())
+	cancelTelemetry()
 	if err := runtime.Shutdown(cancelledTelemetry); err == nil {
 		t.Fatal("cancelled telemetry Shutdown() returned nil")
+	}
+	cleanup, cancelCleanup := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancelCleanup()
+	if err := runtime.Shutdown(cleanup); err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Shutdown(after canceled attempt) error = %v", err)
 	}
 
 	limiter, err := dependencies.buildRateLimiter()
