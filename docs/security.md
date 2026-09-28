@@ -26,7 +26,7 @@ and exclude network, FUSE, and UNC mounts. The reader caps retained material at
 1 MiB and closes an opened file on cancellation, but a blocked pathname lookup
 cannot be preempted before a file descriptor exists. This residual is accepted
 because the portable Go file API cannot cancel that lookup without an unowned
-worker; review it if nonlocal TLS mounts become a supported deployment need or
+worker; review it if non-local TLS mounts become a supported deployment need or
 the file-access implementation changes.
 
 ## Authentication and key handling
