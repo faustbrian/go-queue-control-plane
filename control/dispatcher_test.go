@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
 )
 
 func TestRoutingDispatcherRequiresBothBoundaries(t *testing.T) {

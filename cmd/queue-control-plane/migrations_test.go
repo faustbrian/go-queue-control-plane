@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	migrations "github.com/faustbrian/go-migrations"
+	migrations "github.com/faustbrian/go-migrations/v2"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -79,14 +79,30 @@ func TestExecuteMigrationsPropagatesEveryFailure(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
+			var ownedDatabase *sql.DB
 			err := executeMigrations(
 				context.Background(),
 				"postgres://database/control",
-				test.opener,
+				func(driver, dsn string) (*sql.DB, error) {
+					database, err := test.opener(driver, dsn)
+					ownedDatabase = database
+					if database != nil {
+						t.Cleanup(func() { _ = database.Close() })
+					}
+					return database, err
+				},
 				test.factory,
 			)
 			if !errors.Is(err, test.want) {
 				t.Fatalf("executeMigrations() error = %v, want %v", err, test.want)
+			}
+			if ownedDatabase != nil {
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+				err := ownedDatabase.PingContext(ctx)
+				if err == nil || err.Error() != "sql: database is closed" {
+					t.Fatal("CLI-owned database was not closed after migration failure")
+				}
 			}
 		})
 	}

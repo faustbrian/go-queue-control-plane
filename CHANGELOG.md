@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## Unreleased
+
+## 2.0.0 - 2026-09-30
+
+### Changed
+
+- Move the root module and all package imports to
+  `github.com/faustbrian/go-queue-control-plane/v2`. The public PostgreSQL
+  `MigrationSource` and `NewMigrationRunner` helpers now return Migrations v2
+  types; callers using their results must also import `go-migrations/v2`.
+  Other collaborator major versions, HTTP contracts, embedded SQL, migration
+  identities, checksums, and ledger formats remain unchanged.
+
+### Security
+
+- Adopt Migrations v2 so uncertain advisory-lock acquisition or release
+  discards the physical session instead of returning it to a caller-owned
+  pool, and default migration error formatting does not expose private driver
+  diagnostics. Keep the 30-second lock and five-minute statement budgets.
+- Enforce producer inventory, filename, aggregate-name, and file-byte budgets
+  before retaining metadata or copying compiler-owned embedded migrations;
+  canceled or over-budget loads return no partial input.
+
 ## 1.1.2 - 2026-09-28
 
 ### Changed

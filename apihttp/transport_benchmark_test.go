@@ -8,7 +8,7 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication"
-	"github.com/faustbrian/go-queue-control-plane/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v2/fleet"
 )
 
 func BenchmarkWorkerAPIThousandWorkerMaximumPage(b *testing.B) {

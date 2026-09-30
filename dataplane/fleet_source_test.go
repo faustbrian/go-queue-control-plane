@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v2/fleet"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

@@ -48,7 +48,10 @@ and allowed-signer file.
 
 ## Versioning and changelog
 
-The module starts its public release history at `v1.0.0`. Update `CHANGELOG.md` in
+The module starts its public release history at `v1.0.0`; current main prepares
+`v2.0.0` under the root `/v2` module path. Keep historical v1 release notes and
+assets immutable. A new major tag is created from main, not from a version
+directory or branch. Update `CHANGELOG.md` in
 the same pull request as every user-visible change. Before release, move
 Unreleased entries into a dated version section, verify upgrade and rollback
 guidance, and confirm `/version` reports the tag, commit, and RFC3339 build time.

@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	"github.com/faustbrian/go-queue-control-plane/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/control"
-	"github.com/faustbrian/go-queue-control-plane/dataplane"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
-	"github.com/faustbrian/go-queue-control-plane/server"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	"github.com/faustbrian/go-queue-control-plane/v2/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v2/control"
+	"github.com/faustbrian/go-queue-control-plane/v2/dataplane"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v2/postgres"
+	"github.com/faustbrian/go-queue-control-plane/v2/server"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

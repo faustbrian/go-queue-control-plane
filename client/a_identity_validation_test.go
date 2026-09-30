@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
 )
 
 func TestClientValidatesTenantIdentityBeforeCreatingReader(t *testing.T) {

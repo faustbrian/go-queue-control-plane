@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
 )
 
 var (

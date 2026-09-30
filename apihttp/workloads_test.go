@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/authz"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v2/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v2/authz"
 )
 
 func TestHandlerListsAuthorizedTenantWorkloads(t *testing.T) {

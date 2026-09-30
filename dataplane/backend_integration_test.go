@@ -13,8 +13,8 @@ import (
 	"time"
 
 	goqueue "github.com/faustbrian/go-queue"
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	"github.com/faustbrian/go-queue-control-plane/control"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	"github.com/faustbrian/go-queue-control-plane/v2/control"
 	redisstream "github.com/faustbrian/go-queue/adapters/redisstream"
 	"github.com/faustbrian/go-queue/core"
 	"github.com/faustbrian/go-queue/job"

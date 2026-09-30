@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	migrations "github.com/faustbrian/go-migrations"
+	migrations "github.com/faustbrian/go-migrations/v2"
 )
 
 type migrationApplier interface {

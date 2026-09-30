@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/faustbrian/go-queue-control-plane/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/cli"
+	"github.com/faustbrian/go-queue-control-plane/v2/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v2/cli"
 )
 
 func TestRunBuildsAuthenticatedClientFromEnvironment(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/client"
+	"github.com/faustbrian/go-queue-control-plane/v2/client"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

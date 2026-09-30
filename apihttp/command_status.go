@@ -7,8 +7,8 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication"
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v2/postgres"
 )
 
 const (
