@@ -6,6 +6,11 @@ Versioning.
 
 ## Unreleased
 
+### Documentation
+
+- Clarify published v2 security-model applicability, accepted deployment and
+  collaborator risk ownership, and the configured hosted release checks.
+
 ## 2.0.0 - 2026-09-30
 
 ### Changed
