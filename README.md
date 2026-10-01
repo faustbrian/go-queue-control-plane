@@ -53,13 +53,13 @@ go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@
 go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.1.2
 ```
 
-The supported security-related `v2.0.0` release is published. Use the official
+The supported security-related `v2.0.1` release is published. Use the official
 major suffix:
 
 ```sh
-go get github.com/faustbrian/go-queue-control-plane/v2@v2.0.0
-go install github.com/faustbrian/go-queue-control-plane/v2/cmd/queue-control-plane@v2.0.0
-go install github.com/faustbrian/go-queue-control-plane/v2/cmd/queue-control@v2.0.0
+go get github.com/faustbrian/go-queue-control-plane/v2@v2.0.1
+go install github.com/faustbrian/go-queue-control-plane/v2/cmd/queue-control-plane@v2.0.1
+go install github.com/faustbrian/go-queue-control-plane/v2/cmd/queue-control@v2.0.1
 ```
 
 The public migration helpers now compose Migrations v2 types. See the
@@ -68,7 +68,7 @@ nominal API change and unchanged schema history. The Go floor remains 1.27.0.
 
 The Go-installed server does not carry the release pipeline's commit and build
 time metadata, so its `/version` response uses the development build identity.
-The public `v2.0.0` assets are source-only, not deployable binaries or images;
+The public `v2.0.1` assets are source-only, not deployable binaries or images;
 see the [release process](docs/releasing.md) for their provenance scope.
 
 ## Five-minute local start

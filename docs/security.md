@@ -2,9 +2,11 @@
 
 ## Version and source applicability
 
-This model describes the published root `v2.0.0` contract and current v2 main.
+This model describes the published root `v2.0.1` contract and current v2 main.
 The immutable release source is
-[`427281b`](https://github.com/faustbrian/go-queue-control-plane/tree/v2.0.0).
+[`6da9d0a2`](https://github.com/faustbrian/go-queue-control-plane/tree/v2.0.1).
+This patch adopts Queue v1.1.2's management HTTP redirect protection without
+changing caller-owned clients or the Migrations v2 nominal integration.
 Common deployment responsibilities also apply to supported v1.1 deployments,
 but the Migrations v2 session and default-error protections below do not apply
 to published v1 helpers. See the [supported-version policy](../SECURITY.md)
@@ -63,7 +65,7 @@ inspect the migration ledger and database before retrying an uncertain result.
 These are conditional trusted-collaborator residuals, not guarantees of forced
 callback or driver preemption. Published v1 helpers retain the old producer
 session behavior; use a dedicated migration pool closed after work or
-uncertainty, redact errors, and migrate to published `v2.0.0`. Existing embedded
+uncertainty, redact errors, and migrate to published `v2.0.1`. Existing embedded
 SQL and ledger formats remain unchanged; no history reset is required.
 
 ## Authentication and key handling

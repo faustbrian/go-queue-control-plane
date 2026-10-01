@@ -53,6 +53,16 @@ not built by CI. The SBOM describes the Darwin/arm64 dependency graph and lacks
 detected license evidence for `github.com/pressly/goose/v3`; it is not a complete
 legal-license report. No deployable binary or image is attached.
 
+The published `v2.0.1` release retains seven source-only assets. Its module
+archive was generated from immutable main source `6da9d0a2` using Go's module
+ZIP rules; every archived source file matches the public proxy archive even
+though raw ZIP encoding differs. The module file matches the public proxy.
+The maintainer-local CycloneDX SBOM covers the application and runtime Go
+dependency graph, not tests, standard-library packages, frontend dependencies,
+or a complete license report. Its in-toto provenance records local generation,
+not CI-built artifacts or a certified deployment. Check the signed checksums
+before using these assets.
+
 ## Versioning and changelog
 
 The module starts its public release history at `v1.0.0`; published `v2.0.0`

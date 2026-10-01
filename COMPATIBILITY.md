@@ -19,7 +19,8 @@ follow [`DEPRECATION.md`](DEPRECATION.md).
 
 ## Queue control plane v2 migration
 
-Release `v2.0.0` is published and supported.
+Release `v2.0.1` is published and supported. It retains the v2.0.0 nominal
+migration and adopts Queue v1.1.2's management HTTP redirect protection.
 Use the root module `github.com/faustbrian/go-queue-control-plane/v2` and add
 `/v2` to all control-plane package imports. The source remains at the repository
 root on main; there is no version-specific directory or branch.

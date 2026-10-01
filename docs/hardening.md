@@ -198,8 +198,8 @@ Redis and Valkey, disaster recovery, and Chromium through
 `verification/package.mk`. The PostgreSQL scripts default to `postgres:18-alpine`;
 the current workflow does not define a PostgreSQL 16/17/18 matrix or a
 multi-platform container-build job. Release rehearsal
-[`36805684345`](https://github.com/faustbrian/go-queue-control-plane/actions/runs/36805684345)
-passed the configured operations for published v2.0.0 source `427281b`.
+[`36846457647`](https://github.com/faustbrian/go-queue-control-plane/actions/runs/36846457647)
+passed the configured operations for published v2.0.1 source `6da9d0a2`.
 This does not establish unconfigured version/platform coverage or deployed
 behavior. A local result does not substitute for the required GitHub result
 on the pushed source.
