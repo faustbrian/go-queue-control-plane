@@ -5,7 +5,7 @@
 [![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
-[![Go Reference (published v1)](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v2)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-queue-control-plane?sort=semver)](https://github.com/faustbrian/go-queue-control-plane/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -53,8 +53,8 @@ go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@
 go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.1.2
 ```
 
-Main now prepares the security-related `v2.0.0` module; this version is not
-published yet. After its release, use the official major suffix:
+The supported security-related `v2.0.0` release is published. Use the official
+major suffix:
 
 ```sh
 go get github.com/faustbrian/go-queue-control-plane/v2@v2.0.0
@@ -68,7 +68,8 @@ nominal API change and unchanged schema history. The Go floor remains 1.27.0.
 
 The Go-installed server does not carry the release pipeline's commit and build
 time metadata, so its `/version` response uses the development build identity.
-Use the release process when deployment provenance is required.
+The public `v2.0.0` assets are source-only, not deployable binaries or images;
+see the [release process](docs/releasing.md) for their provenance scope.
 
 ## Five-minute local start
 
