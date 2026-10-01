@@ -108,9 +108,9 @@ that ingress; unsafe cookie requests still encounter the API's CSRF boundary.
 | PostgreSQL saturation | Admission fails before transaction work or dispatch | `postgres.TestPostgresTransactionRunnerFailsClosedWhenPoolIsSaturated` |
 | Valkey loss | Dispatch becomes explicit unknown; no direct fallback or raw backend mutation exists | dispatcher failure tests and package dependency checks |
 | Browser response and workflow | Browser consumes only bounded API pages, replaces results, and exposes no unbounded client cache | Chromium UI suite |
-| Backup and restore | Commands, desired state, audit events, anchors, and migrations restore as one recovery unit | `make disaster-recovery-postgres` |
+| Backup and restore | Commands, desired state, audit events, anchors, and migrations restore as one recovery unit | `make -f verification/package.mk disaster-recovery-postgres` |
 
-`make benchmarks` executes the 10,000-worker, 100,000-audit-event, maximum
+`make -f verification/package.mk benchmarks` executes the 10,000-worker, 100,000-audit-event, maximum
 queue-page, and maximum record-page workloads. Performance comparisons must use
 a controlled runner; hosted smoke execution proves that the bounded fixtures
 remain runnable, not that shared-runner latency is stable.
@@ -187,24 +187,22 @@ exact pushed commit:
 
 ```sh
 make check
-make nilaway
-make fuzz
-make mutation
-make api-compatibility
-make security
-make benchmarks
-make browser-check
-make browser
-npm --prefix _browser audit --audit-level=high
-make integration-postgres
-make integration-queue
-make disaster-recovery-postgres
+golib release dry-run --module .
 ```
 
-Hosted CI additionally runs PostgreSQL 16, 17, and 18, real Redis and Valkey,
-multi-platform container validation/build, Chromium, archive, API
-compatibility, vulnerability, mutation, and recovery jobs. A local result does
-not substitute for the GitHub result on the pushed SHA.
+The selected gates and commands are owned by `modules.json`, `.golib.yaml`,
+and the checksum-pinned CLI. The pinned shared workflow runs the module
+contract, or the release dry-run when selected, together with repository
+contract and CodeQL checks. Configured test operations run real PostgreSQL,
+Redis and Valkey, disaster recovery, and Chromium through
+`verification/package.mk`. The PostgreSQL scripts default to `postgres:18-alpine`;
+the current workflow does not define a PostgreSQL 16/17/18 matrix or a
+multi-platform container-build job. Release rehearsal
+[`36805684345`](https://github.com/faustbrian/go-queue-control-plane/actions/runs/36805684345)
+passed the configured operations for published v2.0.0 source `427281b`.
+This does not establish unconfigured version/platform coverage or deployed
+behavior. A local result does not substitute for the required GitHub result
+on the pushed source.
 
 No release may proceed if ordinary queue delivery depends on control-plane
 availability; any mutation is unauthorized, unaudited, non-idempotent, or
