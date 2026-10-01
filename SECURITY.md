@@ -4,7 +4,7 @@
 
 | Release line | Status | End of support |
 | --- | --- | --- |
-| `v2.0.0` on main | In preparation; not a published supported release | Not applicable |
+| `v2.0.x` | Supported; `v2.0.0` published | Not scheduled |
 | `v1.1.x` | Supported | Not scheduled |
 | `v1.0.x` | Unsupported; security update required | 2026-09-09 |
 
@@ -15,7 +15,7 @@ the changelog. Published `v1.0.0` does not include that fix and consumers must
 upgrade to the supported `v1.1` line. An advisory will identify affected
 versions and any later change to the supported release lines.
 
-Main prepares the Migrations v2 integration described in
+Published `v2.0.0` includes the Migrations v2 integration described in
 [compatibility guidance](COMPATIBILITY.md#queue-control-plane-v2-migration).
 The published v1 helper still composes Migrations v1: with a caller-retained
 database pool, an uncertain advisory-lock acquisition or release can return a

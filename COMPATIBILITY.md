@@ -19,7 +19,7 @@ follow [`DEPRECATION.md`](DEPRECATION.md).
 
 ## Queue control plane v2 migration
 
-The current main branch prepares `v2.0.0`; it is not a published release yet.
+Release `v2.0.0` is published and supported.
 Use the root module `github.com/faustbrian/go-queue-control-plane/v2` and add
 `/v2` to all control-plane package imports. The source remains at the repository
 root on main; there is no version-specific directory or branch.

@@ -51,7 +51,7 @@ inspect the migration ledger and database before retrying an uncertain result.
 These are conditional trusted-collaborator residuals, not guarantees of forced
 callback or driver preemption. Published v1 helpers retain the old producer
 session behavior; use a dedicated migration pool closed after work or
-uncertainty, redact errors, and migrate to v2 when published. Existing embedded
+uncertainty, redact errors, and migrate to published `v2.0.0`. Existing embedded
 SQL and ledger formats remain unchanged; no history reset is required.
 
 ## Authentication and key handling
