@@ -6,6 +6,11 @@ Versioning.
 
 ## Unreleased
 
+### Documentation
+
+- Point installation and security guidance to published v2.0.1, including its
+  Queue management redirect protection and source-only artifact scope.
+
 ## 2.0.1 - 2026-10-01
 
 ### Security

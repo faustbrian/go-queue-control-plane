@@ -4,7 +4,7 @@
 
 | Release line | Status | End of support |
 | --- | --- | --- |
-| `v2.0.x` | Supported; `v2.0.0` published | Not scheduled |
+| `v2.0.x` | Supported; latest patch `v2.0.1` | Not scheduled |
 | `v1.1.x` | Supported | Not scheduled |
 | `v1.0.x` | Unsupported; security update required | 2026-09-09 |
 
@@ -17,6 +17,9 @@ versions and any later change to the supported release lines.
 
 Published `v2.0.0` includes the Migrations v2 integration described in
 [compatibility guidance](COMPATIBILITY.md#queue-control-plane-v2-migration).
+Published `v2.0.1` additionally adopts Queue v1.1.2, rejecting management
+HTTP redirects without changing caller-owned clients. Prefer this patch
+when adopting the supported v2 line.
 The published v1 helper still composes Migrations v1: with a caller-retained
 database pool, an uncertain advisory-lock acquisition or release can return a
 physical session that still owns the lock to that pool, and default migration
