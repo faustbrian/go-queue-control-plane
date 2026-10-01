@@ -45,7 +45,7 @@ linters:
     warn-unused: true
     rules:
       - path: 'adapters/kubernetes/'
-        text: 'SA1019: .*go-queue-control-plane/kubernetes.*deprecated'
+        text: 'SA1019: .*go-queue-control-plane/v2/kubernetes.*deprecated'
         linters:
           - staticcheck
       - path: _test\.go
