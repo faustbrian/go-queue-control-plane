@@ -3,11 +3,71 @@ package dataplane
 import (
 	"context"
 	"errors"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
 	queue "github.com/faustbrian/go-queue/management"
+	"github.com/faustbrian/go-queue/managementhttp"
 )
+
+func TestManagementHTTPClientComposesStatusWithoutRedirects(t *testing.T) {
+	t.Parallel()
+
+	calls, redirects := 0, 0
+	status := http.StatusTemporaryRedirect
+	httpClient := &http.Client{
+		Timeout: time.Second,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			redirects++
+			return nil
+		},
+		Transport: managementTransportFunc(func(request *http.Request) (*http.Response, error) {
+			calls++
+			if err := request.Context().Err(); err != nil {
+				return nil, err
+			}
+			return &http.Response{
+				StatusCode: status, Header: http.Header{"Location": {"https://other.example"}},
+				Body:    io.NopCloser(strings.NewReader(`{"items":[],"next_cursor":""}`)),
+				Request: request,
+			}, nil
+		}),
+	}
+	reader, err := managementhttp.NewClient(managementhttp.ClientConfig{
+		BaseURL: "https://worker.example", Token: "ordinary-token", HTTPClient: httpClient,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	source := mustStatusSource(t, &statusResolverStub{reader: reader})
+	page, err := source.ListQueues(context.Background(), "tenant-1", queue.StatusPageRequest{Limit: 1})
+	if !errors.Is(err, managementhttp.ErrRemoteFailure) || len(page.Items) != 0 || page.NextCursor != "" {
+		t.Fatalf("redirect ListQueues() = (%+v, %v)", page, err)
+	}
+	if calls != 1 || redirects != 0 || httpClient.Timeout != time.Second {
+		t.Fatalf("HTTP ownership: calls=%d redirects=%d timeout=%v", calls, redirects, httpClient.Timeout)
+	}
+	status = http.StatusOK
+	page, err = source.ListQueues(context.Background(), "tenant-1", queue.StatusPageRequest{Limit: 1})
+	if err != nil || len(page.Items) != 0 || page.NextCursor != "" {
+		t.Fatalf("empty ListQueues() = (%+v, %v)", page, err)
+	}
+	if calls != 2 || httpClient.CheckRedirect == nil {
+		t.Fatalf("HTTP client changed: calls=%d", calls)
+	}
+	if err := httpClient.CheckRedirect(nil, nil); err != nil || redirects != 1 {
+		t.Fatalf("caller redirect callback changed: redirects=%d err=%v", redirects, err)
+	}
+}
+
+type managementTransportFunc func(*http.Request) (*http.Response, error)
+
+func (f managementTransportFunc) RoundTrip(request *http.Request) (*http.Response, error) {
+	return f(request)
+}
 
 func TestStatusSourceListsValidatedTenantWorkersAndQueues(t *testing.T) {
 	t.Parallel()

@@ -6,6 +6,14 @@ Versioning.
 
 ## Unreleased
 
+## 2.0.1 - 2026-10-01
+
+### Security
+
+- Adopt Queue v1.1.2 for the owned management HTTP client, preserving tenant
+  routing and Queue type identities while rejecting redirects without changing
+  caller-owned HTTP clients.
+
 ### Documentation
 
 - Clarify published v2 security-model applicability, accepted deployment and
