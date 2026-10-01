@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	"github.com/faustbrian/go-queue-control-plane/authz"
-	"github.com/faustbrian/go-queue-control-plane/history"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	"github.com/faustbrian/go-queue-control-plane/v2/authz"
+	"github.com/faustbrian/go-queue-control-plane/v2/history"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v2/postgres"
 )
 
 func TestHandlerListsAuthorizedTenantAuditHistory(t *testing.T) {

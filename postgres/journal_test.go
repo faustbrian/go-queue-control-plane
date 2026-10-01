@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	"github.com/faustbrian/go-queue-control-plane/history"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	"github.com/faustbrian/go-queue-control-plane/v2/history"
 )
 
 func TestJournalAcceptPersistsAcceptedCommandAndAuditAtomically(t *testing.T) {

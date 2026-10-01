@@ -7,7 +7,7 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication"
-	controlplane "github.com/faustbrian/go-queue-control-plane"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

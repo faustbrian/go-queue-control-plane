@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	migrations "github.com/faustbrian/go-migrations"
+	migrations "github.com/faustbrian/go-migrations/v2"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

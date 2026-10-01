@@ -8,9 +8,9 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres"
-	controlplane "github.com/faustbrian/go-queue-control-plane"
-	"github.com/faustbrian/go-queue-control-plane/control"
-	"github.com/faustbrian/go-queue-control-plane/server"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	"github.com/faustbrian/go-queue-control-plane/v2/control"
+	"github.com/faustbrian/go-queue-control-plane/v2/server"
 )
 
 func TestProductionDependenciesUseBoundedImplementations(t *testing.T) {

@@ -24,3 +24,9 @@ rest of Golib without changing the adapter's narrow Deployment contract.
 Migration requires only changing the import path; exported types, constants,
 error sentinels, constructors, and behavior remain compatible. The legacy path
 will not be removed before `v2.0.0`.
+
+Current main retains both paths under the new root `/v2` module. Within v2,
+prefer `github.com/faustbrian/go-queue-control-plane/v2/adapters/kubernetes`;
+the `/v2/kubernetes` facade aliases those same v2 types. Across module majors,
+update all control-plane imports consistently: v1 and v2 nominal types and
+sentinel values are not interchangeable.

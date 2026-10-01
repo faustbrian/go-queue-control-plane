@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v2/apihttp"
 )
 
 func TestParseBuildInfoAcceptsReleaseAndDevelopmentMetadata(t *testing.T) {

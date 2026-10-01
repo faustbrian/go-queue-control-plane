@@ -1,4 +1,4 @@
-module github.com/faustbrian/go-queue-control-plane
+module github.com/faustbrian/go-queue-control-plane/v2
 
 go 1.27.0
 
@@ -7,7 +7,7 @@ require (
 	github.com/faustbrian/go-authentication v1.2.0
 	github.com/faustbrian/go-authorization v1.1.0
 	github.com/faustbrian/go-identifier v1.0.0
-	github.com/faustbrian/go-migrations v1.1.0
+	github.com/faustbrian/go-migrations/v2 v2.0.0
 	github.com/faustbrian/go-postgres v1.1.0
 	github.com/faustbrian/go-queue v1.1.0
 	github.com/faustbrian/go-telemetry/v2 v2.0.0

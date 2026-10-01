@@ -1,4 +1,4 @@
-//lint:file-ignore SA1019 Delegation preserves the released v1 type identities.
+//lint:file-ignore SA1019 Delegation preserves the legacy v2 package type identities.
 
 // Package kubernetes exposes the target-oriented entry point for the narrow
 // Kubernetes Deployment integration.
@@ -7,7 +7,7 @@ package kubernetes
 import (
 	"io"
 
-	legacy "github.com/faustbrian/go-queue-control-plane/kubernetes"
+	legacy "github.com/faustbrian/go-queue-control-plane/v2/kubernetes"
 )
 
 var (

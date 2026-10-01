@@ -29,6 +29,31 @@ because the portable Go file API cannot cancel that lookup without an unowned
 worker; review it if non-local TLS mounts become a supported deployment need or
 the file-access implementation changes.
 
+## Migration session and source boundary
+
+On current main, the public PostgreSQL migration helpers use Migrations v2.
+Uncertain advisory-lock acquisition or release discards the physical database
+session instead of returning it to a retained caller pool. Healthy sessions
+remain reusable. Default migration error formatting redacts private driver
+data; applications must not deliberately extract and expose private causes.
+The public helper leaves the pool caller-owned, whereas the CLI closes the
+pool it opens. Lock attempts retain a 30-second budget and statements a
+five-minute budget; the producer also applies finite operation and cleanup
+deadlines. Context cancellation is not evidence that SQL was rolled back:
+inspect the migration ledger and database before retrying an uncertain result.
+
+| Residual | Owner and rationale | Mitigation and review trigger |
+| --- | --- | --- |
+| Compiler-owned embedded SQL | Repository maintainers; the provider serves only immutable build-time files, not an arbitrary caller filesystem. | Enforce supplied count, individual and aggregate name, and file-byte budgets before retaining metadata or copying bytes; review any change to embedded history or support for external files. |
+| Driver cancellation and physical close | Application operators and driver maintainers; portable contexts cannot forcibly preempt an uncooperative driver. | Use a context-aware PostgreSQL driver, bounded database/network operations, and a dedicated migration pool when isolation is required; review driver changes or evidence of delayed cancellation/close. |
+| Explicit private diagnostic extraction | Application error-handling owners; classification remains available without default disclosure. | Log only redacted classifications, never raw driver causes or SQL; review new error adapters and diagnostic logging. |
+
+These are conditional trusted-collaborator residuals, not guarantees of forced
+callback or driver preemption. Published v1 helpers retain the old producer
+session behavior; use a dedicated migration pool closed after work or
+uncertainty, redact errors, and migrate to v2 when published. Existing embedded
+SQL and ledger formats remain unchanged; no history reset is required.
+
 ## Authentication and key handling
 
 The production server uses the static API-key implementation from

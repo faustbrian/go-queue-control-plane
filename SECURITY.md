@@ -4,14 +4,27 @@
 
 | Release line | Status | End of support |
 | --- | --- | --- |
+| `v2.0.0` on main | In preparation; not a published supported release | Not applicable |
 | `v1.1.x` | Supported | Not scheduled |
 | `v1.0.x` | Unsupported; security update required | 2026-09-09 |
 
-Security fixes are developed on the default branch and shipped in a new `v1`
-release. Release `v1.1.0` includes the gRPC denial-of-service fix recorded in
+Security fixes are developed on the default branch and shipped in a new
+release, using a new major when public contracts require it. Release `v1.1.0`
+includes the gRPC denial-of-service fix recorded in
 the changelog. Published `v1.0.0` does not include that fix and consumers must
 upgrade to the supported `v1.1` line. An advisory will identify affected
 versions and any later change to the supported release lines.
+
+Main prepares the Migrations v2 integration described in
+[compatibility guidance](COMPATIBILITY.md#queue-control-plane-v2-migration).
+The published v1 helper still composes Migrations v1: with a caller-retained
+database pool, an uncertain advisory-lock acquisition or release can return a
+physical session that still owns the lock to that pool, and default migration
+errors can expose driver diagnostics. There is no patched v1 release for this
+boundary. Until adopting published v2, isolate migration work in a dedicated
+pool that is closed on completion or uncertainty, and do not expose raw
+migration errors to logs or untrusted callers. The CLI owns and closes its pool;
+that lifecycle differs from the public helper's caller-owned pool.
 
 ## Reporting a vulnerability
 

@@ -9,7 +9,7 @@ GOBIN="${tool_dir}" go install \
 
 set +e
 "${tool_dir}/nilaway" \
-    -include-pkgs='github.com/faustbrian/go-queue-control-plane' \
+    -include-pkgs='github.com/faustbrian/go-queue-control-plane/v2' \
     ./...
 status=$?
 set -e

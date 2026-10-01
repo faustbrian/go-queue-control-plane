@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/faustbrian/go-queue-control-plane/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v2/apihttp"
 	telemetry "github.com/faustbrian/go-telemetry/v2"
 )
 

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	migrations "github.com/faustbrian/go-migrations"
-	migrationpostgres "github.com/faustbrian/go-migrations/postgres"
+	migrations "github.com/faustbrian/go-migrations/v2"
+	migrationpostgres "github.com/faustbrian/go-migrations/v2/postgres"
 )
 
 const (
@@ -31,7 +31,7 @@ var migrationFiles embed.FS
 
 // MigrationSource returns the immutable embedded control-plane schema history.
 func MigrationSource() (migrations.Source, error) {
-	return migrations.NewFSSource(migrationFiles, "migrations")
+	return migrations.NewFSSource(embeddedMigrationSource{}, "migrations")
 }
 
 // NewMigrationRunner builds the bounded migrations runner for the embedded
