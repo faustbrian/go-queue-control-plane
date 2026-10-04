@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/alicebob/miniredis/v2 v2.39.0
-	github.com/faustbrian/go-authentication v1.2.0
+	github.com/faustbrian/go-authentication v1.2.1
 	github.com/faustbrian/go-authorization v1.1.0
 	github.com/faustbrian/go-identifier v1.0.0
 	github.com/faustbrian/go-migrations/v2 v2.0.0

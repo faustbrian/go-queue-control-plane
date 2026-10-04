@@ -47,8 +47,8 @@ github.com/ebitengine/purego v0.10.0 h1:QIw4xfpWT6GWTzaW5XEKy3HXoqrJGx1ijYHzTF0/
 github.com/ebitengine/purego v0.10.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/emicklei/go-restful/v3 v3.13.0 h1:C4Bl2xDndpU6nJ4bc1jXd+uTmYPVUwkD6bFY/oTyCes=
 github.com/emicklei/go-restful/v3 v3.13.0/go.mod h1:6n3XBCmQQb25CM2LCACGz8ukIrRry+4bhvbpWn3mrbc=
-github.com/faustbrian/go-authentication v1.2.0 h1:XSaDAh6YSn4U3QQqK/cObfAvlrsBvALaHWMt4MbPbcg=
-github.com/faustbrian/go-authentication v1.2.0/go.mod h1:cLbyMCC4LxGQvUuB+Rx/lbnVvYiBN23mLn7z5TwMRNQ=
+github.com/faustbrian/go-authentication v1.2.1 h1:a+rVBOoJVDfvvP04TjzPJsN4sN6ac9Yy11iYABs8+dk=
+github.com/faustbrian/go-authentication v1.2.1/go.mod h1:nDioddd06agADXVzLYlUu3npMN73+IhrN8b8I4BcEss=
 github.com/faustbrian/go-authorization v1.1.0 h1:IGtr30rj4F6CgLwvbsCzWeVD6TG35/pBTiGG4+Z9tBw=
 github.com/faustbrian/go-authorization v1.1.0/go.mod h1:sbqcFYCCChWSkaO3hTYDv9eLWFQlgmyqYAMfOhBPafE=
 github.com/faustbrian/go-cache v1.0.0 h1:/B3O6vnO7nNKaHo7OyneRzKt0v4usW2cDfjK/nsPvaA=
