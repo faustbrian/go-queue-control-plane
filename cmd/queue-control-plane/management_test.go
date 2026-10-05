@@ -313,6 +313,12 @@ func TestProductionManagementConstructorsLoadSecretFiles(t *testing.T) {
 	if err != nil || reader == nil {
 		t.Fatalf("newProductionManagementStatus() = (%v, %v)", reader, err)
 	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	page, err := reader.ListQueues(ctx, queue.StatusPageRequest{Limit: 1})
+	if !errors.Is(err, context.Canceled) || len(page.Items) != 0 || page.NextCursor != "" {
+		t.Fatalf("canceled production ListQueues() = (%+v, %v)", page, err)
+	}
 	if reader, err := newProductionManagementStatus("://invalid", "token"); !missingDependency(reader) || err == nil {
 		t.Fatalf("invalid status client = (%v, %v)", reader, err)
 	}

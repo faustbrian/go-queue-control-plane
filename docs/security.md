@@ -1,5 +1,19 @@
 # Security, authorization, and privacy
 
+## Version and source applicability
+
+This model describes the published root `v2.0.1` contract and current v2 main.
+The immutable release source is
+[`6da9d0a2`](https://github.com/faustbrian/go-queue-control-plane/tree/v2.0.1).
+This patch adopts Queue v1.1.2's management HTTP redirect protection without
+changing caller-owned clients or the Migrations v2 nominal integration.
+Common deployment responsibilities also apply to supported v1.1 deployments,
+but the Migrations v2 session and default-error protections below do not apply
+to published v1 helpers. See the [supported-version policy](../SECURITY.md)
+and [migration guidance](../COMPATIBILITY.md#queue-control-plane-v2-migration).
+This model does not certify a deployment, caller-supplied collaborator, or
+unpublished change merely because it is on main.
+
 ## Threat model
 
 The control plane accepts high-impact administrative commands and stores their
@@ -42,16 +56,16 @@ five-minute budget; the producer also applies finite operation and cleanup
 deadlines. Context cancellation is not evidence that SQL was rolled back:
 inspect the migration ledger and database before retrying an uncertain result.
 
-| Residual | Owner and rationale | Mitigation and review trigger |
-| --- | --- | --- |
-| Compiler-owned embedded SQL | Repository maintainers; the provider serves only immutable build-time files, not an arbitrary caller filesystem. | Enforce supplied count, individual and aggregate name, and file-byte budgets before retaining metadata or copying bytes; review any change to embedded history or support for external files. |
-| Driver cancellation and physical close | Application operators and driver maintainers; portable contexts cannot forcibly preempt an uncooperative driver. | Use a context-aware PostgreSQL driver, bounded database/network operations, and a dedicated migration pool when isolation is required; review driver changes or evidence of delayed cancellation/close. |
-| Explicit private diagnostic extraction | Application error-handling owners; classification remains available without default disclosure. | Log only redacted classifications, never raw driver causes or SQL; review new error adapters and diagnostic logging. |
+| Residual | Owner | Rationale | Mitigation | Review trigger |
+| --- | --- | --- | --- | --- |
+| Compiler-owned embedded SQL | Repository maintainers | The provider serves immutable build-time files, not an arbitrary caller filesystem. | Enforce count, individual and aggregate name, and file-byte budgets before retaining metadata or copying bytes. | Embedded-history changes or support for external files. |
+| Driver cancellation and physical close | Application operators and driver maintainers | Portable contexts cannot forcibly preempt an uncooperative driver. | Use a context-aware PostgreSQL driver, bounded database/network operations, and a dedicated migration pool when isolation is required. | Driver changes or delayed cancellation/close. |
+| Explicit private diagnostic extraction | Application error-handling owners | Classification is available without default disclosure; deliberate cause extraction leaves that default boundary. | Log redacted classifications, never raw driver causes or SQL. | New error adapters or diagnostic logging. |
 
 These are conditional trusted-collaborator residuals, not guarantees of forced
 callback or driver preemption. Published v1 helpers retain the old producer
 session behavior; use a dedicated migration pool closed after work or
-uncertainty, redact errors, and migrate to v2 when published. Existing embedded
+uncertainty, redact errors, and migrate to published `v2.0.1`. Existing embedded
 SQL and ledger formats remain unchanged; no history reset is required.
 
 ## Authentication and key handling
@@ -209,6 +223,24 @@ do not prevent an attacker with database write access from replacing both data
 and an unprotected backup. Restrict database writes, export verification
 results, protect backups separately, and investigate any chain failure as a
 security incident.
+
+## Accepted deployment and collaborator residuals
+
+The following are conditional ownership boundaries, not acceptance of an
+authentication, authorization, redaction, or resource-limit bypass. Deployments
+must supply the stated mitigations; a missing mitigation is not certified safe.
+The migration-specific residuals above remain separately scoped to their
+published producer versions.
+
+| Residual | Owner | Rationale | Mitigation | Review trigger |
+| --- | --- | --- | --- | --- |
+| Plaintext static secrets at rest | Deployment secret-management owner | The shipped immutable access document contains plaintext secrets; hash-at-rest and dynamic identity integration are not implemented. | Mount a secret-manager-backed read-only volume, restrict filesystem access, exclude images/logs/arguments, and rotate overlapping keys with replica restarts. | Storage or identity-provider changes, or evidence of secret exposure. |
+| Inbound TLS and protected plaintext OTLP paths | Network and ingress operators | The listener relies on deployment TLS; explicit insecure OTLP is limited to a protected local path. | Terminate TLS before untrusted traffic, restrict network access, verify worker certificates, and prefer default TLS for export. | New exposure paths, ingress/Collector changes, or insecure export outside the protected path. |
+| Operator-owned TLS file lookup | Deployment filesystem owner | Portable file APIs cannot cancel a blocked pathname lookup before opening a descriptor. | Use local read-only regular files within the 1 MiB cap; exclude network, FUSE, and UNC mounts. | Non-local mount requirements or file-reader changes. |
+| Ingress-added sessions and trusted trace extraction | Ingress authentication owner | The server issues no cookies or login sessions; trusted propagation depends on authenticated ingress. | Own secure cookie flags, fixation prevention, rotation, expiry, and logout; strip untrusted propagation headers and retain API CSRF checks for unsafe cookie requests. | Session-provider, cookie, or propagation-policy changes. |
+| Process-local rate limiting | Deployment capacity owner | Each replica owns its counters, so aggregate admission grows with replica count. | Size replica budgets and use a shared ingress limiter when aggregate limits are required. | Replica-count, quota, tenant-isolation, or ingress-limiter changes. |
+| Trusted telemetry and application collaborators | Application integration and provider/driver owners | Standard telemetry providers and synchronous authorization, persistence, and dispatch collaborators are trusted code; contexts cannot forcibly preempt arbitrary implementations. | Use bounded context-aware collaborators, fixed telemetry labels, bounded exporter flush/shutdown, and controlled endpoints; do not substitute blocking custom instrumentation. | Provider/driver/adapter changes, new callbacks, or delayed operations/shutdown. |
+| Audit anchors and backup trust | Database security and recovery operators | Hashes detect chain changes only from a trusted anchor; database write access can replace data and an unprotected backup together. | Restrict writes, export verification heads, protect anchors/backups separately, verify restored chains, and investigate failures. | Retention/anchor changes, backup or restore procedures, or a chain failure. |
 
 See the [hardening evidence and threat matrix](hardening.md) for exact test and
 release-gate ownership.

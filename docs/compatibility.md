@@ -7,10 +7,12 @@ data-plane transport exists; that does not make the operation operational.
 ## Current production wiring
 
 Current main uses the Queue control plane `/v2` module and Migrations v2
-`Source`, `Runner`, and `Result` types. V2 is in preparation, not published;
+`Source`, `Runner`, and `Result` types. Release `v2.0.1` is published and supported;
 see the [major migration guide](../COMPATIBILITY.md#queue-control-plane-v2-migration).
 The released v1 helper retains its old Migrations v1 composition. SQL history,
 checksums, HTTP protocol, and other collaborator major selections are unchanged.
+The patch adopts Queue v1.1.2 and its management HTTP redirect protection
+without changing Queue nominal type identities or caller-owned HTTP clients.
 
 The control plane composes Authentication's canonical HTTP adapter, Queue's
 canonical Redis Streams adapter, and PostgreSQL's explicit `Connect` and

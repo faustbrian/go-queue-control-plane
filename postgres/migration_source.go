@@ -15,13 +15,17 @@ import (
 type embeddedMigrationSource struct{}
 
 func (embeddedMigrationSource) ReadDir(ctx context.Context, root string, limits migrations.SourceDirectoryLimits) ([]migrations.SourceEntry, error) {
+	return readEmbeddedMigrationDirectory(ctx, migrationFiles, root, limits)
+}
+
+func readEmbeddedMigrationDirectory(ctx context.Context, files fs.FS, root string, limits migrations.SourceDirectoryLimits) ([]migrations.SourceEntry, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	if limits.MaxEntries < 0 || limits.MaxNameBytes < 0 || limits.MaxTotalNameBytes < 0 {
 		return nil, migrations.ErrSourceLimit
 	}
-	directory, err := migrationFiles.Open(root)
+	directory, err := files.Open(root)
 	if err != nil {
 		return nil, err
 	}
@@ -55,13 +59,17 @@ func (embeddedMigrationSource) ReadDir(ctx context.Context, root string, limits 
 }
 
 func (embeddedMigrationSource) ReadFile(ctx context.Context, name string, maxBytes int) ([]byte, error) {
+	return readEmbeddedMigrationFile(ctx, migrationFiles, name, maxBytes)
+}
+
+func readEmbeddedMigrationFile(ctx context.Context, files fs.ReadFileFS, name string, maxBytes int) ([]byte, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	if maxBytes < 0 {
 		return nil, migrations.ErrInvalidEncoding
 	}
-	file, err := migrationFiles.Open(name)
+	file, err := files.Open(name)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +84,7 @@ func (embeddedMigrationSource) ReadFile(ctx context.Context, name string, maxByt
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	contents, err := migrationFiles.ReadFile(name)
+	contents, err := files.ReadFile(name)
 	if err != nil {
 		return nil, err
 	}

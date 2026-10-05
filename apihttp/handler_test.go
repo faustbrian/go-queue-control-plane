@@ -54,8 +54,13 @@ func TestHandlerTrustsInboundOnlyForAuthenticatedRequest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewHandler() error = %v", err)
 	}
+	anonymous := httptest.NewRequest(http.MethodGet, "/health/live", nil)
+	anonymous = anonymous.WithContext(authentication.ContextWithPrincipal(
+		anonymous.Context(), authentication.AnonymousPrincipal(),
+	))
 	for _, request := range []*http.Request{
 		httptest.NewRequest(http.MethodGet, "/health/live", nil),
+		anonymous,
 		authenticatedRequest(t, http.MethodGet, "/health/live", ""),
 	} {
 		response := httptest.NewRecorder()
@@ -64,8 +69,8 @@ func TestHandlerTrustsInboundOnlyForAuthenticatedRequest(t *testing.T) {
 			t.Fatalf("status = %d, want 200", response.Code)
 		}
 	}
-	if probe.trusted != 1 || probe.untrusted != 1 {
-		t.Fatalf("propagation calls = trusted %d, untrusted %d, want 1 each", probe.trusted, probe.untrusted)
+	if probe.trusted != 1 || probe.untrusted != 2 {
+		t.Fatalf("propagation calls = trusted %d, untrusted %d, want 1 and 2", probe.trusted, probe.untrusted)
 	}
 }
 

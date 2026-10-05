@@ -46,10 +46,27 @@ published `v1.0.0` GitHub release includes a source archive, module file,
 CycloneDX SBOM, in-toto provenance statement, checksum manifest, SSH signature,
 and allowed-signer file.
 
+The published `v2.0.0` release follows that seven-asset source pattern. Its
+module archive and module file come from the public Go proxy. The CycloneDX
+SBOM and in-toto provenance statement were assembled locally by the maintainer,
+not built by CI. The SBOM describes the Darwin/arm64 dependency graph and lacks
+detected license evidence for `github.com/pressly/goose/v3`; it is not a complete
+legal-license report. No deployable binary or image is attached.
+
+The published `v2.0.1` release retains seven source-only assets. Its module
+archive was generated from immutable main source `6da9d0a2` using Go's module
+ZIP rules; every archived source file matches the public proxy archive even
+though raw ZIP encoding differs. The module file matches the public proxy.
+The maintainer-local CycloneDX SBOM covers the application and runtime Go
+dependency graph, not tests, standard-library packages, frontend dependencies,
+or a complete license report. Its in-toto provenance records local generation,
+not CI-built artifacts or a certified deployment. Check the signed checksums
+before using these assets.
+
 ## Versioning and changelog
 
-The module starts its public release history at `v1.0.0`; current main prepares
-`v2.0.0` under the root `/v2` module path. Keep historical v1 release notes and
+The module starts its public release history at `v1.0.0`; published `v2.0.0`
+uses the root `/v2` module path. Keep historical v1 release notes and
 assets immutable. A new major tag is created from main, not from a version
 directory or branch. Update `CHANGELOG.md` in
 the same pull request as every user-visible change. Before release, move
