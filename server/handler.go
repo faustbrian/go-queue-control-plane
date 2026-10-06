@@ -3,9 +3,9 @@ package server
 import (
 	"net/http"
 
-	authentication "github.com/faustbrian/go-authentication"
-	authhttp "github.com/faustbrian/go-authentication/adapters/http"
-	"github.com/faustbrian/go-queue-control-plane/v2/apihttp"
+	authentication "github.com/faustbrian/go-authentication/v2"
+	authhttp "github.com/faustbrian/go-authentication/v2/adapters/http"
+	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
 )
 
 // NewAdministrativeHandler composes browser admission and fail-closed

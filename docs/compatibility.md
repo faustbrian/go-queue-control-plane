@@ -6,18 +6,20 @@ data-plane transport exists; that does not make the operation operational.
 
 ## Current production wiring
 
-Current main uses the Queue control plane `/v2` module and Migrations v2
-`Source`, `Runner`, and `Result` types. Release `v2.0.1` is published and supported;
-see the [major migration guide](../COMPATIBILITY.md#queue-control-plane-v2-migration).
-The released v1 helper retains its old Migrations v1 composition. SQL history,
-checksums, HTTP protocol, and other collaborator major selections are unchanged.
-The patch adopts Queue v1.1.2 and its management HTTP redirect protection
-without changing Queue nominal type identities or caller-owned HTTP clients.
+Current main prepares the Queue control plane `/v3` module with Authentication
+v2.0.0 and Queue v1.1.3. Both dependencies are published; this QCP v3
+composition is not published yet. See the [prospective migration guide](../COMPATIBILITY.md#queue-control-plane-v3-migration-on-main).
+Release `v2.0.1` remains published and supported, with its existing
+Authentication v1 and Queue v1.1.2 composition. Migrations v2 `Source`, `Runner`
+and `Result` types remain selected on main; the released v1 helper retains
+Migrations v1. SQL history, checksums, HTTP protocol, caller-owned resources
+and other collaborator major selections are unchanged.
 
 The control plane composes Authentication's canonical HTTP adapter, Queue's
 canonical Redis Streams adapter, and PostgreSQL's explicit `Connect` and
-bounded `Shutdown` lifecycle. Authentication retains its released `authhttp`
-aliases, so existing source that supplies those types remains compatible.
+bounded `Shutdown` lifecycle. Authentication v2 retains type-identical
+`authhttp` aliases within that major. Authentication v1 aliases are not v2
+types; migrate all nominal imports together rather than mixing those cohorts.
 
 | Capability | Status | Notes |
 | --- | --- | --- |

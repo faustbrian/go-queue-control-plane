@@ -1,14 +1,14 @@
 // Package kubernetes preserves the released path for the deliberately narrow
 // Kubernetes integration.
 //
-// Deprecated: use github.com/faustbrian/go-queue-control-plane/v2/adapters/kubernetes.
+// Deprecated: use github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes.
 package kubernetes
 
 import (
 	"context"
 	"errors"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

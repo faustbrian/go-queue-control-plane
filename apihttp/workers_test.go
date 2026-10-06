@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
-	"github.com/faustbrian/go-queue-control-plane/v2/authz"
-	"github.com/faustbrian/go-queue-control-plane/v2/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
+	"github.com/faustbrian/go-queue-control-plane/v3/authz"
+	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
 )
 
 func TestHandlerListsAuthorizedTenantWorkersWithBoundedCursor(t *testing.T) {

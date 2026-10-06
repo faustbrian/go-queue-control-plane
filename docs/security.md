@@ -2,7 +2,8 @@
 
 ## Version and source applicability
 
-This model describes the published root `v2.0.1` contract and current v2 main.
+This model describes the published root `v2.0.1` contract and explicitly
+identified prospective v3 changes on main.
 The immutable release source is
 [`6da9d0a2`](https://github.com/faustbrian/go-queue-control-plane/tree/v2.0.1).
 This patch adopts Queue v1.1.2's management HTTP redirect protection without
@@ -13,6 +14,11 @@ to published v1 helpers. See the [supported-version policy](../SECURITY.md)
 and [migration guidance](../COMPATIBILITY.md#queue-control-plane-v2-migration).
 This model does not certify a deployment, caller-supplied collaborator, or
 unpublished change merely because it is on main.
+
+Prospective v3 composes Authentication v2 nominal types and Queue v1.1.3.
+Authentication v2.0.0 is published; QCP v3 is not published yet. The
+[v3 migration guide](../COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
+describes adoption without implying release qualification or deployment.
 
 ## Threat model
 
@@ -69,6 +75,12 @@ uncertainty, redact errors, and migrate to published `v2.0.1`. Existing embedded
 SQL and ledger formats remain unchanged; no history reset is required.
 
 ## Authentication and key handling
+
+Prospective v3 on main uses Authentication v2's finite principal and static
+API-key admission policy. Oversized startup identities and keys fail rather
+than being truncated; review access documents before migration. Its principal,
+credential, challenge and canonical HTTP adapter types must all use the v2
+module. Published QCP v2 retains its existing Authentication v1 composition.
 
 The production server uses the static API-key implementation from
 `authentication`. A request supplies a public key ID and secret in separate

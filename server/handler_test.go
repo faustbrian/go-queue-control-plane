@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	authentication "github.com/faustbrian/go-authentication"
-	authhttp "github.com/faustbrian/go-authentication/adapters/http"
-	"github.com/faustbrian/go-queue-control-plane/v2/apihttp"
+	authentication "github.com/faustbrian/go-authentication/v2"
+	authhttp "github.com/faustbrian/go-authentication/v2/adapters/http"
+	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
 )
 
 func TestAdministrativeHandlerRejectsInvalidComposition(t *testing.T) {
@@ -102,9 +102,9 @@ func TestAdministrativeHandlerRejectsInvalidCredentialsBeforeAPI(t *testing.T) {
 func TestAdministrativeHandlerAuthenticatesBearerAndAllowsAnonymousProbes(t *testing.T) {
 	t.Parallel()
 
-	principal, err := authentication.NewPrincipal(authentication.PrincipalSpec{
+	principal, err := authentication.NewPrincipalWithOptions(authentication.PrincipalSpec{
 		Subject: "operator-1", Method: "bearer",
-	})
+	}, authentication.WithMaxPrincipalStringBytes(10))
 	if err != nil {
 		t.Fatalf("NewPrincipal() error = %v", err)
 	}

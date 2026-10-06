@@ -29,6 +29,14 @@ pool that is closed on completion or uncertainty, and do not expose raw
 migration errors to logs or untrusted callers. The CLI owns and closes its pool;
 that lifecycle differs from the public helper's caller-owned pool.
 
+## Prospective main
+
+Current main prepares root v3 with published Authentication v2.0.0. QCP v3 is
+not published yet, and v3 support begins only at publication. The supported
+published lines above remain unchanged. See the
+[prospective migration guide](COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
+for the nominal import changes and finite startup admission policy.
+
 ## Reporting a vulnerability
 
 Do not disclose a suspected vulnerability in a public issue. Use GitHub's

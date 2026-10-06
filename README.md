@@ -32,6 +32,11 @@ also consume durable desired state through the typed client. See
 
 ## Install
 
+Current main prepares root v3 with Authentication v2. It is not published yet;
+the commands below target existing published releases. See the
+[v3 migration guide](COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
+for the coherent nominal import migration and finite authentication admission.
+
 The published v1 line remains available. Add that module to an application with:
 
 ```sh

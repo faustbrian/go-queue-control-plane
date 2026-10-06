@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
-	"github.com/faustbrian/go-queue-control-plane/v2/authz"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v2/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
+	"github.com/faustbrian/go-queue-control-plane/v3/authz"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 )
 
 func TestHandlerGetsAuthorizedTenantCommandResult(t *testing.T) {
