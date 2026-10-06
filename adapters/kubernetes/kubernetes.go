@@ -7,7 +7,7 @@ package kubernetes
 import (
 	"io"
 
-	legacy "github.com/faustbrian/go-queue-control-plane/v2/kubernetes"
+	legacy "github.com/faustbrian/go-queue-control-plane/v3/kubernetes"
 )
 
 var (

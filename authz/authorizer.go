@@ -6,10 +6,10 @@ import (
 	"errors"
 	"reflect"
 
-	authentication "github.com/faustbrian/go-authentication"
+	authentication "github.com/faustbrian/go-authentication/v2"
 	authorization "github.com/faustbrian/go-authorization"
 	"github.com/faustbrian/go-authorization/authn"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
 )
 
 var (

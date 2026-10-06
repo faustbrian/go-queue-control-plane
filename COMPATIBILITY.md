@@ -17,6 +17,27 @@ Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs
 follow [`DEPRECATION.md`](DEPRECATION.md).
 
+## Queue control plane v3 migration on main
+
+Current main prepares `github.com/faustbrian/go-queue-control-plane/v3`; v3 is
+not published yet. Move all control-plane imports together with Authentication
+imports to `github.com/faustbrian/go-authentication/v2`, including the canonical
+`adapters/http` and `apikey` packages. Public static-access and administrative
+handler signatures use those v2 nominal types. Do not mix v1 Authentication
+credentials, principals, challenges or extractors into this composition.
+
+Authentication v2 enforces finite principal and static-credential admission;
+oversized identities or keys are refused rather than truncated. Review startup
+access documents before adoption. Anonymous health probes remain explicit;
+administrative permissions still require authenticated tenant-scoped identity.
+
+Queue v1.1.3 retains management protocol major 1. Authorization's core ACL,
+PostgreSQL, Migrations v2 and Telemetry v2 retain their selected module majors.
+This migration does not change embedded SQL, schema history, HTTP endpoint
+versions, command names, caller resource ownership or persistence formats.
+The source remains at the repository root on main; there are no major-specific
+source directories or branches.
+
 ## Queue control plane v2 migration
 
 Release `v2.0.1` is published and supported. It retains the v2.0.0 nominal

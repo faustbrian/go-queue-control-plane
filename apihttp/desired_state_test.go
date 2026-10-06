@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
-	"github.com/faustbrian/go-queue-control-plane/v2/authz"
-	"github.com/faustbrian/go-queue-control-plane/v2/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v2/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
+	"github.com/faustbrian/go-queue-control-plane/v3/authz"
+	"github.com/faustbrian/go-queue-control-plane/v3/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

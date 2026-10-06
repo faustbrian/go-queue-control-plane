@@ -6,6 +6,16 @@ Versioning.
 
 ## Unreleased
 
+### Changed
+
+- Move the root module and all package imports to
+  `github.com/faustbrian/go-queue-control-plane/v3` to compose Authentication v2
+  principal, credential, challenge, API-key and HTTP adapter types. Update
+  both module majors together; oversized authentication identities and keys
+  now follow the producer's finite admission policy.
+- Adopt Queue v1.1.3 while retaining its management protocol and nominal types.
+  Authorization's core ACL and PostgreSQL retain their existing major versions.
+
 ### Documentation
 
 - Point installation and security guidance to published v2.0.1, including its

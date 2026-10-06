@@ -1,15 +1,15 @@
-module github.com/faustbrian/go-queue-control-plane/v2
+module github.com/faustbrian/go-queue-control-plane/v3
 
 go 1.27.0
 
 require (
 	github.com/alicebob/miniredis/v2 v2.39.0
-	github.com/faustbrian/go-authentication v1.2.0
+	github.com/faustbrian/go-authentication/v2 v2.0.0
 	github.com/faustbrian/go-authorization v1.1.0
 	github.com/faustbrian/go-identifier v1.0.0
 	github.com/faustbrian/go-migrations/v2 v2.0.0
 	github.com/faustbrian/go-postgres v1.1.0
-	github.com/faustbrian/go-queue v1.1.2
+	github.com/faustbrian/go-queue v1.1.3
 	github.com/faustbrian/go-telemetry/v2 v2.0.0
 	github.com/jackc/pgx/v5 v5.10.0
 	go.opentelemetry.io/otel v1.46.0
@@ -24,7 +24,7 @@ require (
 )
 
 require (
-	github.com/appleboy/com v1.2.0 // indirect
+	github.com/appleboy/com v1.2.2 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
