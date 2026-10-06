@@ -1,4 +1,4 @@
-//lint:file-ignore SA1019 Delegation preserves the legacy v2 package type identities.
+//lint:file-ignore SA1019 Delegation preserves the legacy v3 package type identities.
 
 // Package kubernetes exposes the target-oriented entry point for the narrow
 // Kubernetes Deployment integration.
