@@ -44,7 +44,8 @@ func LoadStaticAccessFile(path string, maxBytes int64) (*StaticAccess, error) {
 	if strings.TrimSpace(path) == "" {
 		return nil, ErrInvalidAccessDocument
 	}
-	file, err := os.Open(path) //nolint:gosec // The operator explicitly configures this access document path.
+	// #nosec G304 -- the caller owns the access-document path; startup reads bounded JSON, not request-derived paths
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, ErrInvalidAccessDocument
 	}

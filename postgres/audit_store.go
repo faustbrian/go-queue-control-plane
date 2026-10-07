@@ -224,6 +224,10 @@ func (s *AuditStore) RetainBefore(
 				return err
 			}
 			var encodedHash []byte
+			storedSequence, ok := int64FromUint64(sequence)
+			if !ok {
+				return ErrInvalidAuditState
+			}
 			var deleted int64
 			var nextSequence int64
 			err = tx.QueryRow(
@@ -232,7 +236,7 @@ func (s *AuditStore) RetainBefore(
 				tenant,
 				postgresTimestamp(cutoff),
 				int64(batchSize),
-				int64(sequence), //nolint:gosec // Loaded from a validated bigint.
+				storedSequence,
 				anchor[:],
 				retainedThrough,
 			).Scan(

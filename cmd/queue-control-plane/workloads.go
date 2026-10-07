@@ -54,7 +54,8 @@ func loadProductionWorkloads(path string, maxBytes int64) (workloadRuntime, erro
 }
 
 func openWorkloadFile(path string) (io.ReadCloser, error) {
-	return os.Open(path) //nolint:gosec // The operator explicitly configures this bounded file path.
+	// #nosec G304 -- the operator configures the startup tenant-mapping path; its JSON reader enforces the document bound
+	return os.Open(path)
 }
 
 func productionDeploymentFactory() (controlkubernetes.DeploymentFactory, error) {

@@ -183,7 +183,11 @@ func (s *CommandStore) RetainCommandsBefore(
 			if deleted < 0 || deleted > int64(batchSize) {
 				return ErrInvalidCommandRetentionState
 			}
-			result.Deleted = uint32(deleted) //nolint:gosec // Checked against the bounded batch above.
+			count, ok := uint32FromInt64(deleted)
+			if !ok {
+				return ErrInvalidCommandRetentionState
+			}
+			result.Deleted = count
 
 			return nil
 		},

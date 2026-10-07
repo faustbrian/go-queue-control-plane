@@ -60,7 +60,8 @@ func executeProductionRetention(
 		path,
 		maxBytes,
 		func(path string) (io.ReadCloser, error) {
-			return os.Open(path) //nolint:gosec // The operator explicitly configures this policy path.
+			// #nosec G304 -- the operator configures the retention policy path; bounded parsing precedes database acquisition
+			return os.Open(path)
 		},
 		gopostgres.Connect,
 		buildProductionRetentionAudit,
