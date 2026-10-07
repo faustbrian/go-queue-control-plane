@@ -53,7 +53,6 @@ func NewRuntimeWithPool(pool *gopostgresv2.Pool) (*Runtime, error) {
 }
 
 func newRuntime(raw *pgxpool.Pool, pool interface{ Ping(context.Context) error }) (*Runtime, error) {
-
 	return &Runtime{
 		Journal:   newJournal(newPostgresTransactionRunner(raw)),
 		Audit:     &AuditStore{beginner: raw},

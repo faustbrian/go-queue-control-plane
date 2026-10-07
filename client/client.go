@@ -28,11 +28,11 @@ const (
 	// APIKeyIDHeader carries the non-secret static key identifier accepted by
 	// the deployable control-plane server.
 	// #nosec G101 -- public HTTP header name, not a credential; credential values come from caller-owned authentication
-	APIKeyIDHeader = "X-Queue-Control-Key-ID" //nolint:gosec // A protocol header name, not a credential.
+	APIKeyIDHeader = "X-Queue-Control-Key-ID"
 	// APIKeySecretHeader carries the static key credential accepted by the
 	// deployable control-plane server.
 	// #nosec G101 -- public HTTP header name, not a credential; credential values come from caller-owned authentication
-	APIKeySecretHeader = "X-Queue-Control-Key" //nolint:gosec // A protocol header name, not a credential.
+	APIKeySecretHeader = "X-Queue-Control-Key"
 )
 
 var (

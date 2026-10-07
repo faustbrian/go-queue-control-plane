@@ -17,7 +17,7 @@ func TestTLSMaterialReaderRejectsZeroBudgetForEmptyFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	reader := tlsMaterialReader{}
-	if contents, err := reader.ReadFile(context.Background(), path, 0); contents != nil || err != errTLSMaterial {
+	if contents, err := reader.ReadFile(context.Background(), path, 0); contents != nil || !errors.Is(err, errTLSMaterial) || err.Error() != errTLSMaterial.Error() {
 		t.Fatalf("zero budget returned contents=%v error=%v", contents != nil, err)
 	}
 	if contents, err := reader.ReadFile(context.Background(), path, 1); err != nil || len(contents) != 0 {
@@ -47,7 +47,7 @@ func TestTLSMaterialReaderRedactsUncancelledStatFailure(t *testing.T) {
 	reader := tlsMaterialReader{stat: func(*os.File) (os.FileInfo, error) {
 		return nil, errors.New("private stat diagnostic")
 	}}
-	if contents, err := reader.ReadFile(context.Background(), path, 8); contents != nil || err != errTLSMaterial {
+	if contents, err := reader.ReadFile(context.Background(), path, 8); contents != nil || !errors.Is(err, errTLSMaterial) || err.Error() != errTLSMaterial.Error() {
 		t.Fatalf("stat failure returned contents=%v error=%v", contents != nil, err)
 	}
 }
