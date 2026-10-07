@@ -6,9 +6,12 @@ data-plane transport exists; that does not make the operation operational.
 
 ## Current production wiring
 
-Current main prepares the Queue control plane `/v3` module with Authentication
-v2.0.0 and Queue v1.1.3. Both dependencies are published; this QCP v3
-composition is not published yet. See the [prospective migration guide](../COMPATIBILITY.md#queue-control-plane-v3-migration-on-main).
+Current source uses the Queue control plane `/v3` module with Authentication
+v2.0.0 and Queue v1.1.3. Both dependencies are published. Confirm the
+control-plane version in
+[Releases](https://github.com/faustbrian/go-queue-control-plane/releases)
+before adoption; main source alone is not release qualification. See the
+[v3 migration guide](../COMPATIBILITY.md#queue-control-plane-v3-migration-on-main).
 Release `v2.0.1` remains published and supported, with its existing
 Authentication v1 and Queue v1.1.2 composition. Migrations v2 `Source`, `Runner`
 and `Result` types remain selected on main; the released v1 helper retains

@@ -25,7 +25,7 @@ Migration requires only changing the import path; exported types, constants,
 error sentinels, constructors, and behavior remain compatible. The legacy path
 will not be removed before `v2.0.0`.
 
-Current main retains both paths under the prospective root `/v3` module.
+Current main retains both paths under the root `/v3` module.
 Within v3, prefer
 `github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes`;
 the `/v3/kubernetes` facade aliases those same v3 types. Across module majors,
