@@ -32,10 +32,20 @@ also consume durable desired state through the typed client. See
 
 ## Install
 
-Current main prepares root v3 with Authentication v2. It is not published yet;
-the commands below target existing published releases. See the
+Current source uses root v3 with Authentication v2. Confirm v3 availability in
+[Releases](https://github.com/faustbrian/go-queue-control-plane/releases)
+before adoption; source on main alone is not a published release.
+The commands below retain the supported published v1 and v2 choices. See the
 [v3 migration guide](COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
 for the coherent nominal import migration and finite authentication admission.
+
+When v3.0.0 is published, use the official major suffix:
+
+```sh
+go get github.com/faustbrian/go-queue-control-plane/v3@v3.0.0
+go install github.com/faustbrian/go-queue-control-plane/v3/cmd/queue-control-plane@v3.0.0
+go install github.com/faustbrian/go-queue-control-plane/v3/cmd/queue-control@v3.0.0
+```
 
 The published v1 line remains available. Add that module to an application with:
 

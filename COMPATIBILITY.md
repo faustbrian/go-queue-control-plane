@@ -19,8 +19,11 @@ follow [`DEPRECATION.md`](DEPRECATION.md).
 
 ## Queue control plane v3 migration on main
 
-Current main prepares `github.com/faustbrian/go-queue-control-plane/v3`; v3 is
-not published yet. Move all control-plane imports together with Authentication
+Current source uses `github.com/faustbrian/go-queue-control-plane/v3`.
+Confirm a published v3 tag in
+[Releases](https://github.com/faustbrian/go-queue-control-plane/releases)
+before adoption; main source alone does not establish release availability.
+Move all control-plane imports together with Authentication
 imports to `github.com/faustbrian/go-authentication/v2`, including the canonical
 `adapters/http` and `apikey` packages. Public static-access and administrative
 handler signatures use those v2 nominal types. Do not mix v1 Authentication
