@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v2"
 	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
 	"github.com/faustbrian/go-queue-control-plane/v3/control"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
@@ -150,7 +150,7 @@ func runProcess(
 		workloads = workload.Source
 	}
 
-	pool, err := dependencies.openPool(ctx, gopostgres.Config{DSN: config.DatabaseURL})
+	pool, err := dependencies.openPool(ctx, postgresPoolConfig(config.DatabaseURL))
 	if err != nil {
 		return err
 	}

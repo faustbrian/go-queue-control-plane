@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v2"
 	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
 	"github.com/faustbrian/go-queue-control-plane/v3/control"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 	"github.com/faustbrian/go-queue-control-plane/v3/server"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -26,6 +27,27 @@ var (
 	buildCommit  = "unknown"
 	buildTime    string
 )
+
+// postgresPoolConfig keeps DSN acquisition in the application. Native parsing
+// may synchronously consult environment and files; cancellation is cooperative
+// at the boundaries, not a promise to preempt those native operations.
+func postgresPoolConfig(dsn string) gopostgres.Config {
+	return gopostgres.Config{
+		DSN:           dsn,
+		StartupPolicy: gopostgres.StartupPing,
+		ResolveDSN: func(ctx context.Context, dsn string) (*gopostgres.PoolConfig, error) {
+			if err := ctx.Err(); err != nil {
+				return nil, context.Cause(ctx)
+			}
+			config, err := pgxpool.ParseConfig(dsn)
+			if ctx.Err() != nil {
+				return nil, context.Cause(ctx)
+			}
+
+			return config, err
+		},
+	}
+}
 
 func productionDependencies() processDependencies {
 	return processDependencies{
@@ -57,7 +79,7 @@ func productionDependencies() processDependencies {
 		},
 		retain:           executeProductionRetention,
 		openPool:         gopostgres.Connect,
-		buildPersistence: controlpostgres.NewRuntime,
+		buildPersistence: controlpostgres.NewRuntimeWithPool,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return apihttp.NewFixedWindowRateLimiter(
 				productionRateLimit,

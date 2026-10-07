@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
 	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
 	"github.com/faustbrian/go-queue-control-plane/v3/control"
 	"github.com/faustbrian/go-queue-control-plane/v3/server"
@@ -74,7 +73,7 @@ func TestProductionDependenciesUseBoundedImplementations(t *testing.T) {
 		t.Fatalf("routeDispatchers() = (%v, %v), want dispatcher and nil", routed, err)
 	}
 
-	if pool, err := dependencies.openPool(context.Background(), gopostgres.Config{DSN: "://"}); err == nil || pool != nil {
+	if pool, err := dependencies.openPool(context.Background(), postgresPoolConfig("://")); err == nil || pool != nil {
 		t.Fatalf("openPool(malformed) = (%v, %v), want safe parse failure", pool, err)
 	}
 

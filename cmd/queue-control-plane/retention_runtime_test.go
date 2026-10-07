@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v2"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 	"github.com/jackc/pgx/v5"
 )
@@ -32,7 +32,8 @@ func TestExecuteRetentionLoadsAppliesAndClosesResources(t *testing.T) {
 
 			return io.NopCloser(strings.NewReader(document)), nil
 		},
-		func(_ context.Context, config gopostgres.Config) (*gopostgres.Pool, error) {
+		func(ctx context.Context, config gopostgres.Config) (*gopostgres.Pool, error) {
+			assertProcessPoolConfig(t, ctx, config)
 			if config.DSN != "postgres://database/control" {
 				t.Fatalf("retention DSN = %q", config.DSN)
 			}

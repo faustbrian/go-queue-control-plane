@@ -12,11 +12,12 @@ import (
 	"time"
 
 	identifierulid "github.com/faustbrian/go-identifier/ulid"
-	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v2"
 	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
 	"github.com/faustbrian/go-queue-control-plane/v3/control"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -169,7 +170,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 		t.Fatalf("migrate PostgreSQL: %v", err)
 	}
 
-	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, integrationPoolConfig(dsn))
 	if err != nil {
 		t.Fatalf("open runtime pool: %v", err)
 	}
@@ -178,7 +179,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})
-	runtime, err := controlpostgres.NewRuntime(pool)
+	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}
@@ -433,7 +434,7 @@ func TestPostgresRetentionJobResultIntegration(t *testing.T) {
 	if dsn == "" {
 		t.Fatal("TEST_DATABASE_URL is required for integration tests")
 	}
-	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, integrationPoolConfig(dsn))
 	if err != nil {
 		t.Fatalf("open runtime pool: %v", err)
 	}
@@ -442,7 +443,7 @@ func TestPostgresRetentionJobResultIntegration(t *testing.T) {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})
-	runtime, err := controlpostgres.NewRuntime(pool)
+	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}
@@ -535,4 +536,21 @@ func (dispatcher *integrationDispatcher) Calls() int {
 	defer dispatcher.mu.Unlock()
 
 	return dispatcher.calls
+}
+
+func integrationPoolConfig(dsn string) gopostgres.Config {
+	return gopostgres.Config{
+		DSN:           dsn,
+		StartupPolicy: gopostgres.StartupPing,
+		ResolveDSN: func(ctx context.Context, dsn string) (*gopostgres.PoolConfig, error) {
+			if ctx.Err() != nil {
+				return nil, context.Cause(ctx)
+			}
+			config, err := pgxpool.ParseConfig(dsn)
+			if ctx.Err() != nil {
+				return nil, context.Cause(ctx)
+			}
+			return config, err
+		},
+	}
 }

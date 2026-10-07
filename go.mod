@@ -9,9 +9,10 @@ require (
 	github.com/faustbrian/go-identifier v1.0.0
 	github.com/faustbrian/go-migrations/v2 v2.0.0
 	github.com/faustbrian/go-postgres v1.1.0
+	github.com/faustbrian/go-postgres/v2 v2.0.0
 	github.com/faustbrian/go-queue v1.1.3
 	github.com/faustbrian/go-telemetry/v2 v2.0.0
-	github.com/jackc/pgx/v5 v5.10.0
+	github.com/jackc/pgx/v5 v5.11.0
 	go.opentelemetry.io/otel v1.46.0
 	go.opentelemetry.io/otel/metric v1.46.0
 	go.opentelemetry.io/otel/sdk v1.46.0

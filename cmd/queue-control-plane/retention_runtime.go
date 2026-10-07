@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v2"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 )
 
@@ -33,7 +33,7 @@ func executeRetention(
 		return err
 	}
 
-	pool, err := openPool(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := openPool(ctx, postgresPoolConfig(dsn))
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func executeProductionRetention(
 }
 
 func buildProductionRetentionAudit(pool *gopostgres.Pool) (retentionAudit, error) {
-	runtime, err := controlpostgres.NewRuntime(pool)
+	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
 	if err != nil {
 		return nil, err
 	}

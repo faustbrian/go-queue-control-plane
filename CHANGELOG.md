@@ -6,6 +6,19 @@ Versioning.
 
 ## Unreleased
 
+### Added
+
+- Add `postgres.NewRuntimeWithPool` for caller-owned PostgreSQL v2 pools,
+  sharing the native persistence runtime and bounded readiness checks. The
+  existing `NewRuntime` entrypoint continues accepting PostgreSQL v1 pools.
+
+### Changed
+
+- Adopt published PostgreSQL v2.0.0 and pgx v5.11.0 for server and retention
+  pool acquisition, with application-owned DSN resolution and explicit bounded
+  startup connectivity checks. Migration history and persistence formats are
+  unchanged; PostgreSQL v1 remains available for legacy public collaborators.
+
 ## 3.0.0 - 2026-10-07
 
 ### Changed

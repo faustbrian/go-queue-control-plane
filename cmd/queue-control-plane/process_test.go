@@ -10,13 +10,14 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v2"
 	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
 	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
 	"github.com/faustbrian/go-queue-control-plane/v3/control"
 	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
 	"github.com/faustbrian/go-queue-control-plane/v3/server"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel/metric"
 	metricnoop "go.opentelemetry.io/otel/metric/noop"
 	"go.opentelemetry.io/otel/propagation"
@@ -210,10 +211,11 @@ func TestRunProcessComposesAndClosesRuntime(t *testing.T) {
 			}
 			return control.NewRoutingDispatcher(dataPlane, workloads)
 		},
-		openPool: func(context.Context, gopostgres.Config) (*gopostgres.Pool, error) {
+		openPool: func(ctx context.Context, config gopostgres.Config) (*gopostgres.Pool, error) {
+			assertProcessPoolConfig(t, ctx, config)
 			return pool, nil
 		},
-		buildPersistence: controlpostgres.NewRuntime,
+		buildPersistence: controlpostgres.NewRuntimeWithPool,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return applicationRateLimiter{}, nil
 		},
@@ -496,7 +498,7 @@ func validProcessDependencies(t *testing.T) processDependencies {
 		openPool: func(context.Context, gopostgres.Config) (*gopostgres.Pool, error) {
 			return lazyProcessPool(t), nil
 		},
-		buildPersistence: controlpostgres.NewRuntime,
+		buildPersistence: controlpostgres.NewRuntimeWithPool,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return applicationRateLimiter{}, nil
 		},
@@ -514,12 +516,32 @@ func lazyProcessPool(t *testing.T) *gopostgres.Pool {
 	pool, err := gopostgres.Connect(context.Background(), gopostgres.Config{
 		DSN:           "postgres://localhost/control_plane",
 		StartupPolicy: gopostgres.StartupLazy,
+		ResolveDSN: func(_ context.Context, dsn string) (*gopostgres.PoolConfig, error) {
+			return pgxpool.ParseConfig(dsn)
+		},
 	})
 	if err != nil {
 		t.Fatalf("postgres.Connect() error = %v", err)
 	}
 
 	return pool
+}
+
+func assertProcessPoolConfig(t *testing.T, ctx context.Context, config gopostgres.Config) {
+	t.Helper()
+	if config.StartupPolicy != gopostgres.StartupPing || config.ResolveDSN == nil {
+		t.Fatal("pool acquisition requires an application resolver and explicit startup ping")
+	}
+	native, err := gopostgres.PrepareConfig(ctx, config)
+	if err != nil || native == nil {
+		t.Fatalf("PrepareConfig(acquisition) = (%v, %v)", native, err)
+	}
+	cancelled, cancel := context.WithCancelCause(context.Background())
+	cause := errors.New("resolver cancelled")
+	cancel(cause)
+	if native, err := config.ResolveDSN(cancelled, config.DSN); native != nil || !errors.Is(err, cause) {
+		t.Fatalf("resolver(cancelled) = (%v, %v), want nil and cancellation cause", native, err)
+	}
 }
 
 type processServerFunc func(context.Context) error

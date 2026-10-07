@@ -5,6 +5,8 @@ import (
 	"errors"
 
 	gopostgres "github.com/faustbrian/go-postgres"
+	gopostgresv2 "github.com/faustbrian/go-postgres/v2"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // ErrInvalidRuntimePool reports a missing or uninitialized PostgreSQL pool.
@@ -22,7 +24,7 @@ type Runtime struct {
 
 // PoolReadiness adapts postgres bounded health checks to the API contract.
 type PoolReadiness struct {
-	pool *gopostgres.Pool
+	pool interface{ Ping(context.Context) error }
 }
 
 // Ready performs a bounded PostgreSQL ping through postgres.
@@ -30,12 +32,27 @@ func (readiness *PoolReadiness) Ready(ctx context.Context) error {
 	return readiness.pool.Ping(ctx)
 }
 
-// NewRuntime wires all control-plane persistence services to one pool.
+// NewRuntime wires all control-plane persistence services to a legacy v1 pool.
+// The caller retains ownership; use NewRuntimeWithPool for go-postgres/v2.
 func NewRuntime(pool *gopostgres.Pool) (*Runtime, error) {
 	if pool == nil || pool.Raw() == nil {
 		return nil, ErrInvalidRuntimePool
 	}
-	raw := pool.Raw()
+	return newRuntime(pool.Raw(), pool)
+}
+
+// NewRuntimeWithPool wires persistence services to a go-postgres/v2 pool.
+// It refuses nil or uninitialized pools. The caller retains pool ownership;
+// transactions use the native pgxpool, and readiness uses the pool's bounded Ping.
+func NewRuntimeWithPool(pool *gopostgresv2.Pool) (*Runtime, error) {
+	if pool == nil || pool.Raw() == nil {
+		return nil, ErrInvalidRuntimePool
+	}
+
+	return newRuntime(pool.Raw(), pool)
+}
+
+func newRuntime(raw *pgxpool.Pool, pool interface{ Ping(context.Context) error }) (*Runtime, error) {
 
 	return &Runtime{
 		Journal:   newJournal(newPostgresTransactionRunner(raw)),

@@ -35,11 +35,34 @@ access documents before adoption. Anonymous health probes remain explicit;
 administrative permissions still require authenticated tenant-scoped identity.
 
 Queue v1.1.3 retains management protocol major 1. Authorization's core ACL,
-PostgreSQL, Migrations v2 and Telemetry v2 retain their selected module majors.
+Migrations v2 and Telemetry v2 retain their selected module majors.
 This migration does not change embedded SQL, schema history, HTTP endpoint
 versions, command names, caller resource ownership or persistence formats.
 The source remains at the repository root on main; there are no major-specific
 source directories or branches.
+
+## PostgreSQL v2 pool adoption on main
+
+The next v3 minor source adds `postgres.NewRuntimeWithPool` accepting
+`*github.com/faustbrian/go-postgres/v2.Pool`. `postgres.NewRuntime` retains its
+existing PostgreSQL v1 signature, as do the legacy journal collaborators.
+Both entrypoints share native pgx persistence wiring; neither takes ownership
+of the caller's pool. Readiness uses the corresponding pool's bounded ping.
+
+The server and retention CLI now acquire PostgreSQL v2.0.0 pools with explicit
+`StartupPing`, preserving startup connectivity checks. Their application-owned
+resolver checks cancellation before and after `pgxpool.ParseConfig`; native
+environment and filesystem acquisition during parsing remains synchronous and
+cannot be preempted by context cancellation. PostgreSQL v2 supplies finite DSN
+and native-config admission and bounds cooperative preparation, connectivity,
+readiness and shutdown. Oversized configuration is refused, not truncated.
+
+Applications adopting the new entrypoint must also supply their own
+`ResolveDSN` when constructing PostgreSQL v2 pools and select `StartupPing`
+when startup connectivity is required. The v2 default is lazy. Existing v1
+pool callers need not migrate. Embedded SQL, schema history, migration
+identities, recovery operations and persistence formats remain unchanged.
+This source change alone is not a published control-plane release.
 
 ## Queue control plane v2 migration
 
