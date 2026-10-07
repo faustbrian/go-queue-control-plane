@@ -4,6 +4,7 @@
 
 | Release line | Status | End of support |
 | --- | --- | --- |
+| `v3.x` | Supported; first release `v3.0.0` | Not scheduled |
 | `v2.0.x` | Supported; latest patch `v2.0.1` | Not scheduled |
 | `v1.1.x` | Supported | Not scheduled |
 | `v1.0.x` | Unsupported; security update required | 2026-09-09 |
@@ -31,10 +32,11 @@ that lifecycle differs from the public helper's caller-owned pool.
 
 ## Current source and new major releases
 
-Current source uses root v3 with published Authentication v2.0.0. V3 support
-begins only when a non-prerelease v3 tag is published in
-[Releases](https://github.com/faustbrian/go-queue-control-plane/releases).
-Source on main alone does not establish publication or security qualification.
+Published v3.0.0 starts support for root v3 with Authentication v2.0.0.
+Current main additionally contains the upcoming PostgreSQL v2 pool integration;
+it is not included in v3.0.0. Source on main alone does not establish publication
+or security qualification of that later minor release. Confirm each version
+in [Releases](https://github.com/faustbrian/go-queue-control-plane/releases).
 The supported historical lines above remain unchanged. See the
 [v3 migration guide](COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
 for the nominal import changes and finite startup admission policy.
