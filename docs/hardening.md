@@ -200,6 +200,13 @@ the current workflow does not define a PostgreSQL 16/17/18 matrix or a
 multi-platform container-build job. Release rehearsal
 [`36846457647`](https://github.com/faustbrian/go-queue-control-plane/actions/runs/36846457647)
 passed the configured operations for published v2.0.1 source `6da9d0a2`.
+Root v3 release rehearsal
+[`37534556915`](https://github.com/faustbrian/go-queue-control-plane/actions/runs/37534556915)
+passed at `15a18d12802e15eae37155c607311c816c0961d2`, composing
+Authentication v2.0.0 and Queue v1.1.3. That run rejected stale mutation
+checkpoints and executed fresh mutation verification for the root module.
+Later documentation and development-tool lock changes
+do not turn this result into proof of public v3 publication or deployment.
 This does not establish unconfigured version/platform coverage or deployed
 behavior. A local result does not substitute for the required GitHub result
 on the pushed source.

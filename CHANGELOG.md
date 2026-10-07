@@ -6,20 +6,38 @@ Versioning.
 
 ## Unreleased
 
+## 3.0.0 - 2026-10-07
+
 ### Changed
 
 - Move the root module and all package imports to
   `github.com/faustbrian/go-queue-control-plane/v3` to compose Authentication v2
   principal, credential, challenge, API-key and HTTP adapter types. Update
   both module majors together; oversized authentication identities and keys
-  now follow the producer's finite admission policy.
+  now follow the producer's finite admission policy ([15a18d1280]).
 - Adopt Queue v1.1.3 while retaining its management protocol and nominal types.
   Authorization's core ACL and PostgreSQL retain their existing major versions.
 
 ### Documentation
 
+- Align release guidance with the configured PostgreSQL 18 and shared CI
+  operations; identify the root v3 rehearsal and its fresh mutation evidence
+  without implying publication, additional platform coverage, or deployment.
 - Point installation and security guidance to published v2.0.1, including its
-  Queue management redirect protection and source-only artifact scope.
+  Queue management redirect protection and source-only artifact scope
+  ([570074f61c]).
+
+### Maintenance
+
+- Refresh the pinned shared CI workflow while retaining repository tooling
+  and required module gates ([d631afaf2a]).
+- Patch the development-tool parser to smol-toml v1.9.0 and clarify the
+  coherent v3 and Authentication v2 adoption boundary ([52b6e15c40]).
+
+[15a18d1280]: https://github.com/faustbrian/go-queue-control-plane/commit/15a18d12802e15eae37155c607311c816c0961d2
+[570074f61c]: https://github.com/faustbrian/go-queue-control-plane/commit/570074f61c6b8a655ea9d1d859c42f47d2cfde52
+[d631afaf2a]: https://github.com/faustbrian/go-queue-control-plane/commit/d631afaf2a3d50121dee194743ee49146d7a4c8d
+[52b6e15c40]: https://github.com/faustbrian/go-queue-control-plane/commit/52b6e15c40f57fc8d9b191853f0c2eec1b94c06f
 
 ## 2.0.1 - 2026-10-01
 

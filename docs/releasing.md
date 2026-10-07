@@ -25,8 +25,8 @@ criteria and every required automation gate pass against the release commit.
 The current CI covers Go formatting, module tidiness and checksum verification,
 vet, Staticcheck, strict golangci-lint, advisory NilAway, tests, race, exact
 100% statement coverage, builds, a fuzz smoke test, a high-severity browser
-dependency audit, real PostgreSQL 16, 17, and
-18 migration and persistence integration, an isolated PostgreSQL 18 native
+dependency audit, real PostgreSQL 18 migration and persistence integration,
+an isolated PostgreSQL 18 native
 backup-and-restore drill, the production one-shot audit and safe terminal-
 command retention path, pinned Go
 vulnerability scanning, 100% administrative mutation efficacy and coverage,
@@ -34,13 +34,14 @@ targeted HTTP lifecycle leak assertions, public Go API baseline compatibility,
 authenticated managed-queue and rolling-protocol HTTP integration, real
 Redis 6.2.22 and Valkey 9.1.0 lifecycle/status integration through `queue`,
 including a concurrent retry/delete race with exactly one truthful winner,
-real Chromium CORS, preflight, CSRF, and defensive-header tests, Dockerfile
-checks, and a multi-platform OCI build. It also smoke-runs the
+real Chromium CORS, preflight, CSRF, and defensive-header tests. The current
+shared workflow does not define a PostgreSQL 16/17/18 matrix or a
+multi-platform OCI build job. It also smoke-runs the
 eight 10,000-worker, 100,000-audit-event, maximum-page, maximum-payload,
 reconnect-storm, and backend-outage benchmarks with allocation budgets but
 without a noisy hosted-runner latency threshold.
-The OCI build path can produce BuildKit SBOM and provenance attestations. It
-covers authenticated Redis Streams and Valkey Streams failure management, but
+The configured integration path covers authenticated Redis Streams and
+Valkey Streams failure management, but
 not the remaining transport-level queue and failure load items above. The
 published `v1.0.0` GitHub release includes a source archive, module file,
 CycloneDX SBOM, in-toto provenance statement, checksum manifest, SSH signature,
