@@ -14,7 +14,8 @@ var errTLSMaterial = errors.New("queue-control-plane: invalid TLS material")
 
 // tlsMaterialReader admits only bounded regular files for the owned OTLP runtime.
 type tlsMaterialReader struct {
-	stat func(*os.File) (os.FileInfo, error)
+	stat     func(*os.File) (os.FileInfo, error)
+	openFile func(string, int, os.FileMode) (*os.File, error)
 }
 
 func (reader tlsMaterialReader) ReadFile(ctx context.Context, path string, maxBytes int) ([]byte, error) {
@@ -27,8 +28,11 @@ func (reader tlsMaterialReader) ReadFile(ctx context.Context, path string, maxBy
 
 	// Nonblocking open prevents a configured pipe or device path from hanging
 	// startup before the file can be rejected as non-regular.
-	// #nosec G304 -- Operator-owned local TLS path; type and size checked below.
-	file, err := os.OpenFile(path, os.O_RDONLY|syscall.O_NONBLOCK, 0)
+	openFile := reader.openFile
+	if openFile == nil {
+		openFile = os.OpenFile
+	}
+	file, err := openFile(path, os.O_RDONLY|syscall.O_NONBLOCK, 0)
 	if err != nil {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
