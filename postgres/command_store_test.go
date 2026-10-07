@@ -345,6 +345,10 @@ func TestCommandStoreRetentionFailsClosed(t *testing.T) {
 			step:    execStep{tag: pgconn.NewCommandTag("DELETE 2")},
 			wantErr: ErrInvalidCommandRetentionState,
 		},
+		"overflow count": {
+			step:    execStep{tag: pgconn.NewCommandTag("DELETE 4294967296")},
+			wantErr: ErrInvalidCommandRetentionState,
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()

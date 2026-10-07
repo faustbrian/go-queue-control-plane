@@ -39,12 +39,8 @@ func postgresPoolConfig(dsn string) gopostgres.Config {
 			if err := ctx.Err(); err != nil {
 				return nil, context.Cause(ctx)
 			}
-			config, err := pgxpool.ParseConfig(dsn)
-			if ctx.Err() != nil {
-				return nil, context.Cause(ctx)
-			}
-
-			return config, err
+			// PrepareConfig checks cancellation again when this resolver returns.
+			return pgxpool.ParseConfig(dsn)
 		},
 	}
 }

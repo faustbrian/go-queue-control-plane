@@ -51,7 +51,8 @@ of the caller's pool. Readiness uses the corresponding pool's bounded ping.
 
 The server and retention CLI now acquire PostgreSQL v2.0.0 pools with explicit
 `StartupPing`, preserving startup connectivity checks. Their application-owned
-resolver checks cancellation before and after `pgxpool.ParseConfig`; native
+resolver checks cancellation before `pgxpool.ParseConfig`; PostgreSQL v2
+preparation checks it again after the resolver returns. Native
 environment and filesystem acquisition during parsing remains synchronous and
 cannot be preempted by context cancellation. PostgreSQL v2 supplies finite DSN
 and native-config admission and bounds cooperative preparation, connectivity,

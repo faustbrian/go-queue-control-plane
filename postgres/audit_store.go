@@ -224,10 +224,6 @@ func (s *AuditStore) RetainBefore(
 				return err
 			}
 			var encodedHash []byte
-			storedSequence, ok := int64FromUint64(sequence)
-			if !ok {
-				return ErrInvalidAuditState
-			}
 			var deleted int64
 			var nextSequence int64
 			err = tx.QueryRow(
@@ -236,7 +232,8 @@ func (s *AuditStore) RetainBefore(
 				tenant,
 				postgresTimestamp(cutoff),
 				int64(batchSize),
-				storedSequence,
+				// #nosec G115 -- loadAuditAnchor scans an int64 and rejects negatives before returning uint64; sequence remains within MaxInt64
+				int64(sequence),
 				anchor[:],
 				retainedThrough,
 			).Scan(

@@ -180,11 +180,8 @@ func (s *CommandStore) RetainCommandsBefore(
 				return fmt.Errorf("postgres: retain commands: %w", err)
 			}
 			deleted := tag.RowsAffected()
-			if deleted < 0 || deleted > int64(batchSize) {
-				return ErrInvalidCommandRetentionState
-			}
 			count, ok := uint32FromInt64(deleted)
-			if !ok {
+			if !ok || count > batchSize {
 				return ErrInvalidCommandRetentionState
 			}
 			result.Deleted = count
