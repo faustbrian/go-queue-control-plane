@@ -7,9 +7,48 @@ import (
 	"io/fs"
 	"path"
 	"testing"
+	"testing/fstest"
 
 	migrations "github.com/faustbrian/go-migrations/v2"
 )
+
+func TestEmbeddedMigrationDirectoryRejectsInvalidBudgetsBeforeOpening(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		limits migrations.SourceDirectoryLimits
+	}{
+		{"entries", migrations.SourceDirectoryLimits{MaxEntries: -1, MaxNameBytes: 1, MaxTotalNameBytes: 1}},
+		{"name bytes", migrations.SourceDirectoryLimits{MaxEntries: 1, MaxNameBytes: -1, MaxTotalNameBytes: 1}},
+		{"total name bytes", migrations.SourceDirectoryLimits{MaxEntries: 1, MaxNameBytes: 1, MaxTotalNameBytes: -1}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			files := &migrationUnopenedFS{}
+			entries, err := readEmbeddedMigrationDirectory(context.Background(), files, ".", test.limits)
+			if entries != nil || !errors.Is(err, migrations.ErrSourceLimit) || files.opens != 0 {
+				t.Fatalf("invalid budget: entries=%v error=%v opens=%d", entries, err, files.opens)
+			}
+		})
+	}
+}
+
+type migrationUnopenedFS struct{ opens int }
+
+func (files *migrationUnopenedFS) Open(string) (fs.File, error) {
+	files.opens++
+	return nil, fs.ErrPermission
+}
+
+func TestEmbeddedMigrationSourceAcceptsEmptyInputsAtZeroBudget(t *testing.T) {
+	files := fstest.MapFS{"empty": &fstest.MapFile{Data: []byte{}}}
+	entries, err := readEmbeddedMigrationDirectory(context.Background(), fstest.MapFS{}, ".", migrations.SourceDirectoryLimits{})
+	if err != nil || len(entries) != 0 {
+		t.Fatalf("empty directory at zero budget: entries=%v error=%v", entries, err)
+	}
+	contents, err := readEmbeddedMigrationFile(context.Background(), files, "empty", 0)
+	if err != nil || len(contents) != 0 {
+		t.Fatalf("empty file at zero budget: contents=%v error=%v", contents, err)
+	}
+}
 
 func TestEmbeddedMigrationProviderRejectsMissingAndNonFilePaths(t *testing.T) {
 	provider := embeddedMigrationSource{}
