@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "repository": "github.com/faustbrian/go-queue-control-plane",
+  "module": ".",
+  "package": "history",
+  "gate": "mutation",
+  "input_digest": "sha256:933c85f49a4b115bcc292cacd90d218396ea647dbfcde9f2f205aacea91fa226",
+  "verifier_digest": "sha256:390cf4085a0063fe5dcaa29ce942ea4cb8c7876347da90376b65dc8c5c811104",
+  "result": "passed",
+  "report_digest": "sha256:7e75cc599677b62a6d58cdd828e89b3d693fded3ccfe7dfe698ab812aeabc509",
+  "environment": {
+    "CGO_ENABLED": "1",
+    "GOARCH": "amd64",
+    "GOOS": "linux",
+    "GOVERSION": "go1.27.0",
+    "gremlins_binary_sha256": "sha256:8bd3fe89d0c732672e63d3eb6bafd824eeb8151832e0909c1ffdd015c4bac99e"
+  },
+  "completed_at": "2026-10-07T22:17:19.356299634Z"
+}

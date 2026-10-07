@@ -114,20 +114,31 @@ func workerComesBefore(left, right fleet.WorkerSnapshot) bool {
 }
 
 func (h *handler) worker(snapshot fleet.WorkerSnapshot) Worker {
+	// The snapshot owns defensive copies. This private projection only reads
+	// them until the response is synchronously encoded by listWorkers.
+	queues := snapshot.Queues
+	if len(queues) == 0 {
+		queues = nil
+	}
+	capabilities := snapshot.Capabilities
+	if len(capabilities) == 0 {
+		capabilities = nil
+	}
+
 	return Worker{
 		TenantID:     snapshot.TenantID,
 		WorkerID:     snapshot.WorkerID,
 		Version:      snapshot.Version,
 		StartedAt:    snapshot.StartedAt,
 		ObservedAt:   snapshot.ObservedAt,
-		Queues:       append([]string(nil), snapshot.Queues...),
+		Queues:       queues,
 		Concurrency:  snapshot.Concurrency,
 		State:        snapshot.State,
 		CurrentJobs:  snapshot.CurrentJobs,
 		DrainStatus:  snapshot.DrainStatus,
 		Backend:      snapshot.Backend,
 		Protocol:     snapshot.Protocol,
-		Capabilities: append([]fleet.Capability(nil), snapshot.Capabilities...),
+		Capabilities: capabilities,
 		Compatibility: fleet.Negotiate(
 			h.protocol,
 			snapshot.Protocol,

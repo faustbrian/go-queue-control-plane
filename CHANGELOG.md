@@ -14,6 +14,8 @@ Versioning.
 
 ### Changed
 
+- Avoid redundant worker snapshot collection copies during synchronous HTTP
+  response encoding, retaining deterministic ordering and empty-field shapes.
 - Adopt published PostgreSQL v2.0.0 and pgx v5.11.0 for server and retention
   pool acquisition, with application-owned DSN resolution and explicit bounded
   startup connectivity checks. Migration history and persistence formats are
