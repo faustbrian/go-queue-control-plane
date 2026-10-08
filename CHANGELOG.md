@@ -6,20 +6,47 @@ Versioning.
 
 ## Unreleased
 
+## 3.1.0 - 2026-10-08
+
 ### Added
 
 - Add `postgres.NewRuntimeWithPool` for caller-owned PostgreSQL v2 pools,
   sharing the native persistence runtime and bounded readiness checks. The
-  existing `NewRuntime` entrypoint continues accepting PostgreSQL v1 pools.
+  existing `NewRuntime` entrypoint continues accepting PostgreSQL v1 pools
+  ([55e1e5cd96]).
 
 ### Changed
 
 - Avoid redundant worker snapshot collection copies during synchronous HTTP
-  response encoding, retaining deterministic ordering and empty-field shapes.
+  response encoding, retaining deterministic ordering and empty-field shapes
+  ([9a11dd3a26]).
 - Adopt published PostgreSQL v2.0.0 and pgx v5.11.0 for server and retention
   pool acquisition, with application-owned DSN resolution and explicit bounded
   startup connectivity checks. Migration history and persistence formats are
   unchanged; PostgreSQL v1 remains available for legacy public collaborators.
+- Keep retained audit sequences and command deletion counts checked against
+  their native and batch bounds, with preparation owning post-resolution
+  cancellation ([85fd63886c], [751bab22a7]).
+
+### Documentation
+
+- Distinguish the published v3 baseline from additive pool adoption and its
+  upgrade guidance ([97e0cfd799]).
+
+### Maintenance
+
+- Cover TLS material admission and inclusive migration-source budgets while
+  retaining lint-compatible redaction assertions ([43e536e813], [6d83664679],
+  [3f210f5d3a]).
+
+[55e1e5cd96]: https://github.com/faustbrian/go-queue-control-plane/commit/55e1e5cd9687e8f39e59e9e23c48f2d9671d16a0
+[85fd63886c]: https://github.com/faustbrian/go-queue-control-plane/commit/85fd63886c4cfe0bd2f7e3383f3d4b3839d5abda
+[751bab22a7]: https://github.com/faustbrian/go-queue-control-plane/commit/751bab22a732a17c5269b67583e778be4ca90834
+[43e536e813]: https://github.com/faustbrian/go-queue-control-plane/commit/43e536e813d4bd5ce797a4cb2dbf0b5fb7070fbc
+[6d83664679]: https://github.com/faustbrian/go-queue-control-plane/commit/6d836646790b4115b87489571e735b7359384498
+[3f210f5d3a]: https://github.com/faustbrian/go-queue-control-plane/commit/3f210f5d3ae460870600af642f342eab3b50551e
+[97e0cfd799]: https://github.com/faustbrian/go-queue-control-plane/commit/97e0cfd799cc3ae1600a5e21f1fc73e85dd15214
+[9a11dd3a26]: https://github.com/faustbrian/go-queue-control-plane/commit/9a11dd3a268e90041dc174856ca8ac01b0bc6a56
 
 ## 3.0.0 - 2026-10-07
 
