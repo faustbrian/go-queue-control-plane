@@ -10,7 +10,6 @@ import (
 	"time"
 
 	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"golang.org/x/net/http2"
 )
 
 func TestTypedClientHTTP2RoundTripAndCancellation(t *testing.T) {
@@ -40,10 +39,10 @@ func TestTypedClientHTTP2RoundTripAndCancellation(t *testing.T) {
 	server.EnableHTTP2 = true
 	server.StartTLS()
 	defer server.Close()
-	tlsConfig := server.Client().Transport.(*http.Transport).TLSClientConfig.Clone()
-	transport := &http2.Transport{TLSClientConfig: tlsConfig}
-	defer transport.CloseIdleConnections()
-	api, err := New(Config{BaseURL: server.URL, HTTPClient: &http.Client{Transport: transport, Timeout: 3 * time.Second}, Tokens: &tokenSourceStub{token: "test-bearer"}})
+	httpClient := server.Client()
+	httpClient.Timeout = 3 * time.Second
+	defer httpClient.CloseIdleConnections()
+	api, err := New(Config{BaseURL: server.URL, HTTPClient: httpClient, Tokens: &tokenSourceStub{token: "test-bearer"}})
 	if err != nil {
 		t.Fatal(err)
 	}
