@@ -189,6 +189,34 @@ func TestRegistryScopesMatchingWorkerIdentitiesByTenant(t *testing.T) {
 	}
 }
 
+func TestRegistryTenantSnapshotNeverTruncatesAtForeignWorkers(t *testing.T) {
+	t.Parallel()
+
+	registry := NewRegistry(6)
+	want := []string{"worker-a", "worker-b", "worker-c"}
+	for _, tenant := range []string{"requested", "foreign"} {
+		for _, worker := range want {
+			if got := registry.Upsert(validHeartbeat(tenant, worker, time.Unix(1, 0))); got != HeartbeatAccepted {
+				t.Fatalf("Upsert(%q/%q) = %q, want accepted", tenant, worker, got)
+			}
+		}
+	}
+
+	// The backing map has no traversal order: every snapshot must scan past
+	// foreign workers, regardless of which identity is encountered first.
+	for attempt := range 128 {
+		workers := registry.SnapshotTenant("requested", time.Unix(2, 0), time.Minute).Workers
+		if len(workers) != len(want) {
+			t.Fatalf("snapshot %d has %d workers, want all %d: %+v", attempt, len(workers), len(want), workers)
+		}
+		for index, worker := range workers {
+			if worker.TenantID != "requested" || worker.WorkerID != want[index] {
+				t.Fatalf("snapshot %d worker %d = %q/%q, want requested/%q", attempt, index, worker.TenantID, worker.WorkerID, want[index])
+			}
+		}
+	}
+}
+
 func TestRegistryRepresentsPartitionAndReconnectWithoutFalseState(t *testing.T) {
 	t.Parallel()
 
