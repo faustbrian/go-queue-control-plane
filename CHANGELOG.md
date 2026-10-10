@@ -8,6 +8,9 @@ Versioning.
 
 ### Changed
 
+- Update the coupled Kubernetes client, API and machinery dependencies to
+  0.37.1 while preserving namespace isolation, bounded Deployment pages,
+  scale acknowledgements and cancellation/error classification.
 - Adopt Telemetry v2.0.1 and patched HTTP/2 dependencies; build with
   Go 1.27.2 to address standard-library vulnerabilities while retaining
   the public Go 1.27.0 language minimum.
