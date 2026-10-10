@@ -6,6 +6,8 @@ Versioning.
 
 ## Unreleased
 
+## 3.1.1 - 2026-10-10
+
 ### Changed
 
 - Update the coupled Kubernetes client, API and machinery dependencies to
@@ -14,6 +16,11 @@ Versioning.
 - Adopt Telemetry v2.0.1 and patched HTTP/2 dependencies; build with
   Go 1.27.2 to address standard-library vulnerabilities while retaining
   the public Go 1.27.0 language minimum.
+
+### Fixed
+
+- Keep documentation fence and stale-credential checks effective on CI
+  runners without optional search tooling.
 
 ## 3.1.0 - 2026-10-08
 

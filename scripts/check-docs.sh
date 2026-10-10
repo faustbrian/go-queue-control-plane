@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if ! command -v awk >/dev/null; then
+    printf 'required documentation scanner is unavailable: awk\n' >&2
+    exit 1
+fi
+
 required=(
     README.md
     CHANGELOG.md
@@ -39,16 +44,25 @@ for file in "${markdown[@]}"; do
         printf 'documentation must start with one title: %s\n' "${file}" >&2
         exit 1
     fi
-    fences="$(rg -c '^```' "${file}" || true)"
+    fences="$(awk '/^```/ { count++ } END { print count + 0 }' "${file}")"
     if (( fences % 2 != 0 )); then
         printf 'unbalanced fenced code block: %s\n' "${file}" >&2
         exit 1
     fi
 done
 
-if rg -n 'QUEUE_CONTROL_TOKEN|/Users/' "${markdown[@]}"; then
+if awk '/QUEUE_CONTROL_TOKEN|\/Users\// {
+    printf "%s:%d\n", FILENAME, FNR
+    found = 1
+} END { exit !found }' "${markdown[@]}"; then
     printf 'documentation contains a stale credential or local path\n' >&2
     exit 1
+else
+    scan_status=$?
+    if [[ "${scan_status}" -ne 1 ]]; then
+        printf 'documentation text scan failed\n' >&2
+        exit "${scan_status}"
+    fi
 fi
 
 perl -MFile::Basename=dirname -MFile::Spec -e '
