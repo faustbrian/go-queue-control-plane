@@ -6,6 +6,8 @@ Versioning.
 
 ## Unreleased
 
+## 3.1.1 - 2026-10-10
+
 ### Changed
 
 - Update the coupled Kubernetes client, API and machinery dependencies to
