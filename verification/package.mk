@@ -14,6 +14,7 @@ disaster-recovery-postgres:
 
 docs:
 	scripts/check-docs.sh
+	python3 scripts/test-check-docs.py
 
 integration-postgres:
 	scripts/integration-postgres.sh

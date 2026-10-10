@@ -17,6 +17,11 @@ Versioning.
   Go 1.27.2 to address standard-library vulnerabilities while retaining
   the public Go 1.27.0 language minimum.
 
+### Fixed
+
+- Keep documentation fence and stale-credential checks effective on CI
+  runners without optional search tooling.
+
 ## 3.1.0 - 2026-10-08
 
 ### Added
