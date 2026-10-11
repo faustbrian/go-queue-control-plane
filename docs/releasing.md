@@ -76,13 +76,13 @@ the same pull request as every user-visible change. Before release, move
 Unreleased entries into a dated version section, verify upgrade and rollback
 guidance, and confirm `/version` reports the tag, commit, and RFC3339 build time.
 
-Install the checksum-qualified public `golib` v2.1.1 binary for the current platform
-from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v2.1.1).
+Install the checksum-qualified public `golib` v2.1.3 binary for the current platform
+from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v2.1.3).
 For example, on macOS arm64:
 
 ```sh
-TOOLING_VERSION=2.1.1
-TOOLING_ARCHIVE=golib_2.1.1_darwin_arm64.tar.gz
+TOOLING_VERSION=2.1.3
+TOOLING_ARCHIVE=golib_2.1.3_darwin_arm64.tar.gz
 TOOLING_DIR=$(mktemp -d)
 gh release download "v${TOOLING_VERSION}" \
   --repo faustbrian/go-library-tools \

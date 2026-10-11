@@ -43,7 +43,9 @@ GOWORK=off go test ./... -count=1 -timeout=3m
 
 `make check` and `make ci` consume the checksum-pinned public CLI with bounded
 `--local --all` verification: deterministic module tests, saved fuzz seeds,
-and short active smoke for affected fuzz targets. They still use the manifest's
+and named local risk checks, without active fuzz exploration. Committed-range
+CI supplies `--base-sha` to select active smoke for affected fuzz targets.
+They still use the manifest's
 PostgreSQL, Redis and Valkey services and `integration` tag; have Docker and
 fixtures available. Direct untagged Go tests are separate from that configured
 route, not equivalent live-service proof. No goal ledger is a contributor
