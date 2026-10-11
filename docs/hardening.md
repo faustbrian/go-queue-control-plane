@@ -186,14 +186,15 @@ A release candidate is blocked unless all of the following are green for the
 exact pushed commit:
 
 ```sh
-make check
+make check-full
 golib release dry-run --module .
 ```
 
 The selected gates and commands are owned by `modules.json`, `.golib.yaml`,
-and the checksum-pinned CLI. The pinned shared workflow runs the module
-contract, or the release dry-run when selected, together with repository
-contract and CodeQL checks. Configured test operations run real PostgreSQL,
+and the checksum-pinned CLI. Ordinary PR, main and scheduled shared CI run
+bounded local verification with the documentation boundary, repository contract
+and CodeQL checks. The explicit full command and selected release dry-run retain
+the full module contract. Configured full test operations run real PostgreSQL,
 Redis and Valkey, disaster recovery, and Chromium through
 `verification/package.mk`. The PostgreSQL scripts default to `postgres:18-alpine`;
 the current workflow does not define a PostgreSQL 16/17/18 matrix or a

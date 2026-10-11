@@ -22,7 +22,7 @@ criteria and every required automation gate pass against the release commit.
 - reproducible multi-platform images, SBOM, provenance, signatures, and
   verification instructions.
 
-The current CI covers Go formatting, module tidiness and checksum verification,
+Explicit full qualification covers Go formatting, module tidiness and checksum verification,
 vet, Staticcheck, strict golangci-lint, advisory NilAway, tests, race, exact
 100% statement coverage, builds, a fuzz smoke test, a high-severity browser
 dependency audit, real PostgreSQL 18 migration and persistence integration,
@@ -36,10 +36,12 @@ Redis 6.2.22 and Valkey 9.1.0 lifecycle/status integration through `queue`,
 including a concurrent retry/delete race with exactly one truthful winner,
 real Chromium CORS, preflight, CSRF, and defensive-header tests. The current
 shared workflow does not define a PostgreSQL 16/17/18 matrix or a
-multi-platform OCI build job. It also smoke-runs the
+multi-platform OCI build job. Full qualification also runs the
 eight 10,000-worker, 100,000-audit-event, maximum-page, maximum-payload,
 reconnect-storm, and backend-outage benchmarks with allocation budgets but
-without a noisy hosted-runner latency threshold.
+without a noisy hosted-runner latency threshold. Ordinary PR, main and scheduled
+shared CI use bounded local verification plus the documentation boundary; use
+`make check-full` or the explicit release dry-run for these full campaigns.
 The configured integration path covers authenticated Redis Streams and
 Valkey Streams failure management, but
 not the remaining transport-level queue and failure load items above. The
@@ -74,18 +76,20 @@ the same pull request as every user-visible change. Before release, move
 Unreleased entries into a dated version section, verify upgrade and rollback
 guidance, and confirm `/version` reports the tag, commit, and RFC3339 build time.
 
-Install the checksum-verified `golib` v1.6.2 binary for the current platform
-from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v1.6.2).
+Install the checksum-qualified public `golib` v2.1.1 binary for the current platform
+from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v2.1.1).
 For example, on macOS arm64:
 
 ```sh
-TOOLING_VERSION=1.6.2
-TOOLING_ARCHIVE=golib_1.6.2_darwin_arm64.tar.gz
+TOOLING_VERSION=2.1.1
+TOOLING_ARCHIVE=golib_2.1.1_darwin_arm64.tar.gz
 TOOLING_DIR=$(mktemp -d)
 gh release download "v${TOOLING_VERSION}" \
   --repo faustbrian/go-library-tools \
   --pattern checksums.txt --pattern "$TOOLING_ARCHIVE" \
   --dir "$TOOLING_DIR"
+TOOLING_CHECKSUMS_SHA256=$(awk '$1 == "tool_checksums_sha256:" { print $2 }' .golib.yaml)
+printf '%s  %s\n' "$TOOLING_CHECKSUMS_SHA256" "$TOOLING_DIR/checksums.txt" | shasum -a 256 --check
 awk -v archive="$TOOLING_ARCHIVE" '$2 == archive { print }' \
   "$TOOLING_DIR/checksums.txt" | \
   (cd "$TOOLING_DIR" && shasum -a 256 --check)
@@ -101,7 +105,8 @@ Choose the next semantic version and update the module `version` in
 existing fetched tag. These commands validate release metadata, the module
 archive, clean consumer resolution, and the complete repository contract.
 Neither command publishes; publication is a separate operation bound to the
-reviewed commit and versioned, checksum-bound release assets.
+reviewed commit and versioned, checksum-bound release assets. Remove the
+task-owned tooling download directory after qualification is finished.
 
 For `v1.0.0`, download every asset into an empty directory, check the release's
 signed checksum manifest, and verify every listed payload:

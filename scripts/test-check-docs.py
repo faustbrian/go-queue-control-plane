@@ -24,7 +24,7 @@ EXAMPLE_ARGS = [
 
 
 class DocsGateTest(unittest.TestCase):
-    def run_gate(self, changes=None, removed=(), go_exit=0, with_rg=False):
+    def run_gate(self, changes=None, removed=(), go_exit=0, with_rg=False, args=()):
         with tempfile.TemporaryDirectory(prefix="controlplane-docs-gate-") as tmp:
             root = Path(tmp)
             for name in REQUIRED:
@@ -59,14 +59,14 @@ class DocsGateTest(unittest.TestCase):
                        DOCS_GO_CALLS=str(calls), DOCS_GO_EXIT=str(go_exit))
             self.assertEqual(shutil.which("rg", path=env["PATH"]) is not None, with_rg)
             result = subprocess.run(
-                ["/bin/bash", str(SCRIPT)], cwd=root, env=env,
+                ["/bin/bash", str(SCRIPT), *args], cwd=root, env=env,
                 capture_output=True, text=True, timeout=10,
             )
             arguments = calls.read_text().splitlines() if calls.exists() else []
             return result, arguments
 
-    def assert_rejected(self, changes, diagnostic, with_rg=False, removed=()):
-        result, arguments = self.run_gate(changes, removed, with_rg=with_rg)
+    def assert_rejected(self, changes, diagnostic, with_rg=False, removed=(), args=()):
+        result, arguments = self.run_gate(changes, removed, with_rg=with_rg, args=args)
         self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertIn(diagnostic, result.stderr)
         self.assertEqual(arguments, [])
@@ -76,6 +76,36 @@ class DocsGateTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertNotIn("command not found", result.stderr)
         self.assertEqual(arguments, EXAMPLE_ARGS)
+
+    def test_local_valid_docs_do_not_execute_go(self):
+        result, arguments = self.run_gate(go_exit=37, args=("--local",))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(arguments, [])
+
+    def test_local_retains_structure_text_and_link_refusals(self):
+        cases = (
+            ({"docs/api.md": ""}, (), "required documentation is missing or empty"),
+            ({}, ("LICENSE",), "required documentation is missing or empty"),
+            ({"docs/api.md": "## Wrong title\n"}, (), "documentation must start with one title"),
+            ({"docs/zzz-extra.md": "# Fixture\n```\n"}, (), "unbalanced fenced code block"),
+            ({"docs/zzz-extra.md": "# Fixture\nQUEUE_CONTROL_TOKEN\n"}, (),
+             "documentation contains a stale credential or local path"),
+            ({"docs/zzz-extra.md": "# Fixture\n/Users/synthetic/docs\n"}, (),
+             "documentation contains a stale credential or local path"),
+            ({"docs/api.md": "# Fixture\n[missing](absent.md#anchor)\n"}, (),
+             "missing relative link"),
+        )
+        for changes, removed, diagnostic in cases:
+            with self.subTest(changes=changes, removed=removed):
+                self.assert_rejected(changes, diagnostic, removed=removed, args=("--local",))
+
+    def test_unknown_and_extra_arguments_refuse_before_go(self):
+        for args in (("--unknown",), ("--local", "extra"), ("",), ("--local", "--local")):
+            with self.subTest(args=args):
+                result, arguments = self.run_gate(args=args)
+                self.assertNotEqual(result.returncode, 0, result.stderr)
+                self.assertIn("usage: scripts/check-docs.sh [--local]", result.stderr)
+                self.assertEqual(arguments, [])
 
     def test_odd_fences_reject_root_and_extra_markdown(self):
         for name, count in (("README.md", 1), ("docs/zzz-extra.md", 3)):

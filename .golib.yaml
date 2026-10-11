@@ -1,6 +1,6 @@
 schema_version: 1
-tool_version: v1.6.2
-tool_checksums_sha256: 2a740a44fee468f042b4a66e086fc01a02d8d28877c9b1866e278102665b35ad
+tool_version: v2.1.1
+tool_checksums_sha256: 4e0a38f76cbff547541f3164a0e59e958cf2f62d7b5cea19d7a4d1c51fe5e977
 
 manifest:
   modules: modules.json
@@ -23,6 +23,20 @@ api:
       path: api/control-plane.api
 
 operations:
+  - module: .
+    gate: local-test
+    steps:
+      - type: go-test
+        packages: ["./control"]
+        run: '^TestServiceExecuteCancelsOnlyBeforeDispatch$'
+        count: 1
+        timeout: 90s
+      - type: go-test
+        packages: ["./server"]
+        run: '^TestServerBoundsSlowShutdown$'
+        count: 1
+        race: true
+        timeout: 90s
   - module: .
     gate: test
     steps:

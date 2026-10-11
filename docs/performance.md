@@ -24,7 +24,7 @@ Fixture construction is outside each timed loop. Every benchmark asserts the
 functional result during measurement. Run five single-core samples with:
 
 ```sh
-make benchmarks
+make -f verification/package.mk benchmarks
 ```
 
 Set `BENCH_COUNT` to change sample count and `GOMAXPROCS` to study controlled
@@ -67,8 +67,10 @@ Fleet snapshots deliberately return isolated copies, so their cost scales with
 workers, queues, and capabilities. Audit verification streams over the supplied
 page without allocating.
 
-CI runs one sample of each benchmark and enforces the byte and allocation
-ceilings. GitHub-hosted runners are not stable enough for a defensible latency
+Explicit full qualification runs the benchmark script, whose default is five
+samples, and enforces the byte and allocation ceilings. Ordinary PR, main and
+scheduled shared CI use the bounded local route, not this campaign.
+GitHub-hosted runners are not stable enough for a defensible latency
 budget. Review multi-sample timing output on a controlled runner before
 accepting a material latency regression.
 

@@ -3,7 +3,7 @@
 [![CI](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
-[![Mutation](https://img.shields.io/badge/mutation-100%25_required-blue)](CONTRIBUTING.md#verification)
+[![Mutation](https://img.shields.io/badge/mutation-full_qualification-blue)](CONTRIBUTING.md#verification)
 [![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
 [![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v2)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-queue-control-plane?sort=semver)](https://github.com/faustbrian/go-queue-control-plane/releases)
@@ -167,39 +167,19 @@ and its [Persistence and durability family](https://github.com/faustbrian/go-lib
 
 ## Development
 
-Run the complete local repository gate with:
+For standalone untagged tests:
 
 ```sh
-make ci
+GOWORK=off go test ./... -count=1 -timeout=3m
 ```
 
-`make ci` validates the repository configuration, inventory, cohesion metadata,
-repository contract, online specification conformance, workflow contract, and
-the complete implementation check. Use `make check` for the implementation
-checks alone or `make cohesion` for a focused validation of versioned ecosystem
-metadata.
-
-The implementation check covers formatting, module tidiness and checksums, vet,
-Staticcheck, strict
-golangci-lint, tests, the race detector, exact per-package 100% statement
-coverage, and builds. `make nilaway` runs the pinned advisory NilAway profile,
-and `make fuzz` runs the bounded fuzz smoke suite. `make integration-postgres`
-starts a disposable PostgreSQL 18 container and runs the real persistence
-contract under the race detector. `make benchmarks` runs eight single-core
-large-fleet, API, payload, audit, reconnect, and backend-outage samples with
-enforced allocation budgets. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for repository expectations.
-
-`make security` runs the pinned Go vulnerability scanner against the canonical
-Go vulnerability database and fails on reachable findings.
-
-`make mutation` requires 100% mutant coverage and efficacy across the public
-command contract, authorization mapping, desired state, dispatch, and command
-orchestration.
-
-`make disaster-recovery-postgres` creates isolated PostgreSQL 18 source and
-restore databases, takes a native logical backup, restores it, and verifies the
-complete control and audit state through the production repositories.
+`make check` and `make ci` are bounded public-verifier routes with the actual
+PostgreSQL, Redis, Valkey and integration-tag prerequisites. Both retain the
+cheap no-Go documentation boundary; hosted Required also needs that boundary
+to pass. Explicit `make check-full` retains full integration, disaster recovery,
+browser, benchmark and release-risk qualification. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for focused fuzzing, cancellation/shutdown
+checks, and fixture requirements.
 
 The same server image supports separate migrate-only and bounded
 retention-only Jobs. See [Deployment and configuration](docs/deployment.md) for
@@ -211,8 +191,8 @@ The API, typed client, and CLI expose newest-first tenant command history with
 bounded opaque-cursor pagination in addition to point lookup by idempotency
 key.
 
-`make api-compatibility` compares the complete exported Go module surface with
-the reviewed baseline and fails on compatible or incompatible drift.
+Full qualification compares the exported Go module surface with the reviewed
+API baseline.
 
 ## License
 

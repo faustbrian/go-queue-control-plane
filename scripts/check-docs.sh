@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+local_mode=false
+if (( $# > 0 )); then
+    if [[ "$#" -ne 1 || "$1" != --local ]]; then
+        printf 'usage: scripts/check-docs.sh [--local]\n' >&2
+        exit 1
+    fi
+    local_mode=true
+fi
+
 if ! command -v awk >/dev/null; then
     printf 'required documentation scanner is unavailable: awk\n' >&2
     exit 1
@@ -76,4 +85,6 @@ perl -MFile::Basename=dirname -MFile::Spec -e '
     }
 ' "${markdown[@]}"
 
-go test ./client -run '^ExampleClient_DesiredStateReader$' -count=1
+if [[ "${local_mode}" == false ]]; then
+    go test ./client -run '^ExampleClient_DesiredStateReader$' -count=1
+fi
