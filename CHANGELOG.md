@@ -6,6 +6,14 @@ Versioning.
 
 ## Unreleased
 
+## 2.0.2 - 2026-10-12
+
+### Fixed
+
+- Classify remote workers after heartbeat retrieval completes, so fresh
+  heartbeats are not incorrectly reported as unknown. Preserve future and stale
+  boundaries, tenant authorization, filters and original timestamps.
+
 ## 2.0.1 - 2026-10-01
 
 ### Security

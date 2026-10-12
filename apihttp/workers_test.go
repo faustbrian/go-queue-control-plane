@@ -12,8 +12,108 @@ import (
 
 	controlplane "github.com/faustbrian/go-queue-control-plane/v2"
 	"github.com/faustbrian/go-queue-control-plane/v2/authz"
+	"github.com/faustbrian/go-queue-control-plane/v2/dataplane"
 	"github.com/faustbrian/go-queue-control-plane/v2/fleet"
+	queue "github.com/faustbrian/go-queue/management"
 )
+
+func TestHandlerClassifiesRemoteWorkersAfterAcquisition(t *testing.T) {
+	t.Parallel()
+
+	observed := time.Date(2026, time.October, 11, 17, 0, 0, 123456789, time.UTC)
+	tests := []struct {
+		id       string
+		time     time.Time
+		reported queue.WorkerState
+		want     fleet.State
+	}{
+		{"fresh-before", observed.Add(-time.Nanosecond), queue.WorkerRunning, fleet.StateRunning},
+		{"fresh-now", observed, queue.WorkerRunning, fleet.StateRunning},
+		{"future", observed.Add(time.Nanosecond), queue.WorkerRunning, fleet.StateUnknown},
+		{"before-stale", observed.Add(-30*time.Second + time.Nanosecond), queue.WorkerRunning, fleet.StateRunning},
+		{"stale-at", observed.Add(-30 * time.Second), queue.WorkerRunning, fleet.StateStale},
+		{"stale-after", observed.Add(-30*time.Second - time.Nanosecond), queue.WorkerRunning, fleet.StateStale},
+		{"paused", observed.Add(-time.Second), queue.WorkerPaused, fleet.StatePaused},
+		{"draining", observed.Add(-time.Second), queue.WorkerDraining, fleet.StateDraining},
+		{"stopped", observed.Add(-time.Second), queue.WorkerStopped, fleet.StateStopped},
+	}
+	for _, filter := range []fleet.State{"", fleet.StateRunning, fleet.StateUnknown, fleet.StateStale, fleet.StatePaused, fleet.StateDraining, fleet.StateStopped} {
+		t.Run("state="+string(filter), func(t *testing.T) {
+			t.Parallel()
+
+			clock := observed.Add(-time.Second)
+			workers := make([]queue.WorkerStatus, 0, len(tests))
+			for _, test := range tests {
+				workers = append(workers, queue.WorkerStatus{
+					ID: test.id, Version: "v1.0.0", StartedAt: observed.Add(-time.Hour),
+					HeartbeatAt: test.time, Queues: []string{"critical"},
+					Concurrency: 4, State: test.reported, DrainStatus: queue.DrainNotRequested,
+					Backend: "valkey-streams", Protocol: queue.ProtocolVersion{Major: 1},
+					Capabilities: []queue.Capability{queue.CapabilityWorkerStatus},
+				})
+			}
+			reader := workerStatusReaderFunc(func(_ context.Context, _ string, request queue.StatusPageRequest) (queue.WorkerStatusPage, error) {
+				if request.Cursor == "" {
+					clock = observed.Add(-time.Millisecond)
+					return queue.WorkerStatusPage{Items: workers[:4], NextCursor: "next"}, nil
+				}
+				clock = observed
+				return queue.WorkerStatusPage{Items: workers[4:]}, nil
+			})
+			source, err := dataplane.NewFleetSource(reader)
+			if err != nil {
+				t.Fatal(err)
+			}
+			handler, err := NewHandler(Config{
+				Commands: &commandExecutorStub{}, RemoteWorkers: source, Viewer: &viewerStub{},
+				Now: func() time.Time { return clock }, StaleAfter: 30 * time.Second,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			target := "/v1/tenants/tenant-1/workers"
+			if filter != "" {
+				target += "?state=" + string(filter)
+			}
+			response := httptest.NewRecorder()
+			handler.ServeHTTP(response, authenticatedRequest(t, http.MethodGet, target, ""))
+			if response.Code != http.StatusOK {
+				t.Fatalf("status = %d; body = %s", response.Code, response.Body.String())
+			}
+			var page WorkerPage
+			if err := json.NewDecoder(response.Body).Decode(&page); err != nil {
+				t.Fatal(err)
+			}
+			byID := make(map[string]Worker, len(page.Workers))
+			for _, worker := range page.Workers {
+				if _, exists := byID[worker.WorkerID]; exists {
+					t.Fatalf("duplicate worker %q", worker.WorkerID)
+				}
+				byID[worker.WorkerID] = worker
+			}
+			wanted := 0
+			for _, test := range tests {
+				if filter != "" && filter != test.want {
+					continue
+				}
+				wanted++
+				worker, exists := byID[test.id]
+				if !exists || worker.State != test.want || !worker.ObservedAt.Equal(test.time) || !worker.StartedAt.Equal(observed.Add(-time.Hour)) {
+					t.Errorf("worker %q = %+v, present=%t; want state %q and original timestamps", test.id, worker, exists, test.want)
+				}
+			}
+			if len(page.Workers) != wanted || page.NextCursor != "" {
+				t.Errorf("page count/cursor = %d/%q; want %d/empty", len(page.Workers), page.NextCursor, wanted)
+			}
+		})
+	}
+}
+
+type workerStatusReaderFunc func(context.Context, string, queue.StatusPageRequest) (queue.WorkerStatusPage, error)
+
+func (f workerStatusReaderFunc) ListWorkers(ctx context.Context, tenant string, request queue.StatusPageRequest) (queue.WorkerStatusPage, error) {
+	return f(ctx, tenant, request)
+}
 
 func TestHandlerListsAuthorizedTenantWorkersWithBoundedCursor(t *testing.T) {
 	t.Parallel()
