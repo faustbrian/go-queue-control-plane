@@ -1,6 +1,6 @@
 schema_version: 1
-tool_version: v1.6.2
-tool_checksums_sha256: 2a740a44fee468f042b4a66e086fc01a02d8d28877c9b1866e278102665b35ad
+tool_version: v2.2.0
+tool_checksums_sha256: fd4faaa69fb0849b543daaffc43f503432d2d56f61cbc957d68996127a320c30
 
 manifest:
   modules: modules.json
@@ -11,10 +11,7 @@ evidence:
 
 mutation:
   root: .verification/mutation
-  imports:
-    - module: .
-      archive: .verification/mutation/bootstrap/root.zip
-      ledger: .verification/mutation/migration-ledger.json
+  imports: []
 
 api:
   baselines:
@@ -48,29 +45,4 @@ operations:
       - type: make
         makefile: verification/package.mk
         target: docs
-        timeout: 20m
-  - module: .
-    gate: fuzz
-    steps:
-      - type: go-test
-        packages: [./apihttp]
-        fuzz: '^FuzzCommandHandlerFailsClosed$'
-        budget: 10000x
-        timeout: 2m
-      - type: go-test
-        packages: [./apihttp]
-        fuzz: '^FuzzRecordHandlerFailsClosed$'
-        budget: 10000x
-        timeout: 2m
-      - type: go-test
-        packages: [./apihttp]
-        fuzz: '^FuzzQueueHandlerFailsClosed$'
-        budget: 10000x
-        timeout: 2m
-  - module: .
-    gate: benchmark
-    steps:
-      - type: make
-        makefile: verification/package.mk
-        target: benchmarks
         timeout: 20m

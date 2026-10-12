@@ -14,6 +14,12 @@ Versioning.
   heartbeats are not incorrectly reported as unknown. Preserve future and stale
   boundaries, tenant authorization, filters and original timestamps.
 
+### Security
+
+- Adopt `golang.org/x/net` v0.60.0 and its compatible transitive updates to
+  address reachable HTTP/2 vulnerabilities inherited from the v2 baseline.
+- Build and qualify with Go 1.27.2 to address standard-library advisories.
+
 ## 2.0.1 - 2026-10-01
 
 ### Security

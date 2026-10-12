@@ -66,6 +66,9 @@ The public migration helpers now compose Migrations v2 types. See the
 [v2 migration guide](COMPATIBILITY.md#queue-control-plane-v2-migration) for the
 nominal API change and unchanged schema history. The Go floor remains 1.27.0.
 
+Release verification and container builds use the patched Go 1.27.2 compiler;
+this does not raise the public module's minimum version.
+
 The Go-installed server does not carry the release pipeline's commit and build
 time metadata, so its `/version` response uses the development build identity.
 The public `v2.0.0` assets are source-only, not deployable binaries or images;

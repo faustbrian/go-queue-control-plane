@@ -5,43 +5,24 @@ criteria and every required automation gate pass against the release commit.
 
 ## Required evidence
 
-- deterministic format, module checksum, vet, Staticcheck, strict
-  golangci-lint, advisory NilAway, test, exact meaningful coverage, race,
-  build, fuzz, and leak gates;
-- PostgreSQL migration, retention, backup, restore, and upgrade tests;
-- fake and real `queue` management conformance;
-- Redis and Valkey integration through `queue`, never direct clients;
-- rolling worker protocol, disconnect, stale, delayed, duplicate, timeout,
-  partial result, restart, and backend-failure tests;
-- authorization mutation testing for every action;
-- API fuzzing and browser security tests;
-- large fleet, reconnect storm, queue, failure, maximum payload, history, and
-  backend-outage load benchmarks with enforced allocation budgets;
-- vulnerability and dependency scanning;
-- documentation and API compatibility validation;
-- reproducible multi-platform images, SBOM, provenance, signatures, and
-  verification instructions.
+Follow the assurance tiers in [AGENTS.md](../AGENTS.md). `modules.json` selects
+the native gates and `.golib.yaml` binds the affected integration operations.
+The v2 maintenance release selects API compatibility, documentation, lint,
+security and tests, including the existing PostgreSQL persistence/recovery,
+queue integration and browser-security checks. Its worker-clock regression
+also needs the focused race check.
 
-The current CI covers Go formatting, module tidiness and checksum verification,
-vet, Staticcheck, strict golangci-lint, advisory NilAway, tests, race, exact
-100% statement coverage, builds, a fuzz smoke test, a high-severity browser
-dependency audit, real PostgreSQL 16, 17, and
-18 migration and persistence integration, an isolated PostgreSQL 18 native
-backup-and-restore drill, the production one-shot audit and safe terminal-
-command retention path, pinned Go
-vulnerability scanning, 100% administrative mutation efficacy and coverage,
-targeted HTTP lifecycle leak assertions, public Go API baseline compatibility,
-authenticated managed-queue and rolling-protocol HTTP integration, real
-Redis 6.2.22 and Valkey 9.1.0 lifecycle/status integration through `queue`,
-including a concurrent retry/delete race with exactly one truthful winner,
-real Chromium CORS, preflight, CSRF, and defensive-header tests, Dockerfile
-checks, and a multi-platform OCI build. It also smoke-runs the
-eight 10,000-worker, 100,000-audit-event, maximum-page, maximum-payload,
-reconnect-storm, and backend-outage benchmarks with allocation budgets but
-without a noisy hosted-runner latency threshold.
-The OCI build path can produce BuildKit SBOM and provenance attestations. It
-covers authenticated Redis Streams and Valkey Streams failure management, but
-not the remaining transport-level queue and failure load items above. The
+Exhaustive mutation, fuzz campaigns, repository-wide race, benchmarks and an
+exact statement-coverage target are not gates for this bounded patch. Select
+them only for changes whose material risks require them; do not remove the
+underlying checks or claim that unselected suites passed.
+
+CI uses the checksum-locked tool version below and Go 1.27.2. The public v2
+module still supports Go 1.27.0. Verify the immutable release source, public
+consumer resolution and signed source assets before claiming publication.
+Source releases do not establish deployed image provenance.
+
+The OCI build path can produce BuildKit SBOM and provenance attestations. The
 published `v1.0.0` GitHub release includes a source archive, module file,
 CycloneDX SBOM, in-toto provenance statement, checksum manifest, SSH signature,
 and allowed-signer file.
@@ -58,18 +39,19 @@ legal-license report. No deployable binary or image is attached.
 The module starts its public release history at `v1.0.0`; published `v2.0.0`
 uses the root `/v2` module path. Keep historical v1 release notes and
 assets immutable. A new major tag is created from main, not from a version
-directory or branch. Update `CHANGELOG.md` in
-the same pull request as every user-visible change. Before release, move
+directory or branch. Compatible v2 maintenance tags use the reviewed v2
+maintenance branch; do not merge that branch over the v3 main module. Update
+`CHANGELOG.md` alongside every user-visible change. Before release, move
 Unreleased entries into a dated version section, verify upgrade and rollback
 guidance, and confirm `/version` reports the tag, commit, and RFC3339 build time.
 
-Install the checksum-verified `golib` v1.6.2 binary for the current platform
-from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v1.6.2).
+Install the checksum-verified `golib` v2.2.0 binary for the current platform
+from the [tooling release](https://github.com/faustbrian/go-library-tools/releases/tag/v2.2.0).
 For example, on macOS arm64:
 
 ```sh
-TOOLING_VERSION=1.6.2
-TOOLING_ARCHIVE=golib_1.6.2_darwin_arm64.tar.gz
+TOOLING_VERSION=2.2.0
+TOOLING_ARCHIVE=golib_2.2.0_darwin_arm64.tar.gz
 TOOLING_DIR=$(mktemp -d)
 gh release download "v${TOOLING_VERSION}" \
   --repo faustbrian/go-library-tools \

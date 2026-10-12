@@ -274,7 +274,8 @@ func loadProductionManagement(path string, maxBytes int64) (managementRuntime, e
 }
 
 func openManagementFile(path string) (io.ReadCloser, error) {
-	return os.Open(path) //nolint:gosec // The operator explicitly configures this bounded file path.
+	// #nosec G304 -- paths come from operator startup configuration or its validated tenant token-file references; reads are bounded
+	return os.Open(path)
 }
 
 func newProductionManagementStatus(baseURL, token string) (queue.StatusReader, error) {
