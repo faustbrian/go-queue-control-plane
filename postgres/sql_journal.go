@@ -248,6 +248,9 @@ func (t *sqlJournalTransaction) AppendAudit(
 	event history.Event,
 ) error {
 	zero := history.Hash{}
+	// The per-tenant anchor lock serializes append heads and retention even
+	// when retained events supply the newest head; independent sequences or
+	// unlocked read-then-insert would admit concurrent forks.
 	if _, err := t.tx.Exec(ctx, ensureAuditAnchorSQL, tenant, zero[:], time.Unix(0, 0).UTC()); err != nil {
 		return fmt.Errorf("postgres: ensure audit anchor: %w", err)
 	}
@@ -541,6 +544,9 @@ func containsStatus(statuses []string, status controlplane.CommandStatus) bool {
 }
 
 func commandsEqual(left controlplane.Command, right controlplane.Command) bool {
+	// CommandID is deliberately excluded: duplicate requests can allocate a new
+	// ID before admission, but must recover the original stored identity. Times
+	// are compared at PostgreSQL microsecond precision, not raw Go nanoseconds.
 	return left.IdempotencyKey == right.IdempotencyKey &&
 		left.TenantID == right.TenantID &&
 		left.Actor == right.Actor &&

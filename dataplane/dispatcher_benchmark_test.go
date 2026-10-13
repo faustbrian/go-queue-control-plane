@@ -8,6 +8,9 @@ import (
 	queue "github.com/faustbrian/go-queue/management"
 )
 
+// BenchmarkControllerDispatchBackendOutage measures validation and a synthetic
+// resolver refusal after fixture setup; it does not measure a live backend,
+// remote outage detection or timeout latency.
 func BenchmarkControllerDispatchBackendOutage(b *testing.B) {
 	command := validControlCommand()
 	dispatcher, err := NewControllerDispatcher(

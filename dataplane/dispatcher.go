@@ -1,5 +1,10 @@
 // Package dataplane adapts stable queue management contracts without
 // acquiring backend-native clients or reimplementing queue semantics.
+// Start with NewControllerDispatcher or the record/status/fleet constructors
+// and explicit tenant resolvers. Resolved providers are borrowed, must honor
+// authenticated tenant scope/context and own their shutdown. Commands preserve
+// partial/unknown acknowledgement distinctions, not exactly-once delivery;
+// readers validate package-management models without starting background work.
 package dataplane
 
 import (
@@ -27,6 +32,9 @@ var (
 // ControllerResolver selects a tenant-scoped queue management controller.
 // Tenant routing stays outside backend addressing and queue serialization.
 type ControllerResolver interface {
+	// ResolveController returns a borrowed controller for the authenticated
+	// tenant scope; resolver errors refuse dispatch and lifecycle remains
+	// caller-owned.
 	ResolveController(context.Context, string) (queue.Controller, error)
 }
 

@@ -15,32 +15,58 @@ import (
 
 const (
 	defaultWorkerPageSize uint32 = 100
-	MaxWorkerPageSize     uint32 = 1_000
+	// MaxWorkerPageSize bounds the public response page, not the provider's
+	// entire snapshot allocation.
+	MaxWorkerPageSize uint32 = 1_000
 )
 
 // WorkerPage is one deterministic bounded worker result page.
 type WorkerPage struct {
-	Workers    []Worker `json:"workers"`
-	Rejected   uint64   `json:"rejected"`
-	NextCursor string   `json:"next_cursor,omitempty"`
+	// Workers contains sorted/filtered worker projections; the source snapshot
+	// is materialized before pagination.
+	Workers []Worker `json:"workers"`
+	// Rejected is the tenant snapshot capacity-refusal count.
+	Rejected uint64 `json:"rejected"`
+	// NextCursor is the exclusive last worker identity for another page; empty
+	// means no further page was detected.
+	NextCursor string `json:"next_cursor,omitempty"`
 }
 
 // Worker is the public tenant-scoped worker status representation.
 type Worker struct {
-	TenantID      string                `json:"tenant_id"`
-	WorkerID      string                `json:"worker_id"`
-	Version       string                `json:"version"`
-	StartedAt     time.Time             `json:"started_at"`
-	ObservedAt    time.Time             `json:"observed_at"`
-	Queues        []string              `json:"queues"`
-	Concurrency   uint32                `json:"concurrency"`
-	State         fleet.State           `json:"state"`
-	CurrentJobs   uint32                `json:"current_jobs"`
-	DrainStatus   fleet.DrainState      `json:"drain_status"`
-	Backend       string                `json:"backend"`
-	Protocol      fleet.ProtocolVersion `json:"protocol"`
-	Capabilities  []fleet.Capability    `json:"capabilities"`
-	Compatibility fleet.Compatibility   `json:"compatibility"`
+	// TenantID is the source's scoped tenant attribution.
+	TenantID string `json:"tenant_id"`
+	// WorkerID is the worker identity used in deterministic pagination.
+	WorkerID string `json:"worker_id"`
+	// Version is reported implementation version text.
+	Version string `json:"version"`
+	// StartedAt is reported worker start time.
+	StartedAt time.Time `json:"started_at"`
+	// ObservedAt is the heartbeat observation used for staleness, not
+	// necessarily request receipt time.
+	ObservedAt time.Time `json:"observed_at"`
+	// Queues borrows the independently owned source snapshot's queue slice
+	// during HTTP encoding.
+	Queues []string `json:"queues"`
+	// Concurrency is reported configured worker concurrency.
+	Concurrency uint32 `json:"concurrency"`
+	// State is derived liveness/conflict state, not a verified process
+	// supervision result.
+	State fleet.State `json:"state"`
+	// CurrentJobs is reported in-flight job count.
+	CurrentJobs uint32 `json:"current_jobs"`
+	// DrainStatus is reported drain progress.
+	DrainStatus fleet.DrainState `json:"drain_status"`
+	// Backend is reported backend attribution.
+	Backend string `json:"backend"`
+	// Protocol is the reported management version pair.
+	Protocol fleet.ProtocolVersion `json:"protocol"`
+	// Capabilities borrows the independently owned snapshot's reported
+	// capabilities during encoding.
+	Capabilities []fleet.Capability `json:"capabilities"`
+	// Compatibility is newly computed version/capability negotiation, not
+	// authorization.
+	Compatibility fleet.Compatibility `json:"compatibility"`
 }
 
 type workerQuery struct {

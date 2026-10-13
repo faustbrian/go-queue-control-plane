@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// BenchmarkRegistrySnapshotTenThousandWorkers measures copied/sorted views of
+// 10,000 preseeded workers with 64 queues each; population precedes ResetTimer,
+// and no remote status or transport work is included.
 func BenchmarkRegistrySnapshotTenThousandWorkers(b *testing.B) {
 	now := time.Date(2026, time.July, 16, 12, 0, 0, 0, time.UTC)
 	queues := make([]string, 64)
@@ -43,6 +46,9 @@ func BenchmarkRegistrySnapshotTenThousandWorkers(b *testing.B) {
 	}
 }
 
+// BenchmarkRegistryReconnectStormTenThousandWorkers measures 10,000 later
+// heartbeat upserts per iteration after prepopulation. It models registry
+// replacement, not network reconnect or an arbitrary-tenant memory bound.
 func BenchmarkRegistryReconnectStormTenThousandWorkers(b *testing.B) {
 	now := time.Date(2026, time.July, 16, 12, 0, 0, 0, time.UTC)
 	registry := NewRegistry(10_000)

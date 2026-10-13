@@ -1,4 +1,8 @@
-// Package server owns the bounded administrative HTTP server lifecycle.
+// Package server composes explicit authentication/browser admission and an HTTP
+// server lifecycle. New takes a preconfigured listener and handler; Run owns one
+// Serve loop and bounded graceful shutdown on cancellation, with force-close
+// fallback. It does not supply TLS, supervise workers or shut down borrowed
+// application/telemetry/database collaborators.
 package server
 
 import (
@@ -10,6 +14,7 @@ import (
 	"time"
 )
 
+// ErrInvalidConfiguration reports an invalid listener, handler or timeout bound.
 var ErrInvalidConfiguration = errors.New("server: invalid configuration")
 
 const (
@@ -23,12 +28,24 @@ const (
 
 // Config bounds HTTP admission and graceful shutdown.
 type Config struct {
+	// ReadHeaderTimeout bounds header reads; zero selects five seconds and
+	// negative values fail.
 	ReadHeaderTimeout time.Duration
-	ReadTimeout       time.Duration
-	WriteTimeout      time.Duration
-	IdleTimeout       time.Duration
-	ShutdownTimeout   time.Duration
-	MaxHeaderBytes    int
+	// ReadTimeout bounds request reads; zero selects fifteen seconds and
+	// negative values fail.
+	ReadTimeout time.Duration
+	// WriteTimeout bounds response writes; zero selects thirty seconds and
+	// negative values fail.
+	WriteTimeout time.Duration
+	// IdleTimeout bounds keep-alive waits; zero selects sixty seconds and
+	// negative values fail.
+	IdleTimeout time.Duration
+	// ShutdownTimeout bounds graceful shutdown after cancellation; zero selects
+	// ten seconds before force-close fallback.
+	ShutdownTimeout time.Duration
+	// MaxHeaderBytes bounds accepted headers; zero selects 1 MiB and negative
+	// values fail.
+	MaxHeaderBytes int
 }
 
 // Server serves one preconfigured listener without supervising other
@@ -60,7 +77,10 @@ func New(listener net.Listener, handler http.Handler, config Config) (*Server, e
 	}, nil
 }
 
-// Run serves until the listener fails or ctx requests graceful shutdown.
+// Run serves until listener failure or ctx cancellation. Use one nonnil context
+// and one Run invocation per Server; zero values and concurrent Run calls are
+// unsupported. Cancellation starts a fresh background shutdown budget, then
+// force-closes on failure and joins the Serve loop, not arbitrary handler work.
 func (server *Server) Run(ctx context.Context) error {
 	served := make(chan error, 1)
 	go func() {

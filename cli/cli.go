@@ -1,4 +1,9 @@
 // Package cli implements the administrative command-line workflow.
+// Runner.Run executes one invocation against borrowed typed API and output
+// writers. It owns flag parsing and bounded typed request formation, not
+// authentication, server-side authorization, retries or writer/client shutdown.
+// Error text and explicitly privileged JSON output can contain caller-sensitive
+// data; applications own their destination and collaborator diagnostic safety.
 package cli
 
 import (
@@ -40,10 +45,19 @@ const (
 
 // API is the bounded administrative surface consumed by the CLI.
 type API interface {
+	// ExecuteCommand submits one scoped mutation with durable result certainty
+	// distinct from HTTP success.
 	ExecuteCommand(context.Context, string, apihttp.CommandRequest) (controlplane.CommandResult, error)
+	// ListWorkers returns one bounded scoped fleet page with honest derived
+	// state.
 	ListWorkers(context.Context, string, client.WorkerQuery) (apihttp.WorkerPage, error)
+	// ListWorkloads returns one bounded tenant workload page.
 	ListWorkloads(context.Context, string, client.WorkloadQuery) (controlkubernetes.Page, error)
+	// ListAudit returns one bounded tenant audit page without converting its
+	// digests to authentication claims.
 	ListAudit(context.Context, string, client.AuditQuery) (apihttp.AuditPage, error)
+	// GetCommand looks up the durable tenant/idempotency outcome before retry
+	// decisions.
 	GetCommand(context.Context, string, string) (controlplane.CommandResult, error)
 }
 
@@ -64,14 +78,25 @@ type queueAPI interface {
 
 // Runner executes CLI arguments against an administrative API client.
 type Runner struct {
+	// Client is the required borrowed typed API; optional extra methods enable
+	// queue/record/history operations.
 	Client API
+	// Stdout is required borrowed output; writes may block/fail and are not
+	// closed by Run.
 	Stdout io.Writer
+	// Stderr is required borrowed diagnostic output; backend errors are
+	// printed, so callers must keep them secret-safe.
 	Stderr io.Writer
+	// Now supplies default mutation request time; nil selects time.Now and the
+	// callback remains borrowed.
 	Now    func() time.Time
 	output outputFormat
 }
 
-// Run executes one diagnostic or mutating command and returns a process code.
+// Run executes one diagnostic or mutating command and returns ExitOK,
+// ExitFailure or ExitUsage. It copies Runner configuration for the invocation;
+// shared use still requires safe Client/writer/clock collaborators. Context does
+// not interrupt flag parsing or arbitrary blocked output writes.
 func (r Runner) Run(ctx context.Context, args []string) int {
 	if nilInterface(r.Client) || r.Stdout == nil || r.Stderr == nil {
 		return ExitFailure

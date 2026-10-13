@@ -154,7 +154,9 @@ Lists require `record_list` on the corresponding `failure/failures` or
 `occurred_at`, `queue`, or `attempts`; and `direction` is `asc` or `desc`.
 
 Inspection requires `record_inspect` on the exact record and defaults to
-`payload=hidden`. `payload=redacted` may return only redacted metadata.
+`payload=hidden`. `payload=redacted` may return copied provider-redacted bytes
+only when the source labels the representation redacted; a revealed source is
+masked instead. The provider owns actual content redaction, not merely the label.
 `payload=revealed` requires both `record_inspect` and the separate
 `payload_view` permission on the exact record before the source is asked for
 bytes. Revealed data is base64-encoded JSON and remains bounded by `queue`

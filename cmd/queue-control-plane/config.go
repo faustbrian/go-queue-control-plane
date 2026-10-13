@@ -13,32 +13,82 @@ var ErrInvalidRuntimeConfiguration = errors.New("queue-control-plane: invalid ru
 
 // Config contains the bounded process configuration loaded at startup.
 type Config struct {
-	ListenAddress            string
-	DatabaseURL              string
-	AccessDocumentPath       string
-	AccessDocumentSize       int64
-	AllowedOrigins           []string
-	RunMigrations            bool
-	UIEnabled                bool
-	MigrateOnly              bool
-	RetentionOnly            bool
-	RetentionDocumentPath    string
-	RetentionDocumentSize    int64
-	KubernetesTenantPath     string
-	KubernetesTenantSize     int64
-	ManagementTenantPath     string
-	ManagementTenantSize     int64
-	TelemetryEnabled         bool
-	TelemetryEndpoint        string
-	TelemetryProtocol        string
-	TelemetryInsecure        bool
-	TelemetryEnvironment     string
-	TelemetryInstance        string
-	TelemetryTrustedInbound  bool
-	TelemetryCAFile          string
+	// ListenAddress is the startup TCP listen address; empty environment
+	// selects :8080, without enabling TLS by itself.
+	ListenAddress string
+	// DatabaseURL is required operator-owned PostgreSQL connection text; do not
+	// log it or assume string erasure.
+	DatabaseURL string
+	// AccessDocumentPath is required in serving mode and selects trusted
+	// startup authentication/ACL JSON.
+	AccessDocumentPath string
+	// AccessDocumentSize bounds the access document between one byte and 1 MiB;
+	// default is 1 MiB.
+	AccessDocumentSize int64
+	// AllowedOrigins contains trimmed configured browser origins; transport
+	// construction validates exact HTTP(S) origins.
+	AllowedOrigins []string
+	// RunMigrations opts into schema migration before serving; retention-only
+	// mode refuses it.
+	RunMigrations bool
+	// UIEnabled opts into embedded console routes and is refused in
+	// migration/retention-only modes.
+	UIEnabled bool
+	// MigrateOnly selects one migration invocation without HTTP startup;
+	// mutually exclusive with RetentionOnly.
+	MigrateOnly bool
+	// RetentionOnly selects one bounded-batch retention plan without HTTP or
+	// telemetry startup.
+	RetentionOnly bool
+	// RetentionDocumentPath is required only in retention-only mode; supplied
+	// retention options otherwise fail.
+	RetentionDocumentPath string
+	// RetentionDocumentSize bounds retention-plan input; configured values are
+	// one byte through 1 MiB.
+	RetentionDocumentSize int64
+	// KubernetesTenantPath optionally selects trusted tenant/namespace mappings
+	// for in-cluster Deployment access.
+	KubernetesTenantPath string
+	// KubernetesTenantSize bounds that optional document; its size option
+	// requires a document path.
+	KubernetesTenantSize int64
+	// ManagementTenantPath optionally selects trusted tenant HTTPS management
+	// endpoints and token-file references.
+	ManagementTenantPath string
+	// ManagementTenantSize bounds that optional document; default is 1 MiB when
+	// enabled.
+	ManagementTenantSize int64
+	// TelemetryEnabled opts into the owned OTLP runtime; disabled mode refuses
+	// stray telemetry settings.
+	TelemetryEnabled bool
+	// TelemetryEndpoint is a required operator-selected OTLP destination when
+	// telemetry is enabled.
+	TelemetryEndpoint string
+	// TelemetryProtocol selects grpc or http/protobuf; enabled mode defaults to
+	// grpc.
+	TelemetryProtocol string
+	// TelemetryInsecure explicitly disables transport TLS and cannot coexist
+	// with custom CA, client certificate or server name.
+	TelemetryInsecure bool
+	// TelemetryEnvironment is optional public resource attribution, not
+	// authentication.
+	TelemetryEnvironment string
+	// TelemetryInstance is optional public service-instance attribution.
+	TelemetryInstance string
+	// TelemetryTrustedInbound opts into authenticated inbound HTTP trace-context trust, not principal authentication.
+	TelemetryTrustedInbound bool
+	// TelemetryCAFile optionally selects operator-owned CA material read
+	// through the bounded regular-file reader.
+	TelemetryCAFile string
+	// TelemetryCertificateFile optionally selects client certificate material
+	// and must accompany the private-key file.
 	TelemetryCertificateFile string
-	TelemetryPrivateKeyFile  string
-	TelemetryServerName      string
+	// TelemetryPrivateKeyFile selects sensitive client key material, paired
+	// with its certificate; the path is not credential content.
+	TelemetryPrivateKeyFile string
+	// TelemetryServerName optionally overrides the exporter TLS server name and
+	// is refused in insecure mode.
+	TelemetryServerName string
 }
 
 // LoadConfig reads and validates the process environment without formatting

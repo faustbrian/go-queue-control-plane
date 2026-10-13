@@ -1,4 +1,9 @@
-// Package authz integrates control-plane mutations with authorization.
+// Package authz maps an already authenticated context principal to scoped
+// authorization decisions. New borrows a DecisionMaker; Authorize requires the
+// actor to equal the principal subject and refuses every non-Allow outcome.
+// It does not extract credentials, authenticate tenants, own provider shutdown
+// or interrupt a blocking evaluator; caller context and shared-use safety remain
+// collaborator obligations.
 package authz
 
 import (
@@ -25,6 +30,8 @@ var (
 
 // DecisionMaker is the stable authorization evaluation seam.
 type DecisionMaker interface {
+	// Decide evaluates the scoped request; Authorizer treats errors and every
+	// non-Allow outcome as refusal.
 	Decide(context.Context, authorization.Request) (authorization.Decision, error)
 }
 

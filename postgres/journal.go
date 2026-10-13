@@ -41,7 +41,10 @@ func newJournal(runner transactionRunner) *Journal {
 	return &Journal{runner: runner}
 }
 
-// Accept atomically records a command and its initial audit event.
+// Accept atomically records a new command, applicable desired-state revision
+// and initial audit event. Exact duplicates return stored results without a new
+// event or desired revision; changed content conflicts. CommandID alone does not
+// select a different envelope, and persisted times normalize to UTC microseconds.
 func (j *Journal) Accept(
 	ctx context.Context,
 	command controlplane.Command,
@@ -127,8 +130,9 @@ func (j *Journal) MarkDispatched(ctx context.Context, result controlplane.Comman
 	return j.transition(ctx, result)
 }
 
-// MarkAcknowledged atomically persists a successful data-plane
-// acknowledgement before the terminal result is written.
+// MarkAcknowledged atomically persists a valid data-plane acknowledgement and
+// audit before terminal completion. Acknowledgement is distinct from business
+// success: a reported failed/partial outcome may still have been acknowledged.
 func (j *Journal) MarkAcknowledged(ctx context.Context, result controlplane.CommandResult) error {
 	if result.Status != controlplane.CommandAcknowledged {
 		return ErrResultNotTerminal

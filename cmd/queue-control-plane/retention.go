@@ -21,9 +21,14 @@ const (
 )
 
 var (
+	// ErrInvalidRetentionDocument reports refused parsing or converted policy
+	// values without embedding document contents.
 	ErrInvalidRetentionDocument = errors.New("queue-control-plane: invalid retention document")
-	ErrInvalidRetentionPlan     = errors.New("queue-control-plane: invalid retention plan")
-	ErrRetentionIncomplete      = errors.New("queue-control-plane: retention incomplete")
+	// ErrInvalidRetentionPlan reports missing dependencies or invalid per-tenant policy.
+	ErrInvalidRetentionPlan = errors.New("queue-control-plane: invalid retention plan")
+	// ErrRetentionIncomplete reports that the declared batch budget ended on a
+	// full batch; it is not successful complete cleanup.
+	ErrRetentionIncomplete = errors.New("queue-control-plane: retention incomplete")
 )
 
 type retentionPolicy struct {
@@ -119,6 +124,9 @@ func validRetentionPolicy(policy retentionPolicy) bool {
 		policy.MaxBatches > 0 && policy.MaxBatches <= maximumRetentionBatches
 }
 
+// applyRetention skips legal holds and verifies before/after prefix deletion.
+// Each batch is a separate transaction: earlier committed cleanup is not rolled
+// back by a later tenant/batch failure, and a final full batch means incomplete.
 func applyRetention(
 	ctx context.Context,
 	audit retentionAudit,

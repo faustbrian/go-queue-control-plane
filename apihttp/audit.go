@@ -20,23 +20,42 @@ const (
 
 // AuditPage is one bounded tenant audit-history response.
 type AuditPage struct {
-	Entries      []AuditEntry `json:"entries"`
-	NextSequence uint64       `json:"next_sequence,omitempty"`
+	// Entries is the sequence-ordered public page; HTTP projection does not
+	// independently authenticate its anchor.
+	Entries []AuditEntry `json:"entries"`
+	// NextSequence is the exclusive next-page cursor; zero means no additional
+	// page was detected.
+	NextSequence uint64 `json:"next_sequence,omitempty"`
 }
 
 // AuditEntry is the stable JSON representation of one chained audit event.
 type AuditEntry struct {
-	Sequence       uint64    `json:"sequence"`
-	HashVersion    uint16    `json:"hash_version"`
-	OccurredAt     time.Time `json:"occurred_at"`
-	IdempotencyKey string    `json:"idempotency_key"`
-	CommandID      string    `json:"command_id"`
-	Actor          string    `json:"actor"`
-	Action         string    `json:"action"`
-	Target         string    `json:"target"`
-	Result         string    `json:"result"`
-	PreviousHash   string    `json:"previous_hash"`
-	Hash           string    `json:"hash"`
+	// Sequence is the stored chain position.
+	Sequence uint64 `json:"sequence"`
+	// HashVersion selects the package digest encoding; it is not a signature
+	// algorithm identifier.
+	HashVersion uint16 `json:"hash_version"`
+	// OccurredAt is the stored audit occurrence time.
+	OccurredAt time.Time `json:"occurred_at"`
+	// IdempotencyKey links command events; privileged read audits may leave it
+	// empty.
+	IdempotencyKey string `json:"idempotency_key"`
+	// CommandID links the attributed operation or privileged-access record.
+	CommandID string `json:"command_id"`
+	// Actor is stored actor attribution, not a new authentication decision.
+	Actor string `json:"actor"`
+	// Action is the stored operation or sensitive-access permission.
+	Action string `json:"action"`
+	// Target is the stored resource description; tenant scope is provided by
+	// the route.
+	Target string `json:"target"`
+	// Result is the stored public outcome.
+	Result string `json:"result"`
+	// PreviousHash is lowercase hexadecimal chain-link data, not a trusted
+	// anchor by itself.
+	PreviousHash string `json:"previous_hash"`
+	// Hash is lowercase hexadecimal unkeyed SHA-256 digest data.
+	Hash string `json:"hash"`
 }
 
 func (h *handler) listAudit(writer http.ResponseWriter, request *http.Request) {

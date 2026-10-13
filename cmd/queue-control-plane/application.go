@@ -1,3 +1,10 @@
+// Package main implements the deployable administrative service and one-shot
+// migration/retention modes. LoadConfig validates trusted startup settings;
+// serving composition owns listener, PostgreSQL pool and optional non-global
+// telemetry lifetime. Queue/Kubernetes providers are explicit optional adapters,
+// not worker supervisors. Serving never schedules retention or starts worker
+// reconciliation loops; callers must not infer atomicity across separate
+// command/dispatch/completion transactions or tenant cleanup batches.
 package main
 
 import (

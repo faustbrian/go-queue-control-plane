@@ -12,6 +12,9 @@ import (
 	queue "github.com/faustbrian/go-queue/management"
 )
 
+// ExampleClient_DesiredStateReader composes one caller-scheduled reconciliation
+// against an owned synthetic HTTP server; it does not start a polling loop or
+// prove production authentication, queue delivery or durability.
 func ExampleClient_DesiredStateReader() {
 	target := queue.Target{Kind: queue.TargetQueue, Name: "critical"}
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {

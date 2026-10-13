@@ -1,4 +1,9 @@
-// Package postgres provides PostgreSQL persistence for control-plane state.
+// Package postgres provides command/desired-state transactions and tenant audit
+// history for explicit control-plane composition. NewRuntimeWithPool borrows a
+// go-postgres/v2 pool; NewRuntime preserves the legacy v1 boundary. Apply the
+// hand-maintained embedded MigrationSource separately before use. Constructors
+// do not install/verify schema or own pool shutdown. Driver diagnostics may be
+// wrapped in Go errors; the administrative HTTP layer selects public codes.
 package postgres
 
 import (
@@ -26,6 +31,9 @@ type migrationFactories struct {
 	runner  func(migrations.Source, migrations.Backend) (*migrations.Runner, error)
 }
 
+// migrationFiles is hand-maintained schema history, not generated output.
+// Embedded bytes and migration authority must be changed through their owner.
+//
 //go:embed migrations/*.sql
 var migrationFiles embed.FS
 

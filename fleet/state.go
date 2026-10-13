@@ -1,5 +1,8 @@
-// Package fleet models worker liveness and compatibility without supervising
-// worker processes or implementing queue delivery semantics.
+// Package fleet models reported worker liveness and protocol/capability
+// compatibility without supervising processes or implementing delivery.
+// NewRegistry retains copied reports under one mutex; NewProjection aggregates
+// lifecycle events with a cardinality overflow bucket. Neither authenticates
+// reports, persists state, starts a polling loop or owns provider shutdown.
 package fleet
 
 import (
@@ -23,39 +26,74 @@ const (
 type State string
 
 const (
-	StateRunning  State = "running"
-	StatePaused   State = "paused"
+	// StateRunning is a reported worker processing state, not an externally
+	// verified health guarantee.
+	StateRunning State = "running"
+	// StatePaused is a reported admission pause; active work may remain.
+	StatePaused State = "paused"
+	// StateDraining is a reported drain in progress.
 	StateDraining State = "draining"
-	StateStopped  State = "stopped"
-	StateStale    State = "stale"
-	StateUnknown  State = "unknown"
+	// StateStopped is a reported stopped worker.
+	StateStopped State = "stopped"
+	// StateStale is derived when observation is at or before the staleness
+	// cutoff; workers may not report it.
+	StateStale State = "stale"
+	// StateUnknown is derived for missing/future/unsupported status or registry
+	// conflicts; workers may not report it.
+	StateUnknown State = "unknown"
 )
 
 // DrainState describes progress of a graceful drain request.
 type DrainState string
 
 const (
+	// DrainNotRequested reports no requested drain.
 	DrainNotRequested DrainState = "not_requested"
-	DrainRequested    DrainState = "requested"
-	DrainInProgress   DrainState = "in_progress"
-	DrainCompleted    DrainState = "completed"
-	DrainTimedOut     DrainState = "timed_out"
+	// DrainRequested reports acceptance of a drain request.
+	DrainRequested DrainState = "requested"
+	// DrainInProgress reports active drain work.
+	DrainInProgress DrainState = "in_progress"
+	// DrainCompleted reports completed draining.
+	DrainCompleted DrainState = "completed"
+	// DrainTimedOut reports an expired drain.
+	DrainTimedOut DrainState = "timed_out"
 )
 
 // Heartbeat is the latest status reported by a worker.
 type Heartbeat struct {
-	TenantID     string
-	WorkerID     string
-	Version      string
-	StartedAt    time.Time
-	ObservedAt   time.Time
-	Queues       []string
-	Concurrency  uint32
-	State        State
-	CurrentJobs  uint32
-	DrainStatus  DrainState
-	Backend      string
-	Protocol     ProtocolVersion
+	// TenantID is required bounded tenant scope; the reporting/authentication
+	// boundary must bind it.
+	TenantID string
+	// WorkerID is required bounded worker identity, paired with TenantID in
+	// Registry.
+	WorkerID string
+	// Version is required bounded implementation version text, not the
+	// management Protocol.
+	Version string
+	// StartedAt is required worker start time and must not follow ObservedAt.
+	StartedAt time.Time
+	// ObservedAt is required observation time used for ordering and staleness;
+	// source adapters choose its clock authority.
+	ObservedAt time.Time
+	// Queues contains at most MaxQueuesPerWorker bounded names; Registry copies
+	// the slice.
+	Queues []string
+	// Concurrency must be positive and at most MaxWorkerConcurrency.
+	Concurrency uint32
+	// State must be a reported running/paused/draining/stopped state; derived
+	// stale/unknown values are rejected.
+	State State
+	// CurrentJobs must not exceed Concurrency.
+	CurrentJobs uint32
+	// DrainStatus must be one supported reported drain state.
+	DrainStatus DrainState
+	// Backend is required bounded backend attribution.
+	Backend string
+	// Protocol must be a nonzero version pair; this is a report, not
+	// conformance proof.
+	Protocol ProtocolVersion
+	// Capabilities contains at most MaxCapabilitiesPerWorker bounded capability
+	// names; Registry copies the slice.
 	Capabilities []Capability
 }
 
@@ -116,8 +154,9 @@ func (h Heartbeat) Validate() error {
 	return nil
 }
 
-// EffectiveState safely classifies a heartbeat at the supplied observation
-// time. Missing, future, and malformed reports are never treated as healthy.
+// EffectiveState classifies observation time and reported state at now. Missing
+// or future times and unsupported states are unknown; this method does not run
+// full Heartbeat.Validate. Callers should supply a positive staleAfter.
 func (h Heartbeat) EffectiveState(now time.Time, staleAfter time.Duration) State {
 	if h.ObservedAt.IsZero() || h.ObservedAt.After(now) || !h.State.reported() {
 		return StateUnknown
@@ -156,10 +195,14 @@ func invalidHeartbeatIdentity(value string) bool {
 
 // HeartbeatValidationError identifies one invalid worker-status field.
 type HeartbeatValidationError struct {
-	Field   string
+	// Field names the invalid boundary and is printed by Error.
+	Field string
+	// Problem is printed by Error; producers should supply rule text, not
+	// sensitive rejected values.
 	Problem string
 }
 
+// Error prints the field and rule text, not the rejected heartbeat values.
 func (e *HeartbeatValidationError) Error() string {
 	return fmt.Sprintf("%s: %s", e.Field, e.Problem)
 }

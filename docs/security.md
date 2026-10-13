@@ -144,7 +144,9 @@ queue resource. Granting replay on a source does not grant replay into an
 otherwise unauthorized queue.
 
 An idempotency key is scoped to a tenant. Reusing it with changed command
-content fails with HTTP 409. Dispatch and persistence errors are redacted.
+content fails with HTTP 409. Administrative HTTP problem responses select
+stable public codes; direct Go errors can retain wrapped provider diagnostics,
+and returned failure/metadata fields rely on the provider's secret-safe contract.
 Never treat a timeout or `outcome_unknown` as permission to issue a new key;
 inspect the stored result and the target system first.
 
@@ -197,10 +199,12 @@ requests still require the matching CSRF cookie and header.
 ## Payload and data privacy
 
 Failure and dead-letter lists expose metadata with payloads hidden. Inspection
-also defaults to hidden; redacted inspection can expose bounded content type
-and size but no bytes. Revealed inspection requires both `record_inspect` and
-the separate `payload_view` permission on the exact record before the adapter is
-called. The stable `queue` contract caps revealed bytes at one mebibyte,
+also defaults to hidden; redacted inspection can expose bounded provider-redacted
+bytes when the source representation is explicitly redacted, not original revealed
+bytes. The provider owns actual content redaction. Revealed inspection requires
+both `record_inspect` and the separate `payload_view` permission on the exact
+record before the adapter is called. The stable `queue` contract caps revealed
+bytes at one mebibyte,
 and the control plane rejects malformed, mismatched, or over-disclosed adapter
 output.
 

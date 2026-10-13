@@ -20,10 +20,18 @@ const (
 
 // StaticAccess is a coherent authentication and authorization configuration.
 type StaticAccess struct {
-	Extractor     *authhttp.Extractor
+	// Extractor reads the static key headers; it does not itself authenticate
+	// credentials.
+	Extractor *authhttp.Extractor
+	// Authenticator verifies startup-configured key material; the bundle
+	// supplies it to middleware.
 	Authenticator authentication.Authenticator
-	Authorizer    *controlauthz.Authorizer
-	Challenge     authentication.Challenge
+	// Authorizer applies deny-overrides tenant/resource ACL decisions to
+	// authenticated actors.
+	Authorizer *controlauthz.Authorizer
+	// Challenge is the public authentication challenge, not stored credential
+	// material.
+	Challenge authentication.Challenge
 }
 
 // NewStaticAccess builds bounded API-key authentication and deny-overrides ACL

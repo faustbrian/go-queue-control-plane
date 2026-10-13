@@ -21,27 +21,49 @@ const (
 
 // CommandHistoryPage is one bounded tenant command-history response.
 type CommandHistoryPage struct {
-	Commands   []CommandHistoryEntry `json:"commands"`
-	NextCursor string                `json:"next_cursor,omitempty"`
+	// Commands is a newly projected newest-first page; source providers own
+	// size and content validity.
+	Commands []CommandHistoryEntry `json:"commands"`
+	// NextCursor is opaque pagination state; empty means no additional page was
+	// detected.
+	NextCursor string `json:"next_cursor,omitempty"`
 }
 
 // CommandHistoryEntry is one immutable command envelope and durable outcome.
 type CommandHistoryEntry struct {
-	CommandID            string                     `json:"command_id"`
-	IdempotencyKey       string                     `json:"idempotency_key"`
-	Actor                string                     `json:"actor"`
-	AuthenticationMethod string                     `json:"authentication_method"`
-	Reason               string                     `json:"reason"`
-	Action               controlplane.Action        `json:"action"`
-	Capability           string                     `json:"capability"`
-	Target               TargetRequest              `json:"target"`
-	RequestedAt          time.Time                  `json:"requested_at"`
-	Deadline             time.Time                  `json:"deadline"`
-	Confirmed            bool                       `json:"confirmed"`
-	Selection            *SelectionRequest          `json:"selection,omitempty"`
-	Replay               *ReplayRequest             `json:"replay,omitempty"`
-	Scale                *ScaleRequest              `json:"scale,omitempty"`
-	Result               controlplane.CommandResult `json:"result"`
+	// CommandID is the stored operation identity, separate from its idempotency
+	// key.
+	CommandID string `json:"command_id"`
+	// IdempotencyKey is the tenant-scoped journal duplicate/conflict key.
+	IdempotencyKey string `json:"idempotency_key"`
+	// Actor is the authenticated attribution originally recorded, not body-selected identity.
+	Actor string `json:"actor"`
+	// AuthenticationMethod is recorded ingress method attribution.
+	AuthenticationMethod string `json:"authentication_method"`
+	// Reason is stored administrative audit text; callers must exclude
+	// sensitive values.
+	Reason string `json:"reason"`
+	// Action is the originally admitted operation.
+	Action controlplane.Action `json:"action"`
+	// Capability is recorded operation capability attribution, not a grant.
+	Capability string `json:"capability"`
+	// Target is the originally admitted resource.
+	Target TargetRequest `json:"target"`
+	// RequestedAt is the stored request time used in newest-first ordering.
+	RequestedAt time.Time `json:"requested_at"`
+	// Deadline is the stored bounded enforcement deadline.
+	Deadline time.Time `json:"deadline"`
+	// Confirmed records the submitted destructive-operation confirmation.
+	Confirmed bool `json:"confirmed"`
+	// Selection is an independently projected optional bulk bound.
+	Selection *SelectionRequest `json:"selection,omitempty"`
+	// Replay is an independently projected optional replay destination/policy.
+	Replay *ReplayRequest `json:"replay,omitempty"`
+	// Scale is an independently projected optional replica request.
+	Scale *ScaleRequest `json:"scale,omitempty"`
+	// Result is the stored outcome; HTTP projection borrows its optional fields
+	// until synchronous encoding.
+	Result controlplane.CommandResult `json:"result"`
 }
 
 func (h *handler) listCommandHistory(writer http.ResponseWriter, request *http.Request) {

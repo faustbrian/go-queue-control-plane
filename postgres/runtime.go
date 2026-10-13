@@ -15,10 +15,18 @@ var ErrInvalidRuntimePool = errors.New("postgres: invalid runtime pool")
 // Runtime is the complete PostgreSQL-backed control-plane service bundle.
 // The caller retains ownership of the underlying pool.
 type Runtime struct {
-	Journal   *Journal
-	Audit     *AuditStore
-	Commands  *CommandStore
-	Desired   *DesiredStore
+	// Journal coordinates command, desired-state and audit writes against the
+	// borrowed pool.
+	Journal *Journal
+	// Audit provides tenant audit reads, verification and retention.
+	Audit *AuditStore
+	// Commands provides scoped command lookup, pagination and retention.
+	Commands *CommandStore
+	// Desired reads latest durable desired state; it does not drive worker
+	// convergence.
+	Desired *DesiredStore
+	// Readiness pings the borrowed pool through its configured health-check
+	// budget.
 	Readiness *PoolReadiness
 }
 

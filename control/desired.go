@@ -30,20 +30,35 @@ var (
 type DesiredState string
 
 const (
-	DesiredActive      DesiredState = "active"
-	DesiredPaused      DesiredState = "paused"
-	DesiredDraining    DesiredState = "draining"
+	// DesiredActive allows future worker admission for the selected scope.
+	DesiredActive DesiredState = "active"
+	// DesiredPaused requests paused admission, without proving active jobs have
+	// drained.
+	DesiredPaused DesiredState = "paused"
+	// DesiredDraining requests completion of active work without new admission.
+	DesiredDraining DesiredState = "draining"
+	// DesiredTerminating is a terminal desired transition that cannot return to
+	// another state.
 	DesiredTerminating DesiredState = "terminating"
 )
 
 // DesiredRecord is one revisioned durable state for a queue or worker scope.
 type DesiredRecord struct {
-	TenantID   string
-	Target     controlplane.Target
-	State      DesiredState
-	Revision   uint64
+	// TenantID is the durable tenant scope and must match subsequent commands.
+	TenantID string
+	// Target is the exact durable resource scope and must match subsequent
+	// commands.
+	Target controlplane.Target
+	// State is the requested operational state, not an observed worker
+	// acknowledgement.
+	State DesiredState
+	// Revision increments for each planned change and must not wrap uint64.
+	Revision uint64
+	// CommandKey stores the initiating CommandID, despite the field name; it is
+	// not the IdempotencyKey.
 	CommandKey string
-	ChangedAt  time.Time
+	// ChangedAt retains the command's RequestedAt time.
+	ChangedAt time.Time
 }
 
 // NextDesiredState validates and plans the next monotonic desired-state

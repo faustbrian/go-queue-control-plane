@@ -2,6 +2,11 @@
 
 // Package kubernetes exposes the target-oriented entry point for the narrow
 // Kubernetes Deployment integration.
+// New and resolver/dispatcher constructors delegate to the released
+// compatibility package, preserving identical public types and behavior.
+// Clients are borrowed namespace-scoped apps/v1/scale providers; the adapter
+// owns no watch, cluster lifecycle or replica convergence guarantee. Direct
+// scale callers must authorize and confirm destructive requests themselves.
 package kubernetes
 
 import (

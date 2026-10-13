@@ -13,28 +13,42 @@ import (
 // Runtime is cumulative so a metrics backend can derive honest averages and
 // rates without this package retaining an unbounded time series.
 type QueueMetrics struct {
-	Enqueued  uint64
+	// Enqueued counts observed EventEnqueued events since construction.
+	Enqueued uint64
+	// Succeeded counts observed successful handler events, not durable
+	// settlement.
 	Succeeded uint64
-	Failed    uint64
-	Runtime   time.Duration
+	// Failed counts observed failed handler events.
+	Failed uint64
+	// Runtime accumulates handler success/failure durations; it is not a per-job average.
+	Runtime time.Duration
 }
 
 // QueueSnapshot identifies one queue's current projected counters.
 type QueueSnapshot struct {
+	// Backend identifies the event source backend, not a connection handle.
 	Backend string
-	Queue   string
+	// Queue identifies the event-reported queue.
+	Queue string
+	// Metrics contains copied cumulative counters for this identity.
 	Metrics QueueMetrics
 }
 
-// ProjectionSnapshot is an immutable point-in-time fleet projection.
+// ProjectionSnapshot is an independently owned point-in-time fleet projection.
 type ProjectionSnapshot struct {
-	Queues   []QueueSnapshot
+	// Queues is a newly owned backend/queue-sorted slice; caller mutation does
+	// not alter Projection.
+	Queues []QueueSnapshot
+	// Overflow aggregates events for identities refused at the configured
+	// cardinality limit.
 	Overflow QueueMetrics
 }
 
 // Projection consumes queue lifecycle events without accessing a backend.
 // New queue identities beyond the configured limit are aggregated into the
-// overflow bucket to keep memory use bounded.
+// overflow bucket to bound retained identity cardinality. Event label bytes and
+// numeric overflow are not separately constrained; callers own trusted input.
+// Construct with NewProjection and do not copy after the mutex is used.
 type Projection struct {
 	mu        sync.RWMutex
 	maxQueues int

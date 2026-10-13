@@ -7,6 +7,9 @@ import (
 	"testing"
 )
 
+// FuzzCommandHandlerFailsClosed mutates authenticated JSON bodies against a
+// stub executor, checking decode/admission status and small response bounds;
+// it does not qualify backend mutation enforcement.
 func FuzzCommandHandlerFailsClosed(f *testing.F) {
 	f.Add(`{"idempotency_key":"request-1"}`)
 	f.Add(`{"actor":"spoofed"}`)
@@ -45,6 +48,8 @@ func FuzzCommandHandlerFailsClosed(f *testing.F) {
 	})
 }
 
+// FuzzRecordHandlerFailsClosed mutates record search/sort/visibility queries
+// against permitted synthetic sources and checks refusal/status/response bounds.
 func FuzzRecordHandlerFailsClosed(f *testing.F) {
 	f.Add("critical", "queue", "revealed")
 	f.Add("", "payload", "raw")
@@ -86,6 +91,8 @@ func FuzzRecordHandlerFailsClosed(f *testing.F) {
 	})
 }
 
+// FuzzQueueHandlerFailsClosed mutates queue cursor/limit text against a synthetic
+// source, checking parser refusal/status and bounded response size.
 func FuzzQueueHandlerFailsClosed(f *testing.F) {
 	f.Add("current", "25")
 	f.Add("", "0")

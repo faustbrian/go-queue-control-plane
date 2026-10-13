@@ -1,4 +1,9 @@
-// Package controlplane defines the public administrative domain contracts.
+// Package controlplane defines administrative commands, permissions and result
+// validation for the HTTP/CLI/control-service boundaries. Start with Command
+// and its Validate method; it validates shape, not authentication or permission.
+// Optional PostgreSQL, queue-management and Kubernetes composition own their
+// external resources. Domain values containing pointers are not automatically
+// immutable or safe to mutate while a borrowed operation is in progress.
 package controlplane
 
 import (
@@ -29,16 +34,29 @@ func newCommandID(reader io.Reader) (string, error) {
 type Action string
 
 const (
-	ActionPause     Action = "pause"
-	ActionResume    Action = "resume"
-	ActionDrain     Action = "drain"
+	// ActionPause requests a queue or worker-group admission pause; it does
+	// not join active jobs.
+	ActionPause Action = "pause"
+	// ActionResume requests resumption for a queue or worker group.
+	ActionResume Action = "resume"
+	// ActionDrain requests worker or worker-group draining without immediate
+	// termination.
+	ActionDrain Action = "drain"
+	// ActionTerminate requests worker or worker-group termination.
 	ActionTerminate Action = "terminate"
-	ActionRetry     Action = "retry"
+	// ActionRetry retries one failure or dead-letter record.
+	ActionRetry Action = "retry"
+	// ActionBulkRetry retries a confirmed bounded record selection.
 	ActionBulkRetry Action = "bulk_retry"
-	ActionDelete    Action = "delete"
-	ActionPurge     Action = "purge"
-	ActionReplay    Action = "replay"
-	ActionScale     Action = "scale"
+	// ActionDelete deletes one failure or dead-letter record.
+	ActionDelete Action = "delete"
+	// ActionPurge purges a confirmed queue or record target.
+	ActionPurge Action = "purge"
+	// ActionReplay replays a confirmed record into an explicitly authorized
+	// destination.
+	ActionReplay Action = "replay"
+	// ActionScale requests a bounded Kubernetes workload replica count.
+	ActionScale Action = "scale"
 )
 
 const (
@@ -54,38 +72,80 @@ const (
 type TargetKind string
 
 const (
-	TargetQueue       TargetKind = "queue"
-	TargetWorker      TargetKind = "worker"
+	// TargetQueue identifies a tenant-scoped queue.
+	TargetQueue TargetKind = "queue"
+	// TargetWorker identifies one tenant-scoped worker.
+	TargetWorker TargetKind = "worker"
+	// TargetWorkerGroup identifies a tenant-scoped worker group.
 	TargetWorkerGroup TargetKind = "worker_group"
-	TargetFailure     TargetKind = "failure"
-	TargetDeadLetter  TargetKind = "dead_letter"
-	TargetWorkload    TargetKind = "workload"
+	// TargetFailure identifies a failure record or its supported administrative
+	// selection.
+	TargetFailure TargetKind = "failure"
+	// TargetDeadLetter identifies a dead-letter record or its supported
+	// administrative selection.
+	TargetDeadLetter TargetKind = "dead_letter"
+	// TargetWorkload identifies a Kubernetes workload, not a queue worker
+	// process.
+	TargetWorkload TargetKind = "workload"
 )
 
 // Target identifies an administrative resource without exposing backend
 // addressing or queue serialization details.
 type Target struct {
+	// Kind selects the resource class; supported classes depend on the action.
 	Kind TargetKind
+	// Name is required nonblank identity text bounded by MaxIdentityBytes;
+	// validation does not trim it.
 	Name string
 }
 
 // Command is the mandatory envelope for every administrative mutation.
 type Command struct {
-	CommandID            string
-	IdempotencyKey       string
-	TenantID             string
-	Actor                string
+	// CommandID is an optional bounded operation identity; Service/Journal
+	// generate it when absent.
+	CommandID string
+	// IdempotencyKey is the required tenant-scoped duplicate/conflict key, not
+	// authorization.
+	IdempotencyKey string
+	// TenantID is required bounded scope; a trusted ingress must authenticate
+	// and authorize it.
+	TenantID string
+	// Actor is required bounded attribution; authenticated ingress owns its
+	// binding to a principal.
+	Actor string
+	// AuthenticationMethod is optional bounded audit attribution; orchestration
+	// defaults it to internal, without authenticating anyone.
 	AuthenticationMethod string
-	Reason               string
-	Action               Action
-	Capability           string
-	Target               Target
-	RequestedAt          time.Time
-	Deadline             time.Time
-	Confirmed            bool
-	Selection            *Selection
-	Replay               *Replay
-	Scale                *Scale
+	// Reason is required nonblank audit text bounded by MaxReasonBytes; callers
+	// must omit credentials.
+	Reason string
+	// Action selects a supported mutation and its required
+	// target/confirmation/options.
+	Action Action
+	// Capability is optional bounded audit attribution; orchestration defaults
+	// it to the action text.
+	Capability string
+	// Target identifies the scoped resource; action/target combinations are
+	// validated.
+	Target Target
+	// RequestedAt is required and anchors the enforcement lifetime; validation
+	// does not replace caller time.
+	RequestedAt time.Time
+	// Deadline is optional; orchestration defaults it to RequestedAt plus
+	// DefaultCommandLifetime, and supplied values must follow RequestedAt
+	// within MaxCommandLifetime.
+	Deadline time.Time
+	// Confirmed must be true for purge, bulk retry, replay and scaling to zero.
+	Confirmed bool
+	// Selection is required for bulk retry; its pointer remains caller-owned
+	// outside explicit copying boundaries.
+	Selection *Selection
+	// Replay is required for replay, including an explicit destination and
+	// duplicate policy.
+	Replay *Replay
+	// Scale is required for scaling; zero replicas additionally require
+	// confirmation.
+	Scale *Scale
 }
 
 // MaxBulkSelection is the largest destructive selection accepted by one
@@ -94,6 +154,8 @@ const MaxBulkSelection uint32 = 1_000
 
 // Selection bounds a bulk administrative mutation.
 type Selection struct {
+	// Limit must be positive and at most MaxBulkSelection; it is a per-command
+	// selection bound.
 	Limit uint32
 }
 
@@ -101,14 +163,21 @@ type Selection struct {
 type ReplayPolicy string
 
 const (
-	ReplayRejectDuplicate  ReplayPolicy = "reject_duplicate"
+	// ReplayRejectDuplicate refuses an existing destination identity.
+	ReplayRejectDuplicate ReplayPolicy = "reject_duplicate"
+	// ReplayReplaceDuplicate explicitly permits replacement of an existing
+	// destination identity.
 	ReplayReplaceDuplicate ReplayPolicy = "replace_duplicate"
 )
 
 // Replay contains the explicit destination and idempotency semantics required
 // for a replay command.
 type Replay struct {
-	Destination       string
+	// Destination is a required nonblank queue identity; Service separately
+	// authorizes this destination.
+	Destination string
+	// IdempotencyPolicy must explicitly select rejection or replacement of
+	// destination duplicates.
 	IdempotencyPolicy ReplayPolicy
 }
 
@@ -116,8 +185,8 @@ type Replay struct {
 const MaxScaleReplicas uint32 = 10_000
 
 const (
-	// DefaultCommandLifetime is the bounded enforcement window assigned when a
-	// caller does not supply a narrower deadline.
+	// DefaultCommandLifetime is the enforcement window assigned when a caller
+	// supplies no deadline; explicit windows may extend to MaxCommandLifetime.
 	DefaultCommandLifetime time.Duration = 30_000_000_000
 	// MaxCommandLifetime prevents administrative work from remaining live
 	// indefinitely across request and adapter boundaries.
@@ -126,39 +195,68 @@ const (
 
 // Scale declares the desired Kubernetes workload replica count.
 type Scale struct {
+	// Replicas is at most MaxScaleReplicas; zero requires command confirmation.
 	Replicas uint32
 }
 
-// Permission is the explicit authorization capability required by an action.
+// Permission names an authorization capability required by an operation.
+// Naming a permission does not authenticate a principal or grant access.
 type Permission string
 
 const (
-	PermissionView               Permission = "view"
-	PermissionPause              Permission = "pause"
-	PermissionResume             Permission = "resume"
-	PermissionDrain              Permission = "drain"
-	PermissionTerminate          Permission = "terminate"
-	PermissionRetry              Permission = "retry"
-	PermissionBulkRetry          Permission = "bulk_retry"
-	PermissionDelete             Permission = "delete"
-	PermissionPurge              Permission = "purge"
-	PermissionReplay             Permission = "replay"
-	PermissionScale              Permission = "scale"
-	PermissionRecordList         Permission = "record_list"
-	PermissionRecordInspect      Permission = "record_inspect"
-	PermissionPayloadView        Permission = "payload_view"
-	PermissionDiagnosticsView    Permission = "diagnostics_view"
-	PermissionAuditView          Permission = "audit_view"
+	// PermissionView permits ordinary administrative views.
+	PermissionView Permission = "view"
+	// PermissionPause permits pausing supported resources.
+	PermissionPause Permission = "pause"
+	// PermissionResume permits resuming supported resources.
+	PermissionResume Permission = "resume"
+	// PermissionDrain permits worker draining.
+	PermissionDrain Permission = "drain"
+	// PermissionTerminate permits worker termination.
+	PermissionTerminate Permission = "terminate"
+	// PermissionRetry permits one record retry.
+	PermissionRetry Permission = "retry"
+	// PermissionBulkRetry permits bounded bulk retries.
+	PermissionBulkRetry Permission = "bulk_retry"
+	// PermissionDelete permits record deletion.
+	PermissionDelete Permission = "delete"
+	// PermissionPurge permits confirmed purging.
+	PermissionPurge Permission = "purge"
+	// PermissionReplay permits replay, including separate destination
+	// authorization.
+	PermissionReplay Permission = "replay"
+	// PermissionScale permits workload scaling.
+	PermissionScale Permission = "scale"
+	// PermissionRecordList permits safe record metadata listings.
+	PermissionRecordList Permission = "record_list"
+	// PermissionRecordInspect permits safe record metadata inspection.
+	PermissionRecordInspect Permission = "record_inspect"
+	// PermissionPayloadView permits separately audited payload disclosure.
+	PermissionPayloadView Permission = "payload_view"
+	// PermissionDiagnosticsView permits separately audited diagnostic
+	// disclosure.
+	PermissionDiagnosticsView Permission = "diagnostics_view"
+	// PermissionAuditView permits tenant audit history.
+	PermissionAuditView Permission = "audit_view"
+	// PermissionRetentionConfigure permits retention-policy configuration.
 	PermissionRetentionConfigure Permission = "retention_configure"
 )
 
 // SensitiveAccess is one fail-closed audit record for privileged record data.
 type SensitiveAccess struct {
-	CommandID  string
-	TenantID   string
-	Actor      string
+	// CommandID is a required bounded identity linking this privileged access
+	// to its audit record.
+	CommandID string
+	// TenantID is required tenant scope; the record itself does not
+	// authenticate it.
+	TenantID string
+	// Actor is required bounded authenticated attribution supplied by ingress.
+	Actor string
+	// Permission must be PermissionPayloadView or PermissionDiagnosticsView.
 	Permission Permission
-	Target     Target
+	// Target must identify a bounded failure or dead-letter record.
+	Target Target
+	// OccurredAt is required observation time for the privileged access.
 	OccurredAt time.Time
 }
 
@@ -191,38 +289,77 @@ func (a SensitiveAccess) Validate() error {
 type CommandStatus string
 
 const (
-	CommandPending      CommandStatus = "pending"
-	CommandAccepted     CommandStatus = "accepted"
-	CommandDispatched   CommandStatus = "dispatched"
+	// CommandPending identifies pending dispatch; the native Journal stores
+	// this state as its initial durable admission result.
+	CommandPending CommandStatus = "pending"
+	// CommandAccepted identifies durable acceptance before dispatch.
+	CommandAccepted CommandStatus = "accepted"
+	// CommandDispatched identifies the durable pre-dispatch recovery boundary,
+	// not enforcement proof.
+	CommandDispatched CommandStatus = "dispatched"
+	// CommandAcknowledged identifies recorded backend acknowledgement before
+	// completion.
 	CommandAcknowledged CommandStatus = "acknowledged"
-	CommandSucceeded    CommandStatus = "succeeded"
-	CommandFailed       CommandStatus = "failed"
-	CommandUnsupported  CommandStatus = "unsupported"
-	CommandTimedOut     CommandStatus = "timed_out"
-	CommandPartial      CommandStatus = "partial"
-	CommandUnknown      CommandStatus = "unknown"
-	CommandCanceled     CommandStatus = "canceled"
+	// CommandSucceeded identifies a successful terminal result.
+	CommandSucceeded CommandStatus = "succeeded"
+	// CommandFailed identifies an unsuccessful terminal result; backend effects
+	// may be partial.
+	CommandFailed CommandStatus = "failed"
+	// CommandUnsupported identifies a terminal unsupported capability.
+	CommandUnsupported CommandStatus = "unsupported"
+	// CommandTimedOut identifies an expired terminal enforcement outcome.
+	CommandTimedOut CommandStatus = "timed_out"
+	// CommandPartial identifies a terminal operation with partial effects.
+	CommandPartial CommandStatus = "partial"
+	// CommandUnknown identifies a terminal result without reliable enforcement
+	// certainty.
+	CommandUnknown CommandStatus = "unknown"
+	// CommandCanceled identifies cancellation before dispatch, not cancellation
+	// of previously dispatched work.
+	CommandCanceled CommandStatus = "canceled"
 )
 
 // CommandResult is the durable result associated with an idempotency key.
 type CommandResult struct {
-	CommandID           string           `json:"command_id"`
-	IdempotencyKey      string           `json:"idempotency_key"`
-	TenantID            string           `json:"tenant_id"`
-	Status              CommandStatus    `json:"status"`
-	Failure             string           `json:"failure,omitempty"`
-	WorkerID            string           `json:"worker_id,omitempty"`
-	Protocol            *ProtocolVersion `json:"protocol,omitempty"`
-	CapabilityAvailable *bool            `json:"capability_available,omitempty"`
-	DispatchedAt        time.Time        `json:"dispatched_at,omitempty"`
-	AcknowledgedAt      time.Time        `json:"acknowledged_at,omitempty"`
-	CompletedAt         time.Time        `json:"completed_at,omitempty"`
+	// CommandID is an optional bounded operation identity retained for legacy
+	// result compatibility.
+	CommandID string `json:"command_id"`
+	// IdempotencyKey is the required scoped journal lookup key.
+	IdempotencyKey string `json:"idempotency_key"`
+	// TenantID is the required bounded journal scope.
+	TenantID string `json:"tenant_id"`
+	// Status selects a validated lifecycle state; a returned unknown result
+	// need not itself have been durably saved.
+	Status CommandStatus `json:"status"`
+	// Failure is required bounded nonblank text for unsuccessful terminal
+	// states and absent otherwise; use secret-safe public codes.
+	Failure string `json:"failure,omitempty"`
+	// WorkerID is optional bounded acknowledgement attribution and must
+	// accompany Protocol.
+	WorkerID string `json:"worker_id,omitempty"`
+	// Protocol is optional worker protocol attribution; when present its major
+	// must be nonzero and WorkerID must be present.
+	Protocol *ProtocolVersion `json:"protocol,omitempty"`
+	// CapabilityAvailable optionally distinguishes a reported capability from
+	// an unspecified acknowledgement; nil means not supplied.
+	CapabilityAvailable *bool `json:"capability_available,omitempty"`
+	// DispatchedAt records the pre-dispatch boundary, not proof that a backend
+	// accepted the operation.
+	DispatchedAt time.Time `json:"dispatched_at,omitempty"`
+	// AcknowledgedAt records acknowledgement after dispatch;
+	// accepted/pending/dispatched states may not carry it.
+	AcknowledgedAt time.Time `json:"acknowledged_at,omitempty"`
+	// CompletedAt is required for terminal states and absent before completion.
+	CompletedAt time.Time `json:"completed_at,omitempty"`
 }
 
 // ProtocolVersion identifies the data-plane protocol that acknowledged a
 // command without coupling this package to an adapter implementation.
 type ProtocolVersion struct {
+	// Major is the nonzero major identity required when attached to a
+	// CommandResult.
 	Major uint16 `json:"major"`
+	// Minor is the worker's reported minor protocol revision.
 	Minor uint16 `json:"minor"`
 }
 
@@ -487,7 +624,11 @@ func invalidIdentity(value string) bool {
 
 // ValidationError is a machine-readable public contract for invalid input.
 type ValidationError struct {
-	Field   string
+	// Field names the invalid input boundary and is printed by Error; keep
+	// labels non-sensitive.
+	Field string
+	// Problem is printed by Error; use rule descriptions rather than rejected
+	// values.
 	Problem string
 }
 

@@ -6,6 +6,13 @@ Versioning.
 
 ## Unreleased
 
+### Documentation
+
+- Clarify command admission, acknowledgement and convergence, borrowed
+  provider/lifecycle obligations, audit-chain trust and per-boundary limits.
+- Reconcile redacted record inspection with the tested provider-redacted byte
+  representation, distinct from separately authorized original payload reveal.
+
 ## 3.1.1 - 2026-10-10
 
 ### Changed

@@ -1,4 +1,10 @@
-// Package client provides a typed bounded administrative API client.
+// Package client provides typed administrative HTTP access. New selects one
+// borrowed authentication source, copies HTTP settings with redirects disabled,
+// and bounds buffered response bytes. The caller owns transport/TLS trust,
+// credential lifetime and collaborator blocking/concurrency; no polling or
+// shutdown goroutine is started. Ordinary successful JSON models are decoded,
+// not universally semantically validated; GetDesiredState adds exact-target
+// validation for worker convergence.
 package client
 
 import (
@@ -36,91 +42,150 @@ const (
 )
 
 var (
+	// ErrInvalidConfiguration reports an invalid endpoint, authentication
+	// choice or response bound.
 	ErrInvalidConfiguration = errors.New("control-plane client: invalid configuration")
-	ErrInvalidRequest       = errors.New("control-plane client: invalid request")
-	ErrInvalidToken         = errors.New("control-plane client: invalid bearer token")
-	ErrInvalidAPIKey        = errors.New("control-plane client: invalid API key")
-	ErrResponseTooLarge     = errors.New("control-plane client: response too large")
+	// ErrInvalidRequest reports unsupported or unbounded typed request input.
+	ErrInvalidRequest = errors.New("control-plane client: invalid request")
+	// ErrInvalidToken reports a blank token returned by the borrowed token
+	// source.
+	ErrInvalidToken = errors.New("control-plane client: invalid bearer token")
+	// ErrInvalidAPIKey reports a blank key identifier or secret returned by the
+	// borrowed key source.
+	ErrInvalidAPIKey = errors.New("control-plane client: invalid API key")
+	// ErrResponseTooLarge reports a response exceeding the configured byte
+	// bound before JSON decoding.
+	ErrResponseTooLarge = errors.New("control-plane client: response too large")
 )
 
 // TokenSource acquires a bearer token for one request context.
 type TokenSource interface {
+	// Token acquires credentials synchronously for ctx; callers own blocking,
+	// shared-use safety and credential lifetime.
 	Token(context.Context) (string, error)
 }
 
 // APIKeySource acquires a static API-key identifier and secret for one request
 // context.
 type APIKeySource interface {
+	// APIKey returns a nonblank identifier and secret for this request;
+	// implementations own blocking, concurrency and secret lifetime.
 	APIKey(context.Context) (string, string, error)
 }
 
 // Config defines the API endpoint, authentication, and response bounds.
 type Config struct {
-	BaseURL          string
-	HTTPClient       *http.Client
-	Tokens           TokenSource
-	APIKeys          APIKeySource
+	// BaseURL must be an HTTP(S) origin without credentials, query, fragment or
+	// non-root path; TLS trust is caller-configured.
+	BaseURL string
+	// HTTPClient is shallow-copied with redirects disabled; nil selects a
+	// 30-second client. Transport and Jar remain shared caller-owned
+	// collaborators.
+	HTTPClient *http.Client
+	// Tokens is one borrowed authentication source; exactly one of Tokens and
+	// APIKeys must be supplied.
+	Tokens TokenSource
+	// APIKeys is one borrowed authentication source, mutually exclusive with
+	// Tokens.
+	APIKeys APIKeySource
+	// MaxResponseBytes bounds buffered response bytes before JSON parsing; zero
+	// selects 4 MiB, negative values fail.
 	MaxResponseBytes int64
 }
 
 // WorkerQuery contains bounded worker-list filters.
 type WorkerQuery struct {
+	// Limit bounds one worker page; zero leaves the server default and values
+	// above MaxWorkerPageSize fail.
 	Limit uint32
+	// After is the optional last worker identity cursor passed to the server.
 	After string
+	// State optionally filters derived fleet state; the server validates
+	// supported values.
 	State fleet.State
+	// Queue optionally selects a queue membership filter.
 	Queue string
 }
 
 // WorkloadQuery contains bounded Kubernetes pagination.
 type WorkloadQuery struct {
-	Limit    int64
+	// Limit bounds one workload page; zero leaves the server default, negative
+	// or oversized values fail.
+	Limit int64
+	// Continue is the optional opaque Kubernetes pagination token, not an
+	// authorization capability.
 	Continue string
 }
 
 // AuditQuery contains bounded audit-history pagination.
 type AuditQuery struct {
+	// After is the exclusive audit sequence cursor; zero starts at retained
+	// history.
 	After uint64
+	// Limit bounds one audit page; zero leaves the server default.
 	Limit uint32
 }
 
 // CommandQuery contains bounded command-history pagination.
 type CommandQuery struct {
+	// Cursor is optional bounded opaque newest-first pagination state.
 	Cursor string
-	Limit  uint32
+	// Limit bounds one command page; zero leaves the server default.
+	Limit uint32
 }
 
 // QueueQuery contains bounded queue-status pagination.
 type QueueQuery struct {
+	// Cursor is optional bounded backend pagination state, not authorization.
 	Cursor string
-	Limit  uint32
+	// Limit bounds one queue-status page; zero leaves the server default.
+	Limit uint32
 }
 
 // RecordQuery contains bounded failure and dead-letter list controls.
 type RecordQuery struct {
-	Cursor    string
-	Limit     uint32
-	Search    string
-	Sort      queue.SortField
+	// Cursor is optional bounded backend pagination state.
+	Cursor string
+	// Limit bounds one record page; zero leaves the server default.
+	Limit uint32
+	// Search is optional bounded metadata search text; it is not payload
+	// search.
+	Search string
+	// Sort optionally selects occurrence time, queue or attempt ordering.
+	Sort queue.SortField
+	// Direction optionally selects ascending or descending order; empty leaves
+	// the server default.
 	Direction queue.SortDirection
 }
 
 // RecordInspectOptions controls independently privileged record fields.
 type RecordInspectOptions struct {
-	Payload           queue.PayloadVisibility
+	// Payload must select hidden, redacted or revealed visibility. Revealed
+	// bytes require additional permission/access audit; hidden/redacted
+	// inspection still requires record_inspect.
+	Payload queue.PayloadVisibility
+	// RevealDiagnostics requests separately authorized/audited diagnostics, not
+	// blanket payload access.
 	RevealDiagnostics bool
 }
 
 // APIError is a stable non-success administrative response.
 type APIError struct {
+	// Status is the non-success HTTP status returned by the remote server.
 	Status int
-	Code   string
+	// Code is decoded from the remote problem body and printed by Error; it is
+	// not independently sanitized by Client.
+	Code string
 }
 
+// Error prints status and server-provided Code, not the entire response body.
 func (e *APIError) Error() string {
 	return fmt.Sprintf("control-plane API: status %d code %s", e.Status, e.Code)
 }
 
-// Client calls the versioned administrative API.
+// Client calls the versioned administrative API after New; its zero value is
+// invalid. Shared use requires safe borrowed transports and credential sources.
+// Methods close response bodies but do not close the transport or credentials.
 type Client struct {
 	baseURL          *url.URL
 	httpClient       *http.Client

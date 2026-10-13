@@ -46,6 +46,10 @@ type fixedWindow struct {
 
 // FixedWindowRateLimiter keeps a bounded number of in-memory admission
 // counters. Capacity exhaustion fails closed for previously unseen keys.
+// Construct with NewFixedWindowRateLimiter; its zero value is invalid and it
+// must not be copied after mutex use. Allow synchronizes counters, but the
+// borrowed clock must support concurrent calls and may block/panic outside the
+// lock. No timer, sweeper goroutine, close or distributed quota is owned.
 type FixedWindowRateLimiter struct {
 	mu        sync.Mutex
 	limit     uint32
@@ -83,6 +87,8 @@ func (limiter *FixedWindowRateLimiter) Allow(ctx context.Context, key string) bo
 		return false
 	}
 
+	// The application clock runs outside the lock so it cannot stall other
+	// callers while holding counter ownership; ctx cannot interrupt that callback.
 	now := limiter.now()
 	limiter.mu.Lock()
 	defer limiter.mu.Unlock()

@@ -22,6 +22,8 @@ var (
 
 // StatusReaderResolver selects a tenant-scoped queue status reader.
 type StatusReaderResolver interface {
+	// ResolveStatusReader returns a borrowed tenant-scoped reader honoring ctx;
+	// the source validates requests and output without closing the reader.
 	ResolveStatusReader(context.Context, string) (queue.StatusReader, error)
 }
 

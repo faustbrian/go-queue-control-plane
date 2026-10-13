@@ -1,3 +1,8 @@
+// Package main hosts synthetic loopback surfaces for the optional Chromium
+// assurance harness. Fixed approved/hostile/API origins exercise admission and
+// console behavior; fixture credential checks are not production authentication.
+// It owns listeners and signal-triggered shutdown for the test process, not
+// queue/database clients or a deployable control plane.
 package main
 
 import (

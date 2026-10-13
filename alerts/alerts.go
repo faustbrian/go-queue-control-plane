@@ -1,5 +1,9 @@
 // Package alerts derives bounded alert inputs from validated operational
 // snapshots without delivering notifications or storing time series.
+// Evaluate borrows one validated tenant snapshot and explicit Policy, returning
+// independent alert values in input/category order. Unsupported measurements
+// are not evidence of zero. NewTelemetryExporter borrows a synchronous meter;
+// callers own scheduling, provider blocking/concurrency and exporter shutdown.
 package alerts
 
 import (
@@ -30,42 +34,83 @@ var (
 type Kind string
 
 const (
-	KindQueueWait       Kind = "queue_wait"
-	KindFailureCount    Kind = "failure_count"
-	KindStaleWorker     Kind = "stale_worker"
+	// KindQueueWait identifies supported oldest-age measurements strictly above
+	// the configured duration.
+	KindQueueWait Kind = "queue_wait"
+	// KindFailureCount identifies supported failure counts strictly above the
+	// configured count.
+	KindFailureCount Kind = "failure_count"
+	// KindStaleWorker identifies a derived stale worker when that category is
+	// enabled.
+	KindStaleWorker Kind = "stale_worker"
+	// KindDeadLetterCount identifies supported dead-letter counts strictly
+	// above the configured count.
 	KindDeadLetterCount Kind = "dead_letter_count"
-	KindCommandFailure  Kind = "command_failure"
+	// KindCommandFailure identifies failed or unknown command results, not
+	// every unsuccessful status.
+	KindCommandFailure Kind = "command_failure"
 )
 
 // Alert is a backend-neutral threshold breach suitable for telemetry export.
 type Alert struct {
-	Kind       Kind      `json:"kind"`
-	TenantID   string    `json:"tenant_id"`
-	Resource   string    `json:"resource"`
-	Value      float64   `json:"value"`
-	Threshold  float64   `json:"threshold"`
+	// Kind selects a supported public alert category.
+	Kind Kind `json:"kind"`
+	// TenantID is scoped attribution retained for platform consumers, but
+	// omitted from TelemetryExporter labels.
+	TenantID string `json:"tenant_id"`
+	// Resource identifies the breached queue/worker/command or aggregate count
+	// category.
+	Resource string `json:"resource"`
+	// Value is a nonnegative observed count or seconds value; large uint64
+	// counts may round in float64.
+	Value float64 `json:"value"`
+	// Threshold is the strict upper count/seconds threshold; status alerts use
+	// zero.
+	Threshold float64 `json:"threshold"`
+	// ObservedAt is the UTC source/command/input observation time appropriate
+	// to the category.
 	ObservedAt time.Time `json:"observed_at"`
 }
 
 // Policy enables alert categories and declares strict upper thresholds.
 // Zero count or duration thresholds disable the corresponding category.
 type Policy struct {
-	MaxQueueWait    time.Duration
-	MaxFailures     uint64
-	MaxDeadLetters  uint64
-	StaleWorkers    bool
+	// MaxQueueWait enables supported oldest-age alerts when positive; zero
+	// disables and negative values fail.
+	MaxQueueWait time.Duration
+	// MaxFailures enables strictly greater supported count alerts when nonzero.
+	MaxFailures uint64
+	// MaxDeadLetters enables strictly greater supported dead-letter count
+	// alerts when nonzero.
+	MaxDeadLetters uint64
+	// StaleWorkers enables one alert per derived stale worker.
+	StaleWorkers bool
+	// CommandFailures enables one alert per failed or unknown command.
 	CommandFailures bool
 }
 
 // Input is one tenant's bounded current operational snapshot.
 type Input struct {
-	TenantID    string
-	ObservedAt  time.Time
-	Queues      queue.QueueStatusPage
-	Workers     fleet.RegistrySnapshot
-	Failures    queue.Measurement[uint64]
+	// TenantID is required bounded scope and must match all supplied
+	// worker/command records.
+	TenantID string
+	// ObservedAt is required observation time for count and stale-worker
+	// alerts.
+	ObservedAt time.Time
+	// Queues is a validated bounded queue-status page; unsupported age
+	// measurements produce no alert.
+	Queues queue.QueueStatusPage
+	// Workers contains at most MaxWorkers validated scoped reports with derived
+	// state.
+	Workers fleet.RegistrySnapshot
+	// Failures is an optional supported aggregate count; unsupported data is
+	// not treated as zero evidence.
+	Failures queue.Measurement[uint64]
+	// DeadLetters is an optional supported aggregate dead-letter count.
 	DeadLetters queue.Measurement[uint64]
-	Commands    []controlplane.CommandResult
+	// Commands contains at most MaxCommands validated scoped outcomes; slices
+	// remain caller-owned during Evaluate.
+	Commands []controlplane.CommandResult
 }
 
 // Evaluate returns deterministic alert inputs for enabled threshold breaches.

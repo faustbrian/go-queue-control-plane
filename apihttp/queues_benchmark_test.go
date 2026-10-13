@@ -8,6 +8,9 @@ import (
 	queue "github.com/faustbrian/go-queue/management"
 )
 
+// BenchmarkQueuePageTwoHundredMeasurements measures projection of a prebuilt
+// maximum page with supported measurements; fixture setup precedes ResetTimer
+// and neither HTTP encoding nor queue/backend I/O is measured.
 func BenchmarkQueuePageTwoHundredMeasurements(b *testing.B) {
 	observedAt := time.Date(2026, time.July, 16, 12, 0, 0, 0, time.UTC)
 	items := make([]queue.QueueStatus, queue.MaxStatusPageSize)

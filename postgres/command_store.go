@@ -36,18 +36,28 @@ var (
 
 // CommandRecord joins one immutable command envelope to its durable outcome.
 type CommandRecord struct {
+	// Command is the stored envelope, including independently materialized
+	// option pointers.
 	Command controlplane.Command
-	Result  controlplane.CommandResult
+	// Result is the stored outcome with materialized optional acknowledgement
+	// fields.
+	Result controlplane.CommandResult
 }
 
 // CommandPage is one bounded newest-first tenant command-history page.
 type CommandPage struct {
-	Records    []CommandRecord
+	// Records is a newly materialized newest-first page ordered by requested
+	// time and idempotency key.
+	Records []CommandRecord
+	// NextCursor is opaque bounded pagination state; empty means no further
+	// page was detected.
 	NextCursor string
 }
 
 // CommandRetentionResult reports one bounded terminal-command cleanup batch.
 type CommandRetentionResult struct {
+	// Deleted counts terminal commands removed after audit/desired-state
+	// reference refusals.
 	Deleted uint32
 }
 

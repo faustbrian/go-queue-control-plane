@@ -142,6 +142,7 @@ starting serving replicas.
 
 ## Documentation
 
+- [Source contract audit and limitations](docs/source-documentation-audit.md)
 - [Architecture and trust boundaries](docs/architecture.md)
 - [HTTP API reference](docs/api.md)
 - [CLI reference](docs/cli.md)

@@ -1,4 +1,8 @@
-// Package control orchestrates administrative desired-state mutations.
+// Package control orchestrates authorization, durable idempotent admission,
+// dispatch and lifecycle audit without enforcing queue delivery or supervising
+// workers. NewService borrows its authorizer, lifecycle journal, dispatcher and
+// clock; they must support synchronous shared use and bounded operations.
+// NextDesiredState plans convergence revisions, not worker acknowledgements.
 package control
 
 import (
@@ -25,6 +29,8 @@ var ErrLifecycleJournalUnavailable = errors.New("control: lifecycle journal unav
 
 // Authorizer enforces actor permissions at the target-resource boundary.
 type Authorizer interface {
+	// Authorize must fail closed for the tenant, authenticated actor,
+	// permission and target, returning nil only when access is allowed.
 	Authorize(
 		context.Context,
 		string,
@@ -39,10 +45,15 @@ type Authorizer interface {
 // returns the existing result with created=false for duplicate keys. Complete
 // must atomically update the result and append its completion audit event.
 type Journal interface {
+	// Accept must atomically claim the tenant/key and initial audit, returning
+	// existing results without new dispatch for duplicates and rejecting
+	// conflicting envelopes.
 	Accept(
 		context.Context,
 		controlplane.Command,
 	) (result controlplane.CommandResult, created bool, err error)
+	// Complete must atomically persist the terminal result and corresponding
+	// audit; errors do not undo external dispatch.
 	Complete(context.Context, controlplane.CommandResult) error
 }
 
@@ -50,35 +61,57 @@ type Journal interface {
 // leaving the original Journal interface source-compatible.
 type LifecycleJournal interface {
 	Journal
+	// MarkDispatched must durably record the pre-dispatch recovery boundary and
+	// audit before backend I/O.
 	MarkDispatched(context.Context, controlplane.CommandResult) error
+	// MarkAcknowledged must durably record acknowledgement and audit before
+	// terminal completion.
 	MarkAcknowledged(context.Context, controlplane.CommandResult) error
 }
 
 // Dispatcher sends a validated, authorized, and durably accepted command to
 // its explicitly selected data-plane or workload adapter.
 type Dispatcher interface {
+	// Dispatch synchronously enforces the borrowed command; failure may follow
+	// partial or accepted external work.
 	Dispatch(context.Context, controlplane.Command) error
 }
 
 // DispatchOutcome is a terminal, redacted data-plane acknowledgement. It
 // deliberately omits tenant and idempotency identity, which Service owns.
 type DispatchOutcome struct {
-	Status              controlplane.CommandStatus
-	Failure             string
-	WorkerID            string
-	Protocol            *controlplane.ProtocolVersion
+	// Status is a terminal backend outcome validated by Service, not merely
+	// command acceptance.
+	Status controlplane.CommandStatus
+	// Failure is a secret-safe public failure code for unsuccessful terminal
+	// outcomes.
+	Failure string
+	// WorkerID optionally attributes an acknowledgement and must accompany
+	// Protocol.
+	WorkerID string
+	// Protocol optionally identifies the acknowledging worker protocol; paired
+	// with WorkerID.
+	Protocol *controlplane.ProtocolVersion
+	// CapabilityAvailable optionally reports negotiated capability
+	// availability; nil means unspecified.
 	CapabilityAvailable *bool
-	CompletedAt         time.Time
+	// CompletedAt is the backend completion time and must not precede
+	// RequestedAt.
+	CompletedAt time.Time
 }
 
 // ResultDispatcher reports an honest terminal data-plane acknowledgement.
 // Legacy Dispatcher implementations remain supported for workload adapters.
 type ResultDispatcher interface {
+	// DispatchResult returns terminal acknowledgement detail; errors may leave
+	// external effects and must not fabricate certainty.
 	DispatchResult(context.Context, controlplane.Command) (DispatchOutcome, error)
 }
 
 // Service sequences authorization, idempotency, audit, dispatch, and outcome
-// persistence without implementing worker or backend semantics.
+// persistence without implementing worker/backend semantics or owning shutdown.
+// Construct before use with nonnil collaborators and a LifecycleJournal. Panics
+// and blocking calls are not isolated; safe shared use follows collaborators.
 type Service struct {
 	authorizer   Authorizer
 	journal      Journal
@@ -93,7 +126,9 @@ type serviceTelemetry struct {
 	duration metric.Float64Histogram
 }
 
-// NewService creates a command orchestration service.
+// NewService retains borrowed dependencies without validating the whole graph.
+// Execute refuses journals without LifecycleJournal before dispatch; other
+// missing or unusable collaborators can panic when invoked.
 func NewService(
 	authorizer Authorizer,
 	journal Journal,
@@ -140,8 +175,13 @@ func NewInstrumentedService(
 	return service, nil
 }
 
-// Execute runs an administrative mutation at most once per durable
-// idempotency record.
+// Execute makes at most one dispatch attempt per atomically admitted journal
+// record, provided Journal honors its contract. Duplicate keys return stored
+// outcomes; they do not retry external work. Authorization precedes admission,
+// including separate replay-destination permission. Cancellation is recorded
+// only before dispatch; later failure can leave external effects or an unknown
+// outcome that must be inspected/reconciled. Command option pointers are borrowed
+// for this synchronous call and must remain stable.
 func (s *Service) Execute(
 	ctx context.Context,
 	command controlplane.Command,
@@ -219,6 +259,9 @@ func (s *Service) Execute(
 	}
 
 	if err := ctx.Err(); err != nil {
+		// Persist the pre-dispatch cancellation despite request cancellation.
+		// WithoutCancel keeps values but removes deadline/cancellation; this
+		// cleanup call's actual bound belongs to the journal/provider.
 		result := controlplane.CommandResult{
 			CommandID: command.CommandID, IdempotencyKey: command.IdempotencyKey,
 			TenantID: command.TenantID, Status: controlplane.CommandCanceled,
@@ -282,6 +325,8 @@ func (s *Service) Execute(
 	}
 
 	if acknowledgedOutcome {
+		// A validated response acknowledges transport, even when its terminal
+		// business status is failed/partial. It is not a success-only milestone.
 		result.AcknowledgedAt = result.CompletedAt
 		acknowledged := result
 		acknowledged.Status = controlplane.CommandAcknowledged

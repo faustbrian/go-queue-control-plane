@@ -13,11 +13,19 @@ import (
 type HeartbeatDisposition string
 
 const (
-	HeartbeatAccepted         HeartbeatDisposition = "accepted"
-	HeartbeatDuplicate        HeartbeatDisposition = "duplicate"
-	HeartbeatReordered        HeartbeatDisposition = "reordered"
-	HeartbeatConflict         HeartbeatDisposition = "conflict"
-	HeartbeatInvalid          HeartbeatDisposition = "invalid"
+	// HeartbeatAccepted retains a copied new or later validated heartbeat.
+	HeartbeatAccepted HeartbeatDisposition = "accepted"
+	// HeartbeatDuplicate leaves an identical same-time report unchanged.
+	HeartbeatDuplicate HeartbeatDisposition = "duplicate"
+	// HeartbeatReordered ignores an older observation.
+	HeartbeatReordered HeartbeatDisposition = "reordered"
+	// HeartbeatConflict marks same-time conflicting reports unknown until a
+	// later valid report arrives.
+	HeartbeatConflict HeartbeatDisposition = "conflict"
+	// HeartbeatInvalid refuses a malformed report without retaining it.
+	HeartbeatInvalid HeartbeatDisposition = "invalid"
+	// HeartbeatCapacityExceeded refuses a new worker identity at capacity and
+	// increments the tenant rejection counter.
 	HeartbeatCapacityExceeded HeartbeatDisposition = "capacity_exceeded"
 )
 
@@ -25,16 +33,24 @@ const (
 // fail-safe state.
 type WorkerSnapshot struct {
 	Heartbeat
+	// State is derived liveness/conflict state, shadowing the embedded reported
+	// State.
 	State State
 }
 
 // RegistrySnapshot is a deterministic point-in-time view of retained workers.
 type RegistrySnapshot struct {
-	Workers  []WorkerSnapshot
+	// Workers is a newly owned tenant/worker-sorted slice with copied
+	// queue/capability slices.
+	Workers []WorkerSnapshot
+	// Rejected counts capacity refusals in the selected tenant or whole-registry view.
 	Rejected uint64
 }
 
-// Registry retains a bounded set of latest worker heartbeats.
+// Registry synchronizes a bounded set of latest copied worker heartbeats.
+// Construct with NewRegistry and do not copy after use. There is no eviction or
+// close operation. Worker cardinality is bounded, but rejection-counter tenant
+// cardinality is not: this is not a total memory bound for arbitrary tenants.
 type Registry struct {
 	mu         sync.RWMutex
 	maxWorkers int

@@ -22,6 +22,8 @@ var (
 
 // RecordReaderResolver selects a tenant-scoped queue record reader.
 type RecordReaderResolver interface {
+	// ResolveRecordReader returns a borrowed scoped reader; callers/providers
+	// own its lifecycle and copied output obligations.
 	ResolveRecordReader(context.Context, string) (queue.RecordReader, error)
 }
 

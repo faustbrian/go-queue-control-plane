@@ -30,22 +30,36 @@ var (
 
 // VerificationReport identifies the verified tenant audit head.
 type VerificationReport struct {
-	Events       uint64
+	// Events counts retained events traversed, excluding an already retained-away prefix.
+	Events uint64
+	// HeadSequence is the last verified retained sequence or anchor sequence
+	// for an empty chain.
 	HeadSequence uint64
-	HeadHash     history.Hash
+	// HeadHash is the corresponding database-backed chain digest, not external
+	// authentication.
+	HeadHash history.Hash
 }
 
 // RetentionResult describes one bounded retained-prefix cleanup batch.
 type RetentionResult struct {
-	Deleted         uint32
-	AnchorSequence  uint64
-	AnchorHash      history.Hash
+	// Deleted counts entries deleted in this bounded transaction.
+	Deleted uint32
+	// AnchorSequence is the last retained-away sequence after prefix deletion.
+	AnchorSequence uint64
+	// AnchorHash preserves the digest needed to link later retained history.
+	AnchorHash history.Hash
+	// RetainedThrough is the monotonic UTC retention cutoff represented by the
+	// removed prefix.
 	RetainedThrough time.Time
 }
 
 // AuditPage is one verified bounded tenant audit-history page.
 type AuditPage struct {
-	Entries      []history.Entry
+	// Entries is a newly materialized sequence-ordered page, verified relative
+	// to its first stored predecessor.
+	Entries []history.Entry
+	// NextSequence is the exclusive cursor for another page; zero means no
+	// further page was detected.
 	NextSequence uint64
 }
 
@@ -91,7 +105,11 @@ func (s *AuditStore) AuditSensitiveAccess(
 	)
 }
 
-// ListTenant returns one verified page after the supplied sequence cursor.
+// ListTenant returns one internally linked page after the exclusive sequence
+// cursor. It checks contiguity/digests relative to the first stored predecessor,
+// not linkage back to the tenant retention anchor; use VerifyTenant for that
+// traversal. Neither operation authenticates database state against an external
+// trusted root.
 func (s *AuditStore) ListTenant(
 	ctx context.Context,
 	tenant string,
@@ -137,7 +155,9 @@ func (s *AuditStore) ListTenant(
 	return page, nil
 }
 
-// VerifyTenant streams and verifies one tenant chain in a repeatable snapshot.
+// VerifyTenant traverses retained tenant history from its database anchor in a
+// repeatable-read snapshot. pageSize bounds each fetched batch, not total work;
+// callers own the overall context/deadline and external anchor trust.
 func (s *AuditStore) VerifyTenant(
 	ctx context.Context,
 	tenant string,

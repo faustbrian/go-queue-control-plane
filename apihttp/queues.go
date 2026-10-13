@@ -15,38 +15,66 @@ const defaultQueuePageSize uint32 = 100
 
 // Measurement distinguishes an honestly measured zero from unsupported data.
 type Measurement[T any] struct {
-	Value     T    `json:"value"`
+	// Value is meaningful only when Supported is true; unsupported values
+	// project to zero.
+	Value T `json:"value"`
+	// Supported distinguishes observed zero from an unavailable backend
+	// measurement.
 	Supported bool `json:"supported"`
 }
 
 // QueuePage is one bounded page of queue observations.
 type QueuePage struct {
-	Queues     []Queue `json:"queues"`
-	NextCursor string  `json:"next_cursor,omitempty"`
+	// Queues is the newly projected observation page; providers own page
+	// limits.
+	Queues []Queue `json:"queues"`
+	// NextCursor is opaque backend pagination state; empty means no further
+	// page is advertised.
+	NextCursor string `json:"next_cursor,omitempty"`
 }
 
 // Queue is a backend-neutral logical queue observation.
 type Queue struct {
-	Backend    string       `json:"backend"`
-	Name       string       `json:"name"`
-	ObservedAt time.Time    `json:"observed_at"`
-	Metrics    QueueMetrics `json:"metrics"`
+	// Backend is observed backend attribution, not its address.
+	Backend string `json:"backend"`
+	// Name is the logical observed queue identity.
+	Name string `json:"name"`
+	// ObservedAt is source observation time normalized to UTC.
+	ObservedAt time.Time `json:"observed_at"`
+	// Metrics contains independent support flags for backend gauges/counters.
+	Metrics QueueMetrics `json:"metrics"`
 }
 
 // QueueMetrics contains supported gauges and monotonic lifecycle counters.
 type QueueMetrics struct {
-	Depth            Measurement[int64]   `json:"depth"`
-	Lag              Measurement[int64]   `json:"lag"`
-	Pending          Measurement[int64]   `json:"pending"`
+	// Depth is supported observed queue depth, not a guaranteed future count.
+	Depth Measurement[int64] `json:"depth"`
+	// Lag is supported backend-defined queue lag.
+	Lag Measurement[int64] `json:"lag"`
+	// Pending is supported in-flight/pending work.
+	Pending Measurement[int64] `json:"pending"`
+	// OldestAgeSeconds is supported oldest-record age converted from duration
+	// to seconds.
 	OldestAgeSeconds Measurement[float64] `json:"oldest_age_seconds"`
-	Throughput       Measurement[float64] `json:"throughput"`
-	RuntimeSeconds   Measurement[float64] `json:"runtime_seconds"`
-	Succeeded        Measurement[uint64]  `json:"succeeded"`
-	Failed           Measurement[uint64]  `json:"failed"`
-	Retried          Measurement[uint64]  `json:"retried"`
-	Reclaimed        Measurement[uint64]  `json:"reclaimed"`
-	DeadLettered     Measurement[uint64]  `json:"dead_lettered"`
-	SettlementErrors Measurement[uint64]  `json:"settlement_errors"`
+	// Throughput is supported backend-defined throughput, not a control-plane
+	// benchmark.
+	Throughput Measurement[float64] `json:"throughput"`
+	// RuntimeSeconds is supported runtime duration converted to seconds;
+	// averaging remains consumer-owned.
+	RuntimeSeconds Measurement[float64] `json:"runtime_seconds"`
+	// Succeeded counts supported successful lifecycle observations.
+	Succeeded Measurement[uint64] `json:"succeeded"`
+	// Failed counts supported failed lifecycle observations.
+	Failed Measurement[uint64] `json:"failed"`
+	// Retried counts supported retry observations.
+	Retried Measurement[uint64] `json:"retried"`
+	// Reclaimed counts supported reclaimed work.
+	Reclaimed Measurement[uint64] `json:"reclaimed"`
+	// DeadLettered counts supported dead-letter events.
+	DeadLettered Measurement[uint64] `json:"dead_lettered"`
+	// SettlementErrors counts supported settlement failures; handler success
+	// alone does not imply settlement.
+	SettlementErrors Measurement[uint64] `json:"settlement_errors"`
 }
 
 func (h *handler) listQueues(writer http.ResponseWriter, request *http.Request) {

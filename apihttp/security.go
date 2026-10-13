@@ -12,18 +12,29 @@ import (
 	authentication "github.com/faustbrian/go-authentication/v2"
 )
 
+// ErrInvalidSecurityConfiguration reports an invalid exact-origin or admission
+// configuration without printing configured values.
 var ErrInvalidSecurityConfiguration = errors.New("apihttp: invalid security configuration")
 
 // RateLimiter makes one bounded admission decision for a stable safe key.
 type RateLimiter interface {
+	// Allow synchronously returns admission for ctx/key; implementations must
+	// bound blocking, preserve shared-use safety and fail closed.
 	Allow(context.Context, string) bool
 }
 
 // SecurityConfig controls browser and request-admission protections.
 type SecurityConfig struct {
-	AllowedOrigins   []string
+	// AllowedOrigins is copied into an exact HTTP(S) origin set; empty refuses
+	// every request carrying Origin.
+	AllowedOrigins []string
+	// AllowCredentials controls the CORS credential response header for an
+	// allowed origin; it does not authenticate users.
 	AllowCredentials bool
-	RateLimiter      RateLimiter
+	// RateLimiter optionally performs admission inside this wrapper; compose
+	// after authentication or use NewAdministrativeHandler for subject-aware
+	// ordering.
+	RateLimiter RateLimiter
 }
 
 type securityMiddleware struct {

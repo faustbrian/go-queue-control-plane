@@ -11,6 +11,10 @@ import (
 	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
 )
 
+// BenchmarkWorkerAPIThousandWorkerMaximumPage measures in-process authenticated
+// request creation, worker projection and JSON encoding for a prebuilt maximum
+// page/queue-membership shape. Setup precedes ResetTimer; no network/TLS/provider
+// authentication or remote fleet fetch is measured.
 func BenchmarkWorkerAPIThousandWorkerMaximumPage(b *testing.B) {
 	observedAt := time.Date(2026, time.July, 16, 12, 0, 0, 0, time.UTC)
 	queues := make([]string, fleet.MaxQueuesPerWorker)

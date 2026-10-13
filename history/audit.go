@@ -1,4 +1,9 @@
-// Package history defines bounded operational and append-only audit contracts.
+// Package history seals and verifies value-based administrative audit hash
+// chains. Seal creates an unkeyed SHA-256 link; VerifyFrom additionally checks
+// contiguous sequences. Trusted anchors and tenant separation are external
+// responsibilities: digests are not authentication or confidentiality, and a
+// party able to replace the complete chain/root can recompute them. Inputs are
+// borrowed synchronously without size validation; no persistence is owned.
 package history
 
 import (
@@ -19,22 +24,42 @@ type Hash [sha256.Size]byte
 
 // Event is the canonical content of one administrative audit record.
 type Event struct {
-	Sequence       uint64
-	HashVersion    uint16
-	OccurredAt     time.Time
-	CommandID      string
+	// Sequence is the chain position; VerifyFrom checks contiguous values,
+	// while Seal does not validate it.
+	Sequence uint64
+	// HashVersion selects the package encoding: 2 includes CommandID, while 0/1
+	// retain v1 compatibility; Verify rejects values above 2.
+	HashVersion uint16
+	// OccurredAt is hashed as Unix nanoseconds; persistence normalizes
+	// timestamps before sealing.
+	OccurredAt time.Time
+	// CommandID is hashed only in version 2; it is not independently
+	// authenticated.
+	CommandID string
+	// IdempotencyKey links command audit events; privileged-access events may
+	// leave it empty.
 	IdempotencyKey string
-	Actor          string
-	Action         string
-	Target         string
-	Result         string
+	// Actor is attributed actor text; callers must bind identity and exclude
+	// secrets.
+	Actor string
+	// Action is the attributed operation or sensitive-access permission text.
+	Action string
+	// Target is attributed resource text; tenant scope is external to this
+	// event digest.
+	Target string
+	// Result is the attributed public operation outcome.
+	Result string
 }
 
 // Entry links an event to the preceding retained or anchored audit digest.
 type Entry struct {
+	// PreviousHash links to the preceding entry or externally trusted anchor.
 	PreviousHash Hash
-	Hash         Hash
-	Event        Event
+	// Hash is an unkeyed SHA-256 content/link digest, not a signature or MAC.
+	Hash Hash
+	// Event is copied value content; no size or identity validation occurs in
+	// Seal.
+	Event Event
 }
 
 // HashBytes creates an anchor hash for a retained prefix or external root.
@@ -51,8 +76,9 @@ func Seal(previous Hash, event Event) Entry {
 	}
 }
 
-// Verify checks the content and ordering of entries after anchor. An empty
-// retained page is valid because there is no content to contradict its anchor.
+// Verify checks content and chain-link order after anchor, not contiguous event
+// sequences; use VerifyFrom for that additional check. An empty page is valid
+// but establishes no authenticity of its supplied anchor.
 func Verify(anchor Hash, entries []Entry) error {
 	return verifyHashes(anchor, entries)
 }
@@ -90,6 +116,9 @@ func verifyHashes(anchor Hash, entries []Entry) error {
 }
 
 func digest(previous Hash, event Event) Hash {
+	// Domain tags preserve v1 compatibility (versions 0/1) and v2 CommandID
+	// binding. Length prefixes avoid concatenation ambiguity, not oversized
+	// input: append can grow beyond this scratch buffer for caller strings.
 	var storage [2_048]byte
 	encoded := storage[:0]
 	if event.HashVersion == 2 {

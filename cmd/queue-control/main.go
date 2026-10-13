@@ -1,3 +1,8 @@
+// Package main implements the queue-control client command. Startup reads
+// operator-owned endpoint/key settings and delegates one invocation to cli.Runner.
+// It owns no server, data-plane loop or durable retry; the typed client's default
+// HTTP timeout bounds requests, while output/credential lifetime remains process
+// owned. Credential strings are not erased by command completion.
 package main
 
 import (

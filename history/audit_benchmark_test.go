@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// BenchmarkVerifyOneHundredThousandAuditEvents verifies 100,000 presealed short
+// v1-compatible events after ResetTimer; it excludes sealing, database reads,
+// retention and external anchor authentication.
 func BenchmarkVerifyOneHundredThousandAuditEvents(b *testing.B) {
 	entries := make([]Entry, 100_000)
 	previous := HashBytes([]byte("retained-prefix"))

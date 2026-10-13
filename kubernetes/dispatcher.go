@@ -16,11 +16,16 @@ var (
 
 // Scaler is the scale-only workload mutation exposed to the dispatcher.
 type Scaler interface {
+	// Scale updates the named workload replicas honoring ctx;
+	// authorization/confirmation must happen before this borrowed provider
+	// call.
 	Scale(context.Context, string, uint32) (ScaleResult, error)
 }
 
 // TenantResolver maps a tenant to its namespace-scoped Kubernetes adapter.
 type TenantResolver interface {
+	// ResolveTenant returns the borrowed namespace-scoped scaler for a tenant;
+	// errors refuse dispatch.
 	ResolveTenant(context.Context, string) (Scaler, error)
 }
 

@@ -18,25 +18,31 @@ worker already knows how to enforce.
 
 ## Mutation flow
 
-Every mutation follows one sequence:
+An admitted HTTP mutation follows this normal dispatch path; refusals, duplicate
+keys, pre-dispatch cancellation and dispatch/persistence failures can stop it
+before a later boundary:
 
-1. Decode and validate a bounded command envelope.
-2. Authenticate the caller and authorize the action, tenant, resource type,
-   and resource ID.
+1. Authenticate ingress before the administrative handler reads the body.
+2. Decode a bounded command envelope; validate and authorize the action,
+   tenant, resource type and resource ID before durable admission.
 3. Atomically persist the command, initial audit event, and applicable desired
    state under the tenant and idempotency key.
-4. Dispatch through either the `queue` management adapter or the narrowly
-   scoped Kubernetes scale adapter.
-5. Atomically persist the terminal result and completion audit event.
+4. Atomically record the dispatched recovery boundary before invoking either
+   the `queue` management adapter or the Kubernetes scale adapter.
+5. When a valid acknowledgement is received, record it before terminal
+   completion; this is a transport milestone, not necessarily business success.
+6. Atomically persist the terminal result and completion audit event.
 
 A repeated idempotency key returns the stored result and is not dispatched
 again. Reusing a key for a different command returns an idempotency conflict.
-The service allocates a distinct lowercase ULID command ID before the first
-journal write. That identifier is preserved through PostgreSQL, queue dispatch,
-desired-state attribution, audit reads, API responses, clients, and CLI output;
-the idempotency key remains a separate caller-owned deduplication contract.
+If no CommandID is supplied, the service allocates a distinct lowercase ULID
+before the first journal write. That identifier is preserved through PostgreSQL,
+queue dispatch, desired-state attribution, audit reads, API responses, clients,
+and CLI output; the idempotency key remains a separate caller-owned deduplication
+contract.
 The PostgreSQL upgrade retains historical UUID command identifiers as opaque
-text, but every command created after the upgrade receives a lowercase ULID.
+text. HTTP mutations generate a lowercase ULID when admitted through the
+service; direct Go callers may instead supply a bounded explicit CommandID.
 If dispatch fails before reaching a tenant controller, the public result is
 `failed` with the redacted code `dispatch_failed`. Published `queue`
 pending, dispatched, acknowledged, failed, unsupported, timed-out, canceled,
@@ -53,8 +59,11 @@ binary and applied through `migrations`. Database access is provided through
 
 Audit entries form a tenant-local SHA-256 chain. Retention advances a durable
 anchor before deleting a bounded contiguous prefix, allowing verification of
-the retained suffix. The one-shot retention process then removes only old
-terminal commands with no retained audit or current desired-state reference.
+the retained suffix. These are unkeyed digests, not signatures: external root
+trust is required against an actor able to replace database state. Page-local
+link validation and complete anchor-based traversal are distinct operations.
+The one-shot retention process then removes only old terminal commands with no
+retained audit or current desired-state reference.
 Serving replicas never schedule cleanup internally.
 
 Control state must not be placed in an evictable cache. Ephemeral heartbeat or

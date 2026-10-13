@@ -21,6 +21,8 @@ var (
 )
 
 type rowQueryer interface {
+	// QueryRow returns a caller-scanned row honoring ctx; the store borrows
+	// this SQL read boundary and never closes it.
 	QueryRow(context.Context, string, ...any) pgx.Row
 }
 

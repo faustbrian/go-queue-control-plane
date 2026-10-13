@@ -1,6 +1,12 @@
 // Package kubernetes preserves the released path for the deliberately narrow
 // Kubernetes integration.
 //
+// New borrows a namespace-scoped apps/v1 Deployment client, with
+// autoscaling/v1 scale access. The pinned Kubernetes SDK owns transport;
+// providers must honor scope, pagination and context. This package creates no
+// watch, cluster client, HPA/KEDA controller or shutdown loop. It preserves
+// released type identities through the canonical adapter aliases.
+//
 // Deprecated: use github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes.
 package kubernetes
 
@@ -36,9 +42,16 @@ const (
 // DeploymentClient is the deliberately restricted part of a namespace-scoped
 // Kubernetes Deployment client used by the control plane.
 type DeploymentClient interface {
+	// Get reads the named Deployment in the client's configured namespace
+	// honoring ctx.
 	Get(context.Context, string, metav1.GetOptions) (*appsv1.Deployment, error)
+	// List must honor namespace and server pagination limits; Adapter does not
+	// cap an already materialized response.
 	List(context.Context, metav1.ListOptions) (*appsv1.DeploymentList, error)
+	// GetScale reads the named autoscaling/v1 scale subresource honoring ctx.
 	GetScale(context.Context, string, metav1.GetOptions) (*autoscalingv1.Scale, error)
+	// UpdateScale updates only the borrowed scale subresource in the configured
+	// namespace; failure may follow remote acceptance.
 	UpdateScale(context.Context, string, *autoscalingv1.Scale, metav1.UpdateOptions) (*autoscalingv1.Scale, error)
 }
 
@@ -50,31 +63,55 @@ type Adapter struct {
 
 // Status is the bounded Deployment state presented by the control plane.
 type Status struct {
-	Namespace           string `json:"namespace"`
-	Name                string `json:"name"`
-	Generation          int64  `json:"generation"`
-	ObservedGeneration  int64  `json:"observed_generation"`
-	DesiredReplicas     int32  `json:"desired_replicas"`
-	UpdatedReplicas     int32  `json:"updated_replicas"`
-	ReadyReplicas       int32  `json:"ready_replicas"`
-	AvailableReplicas   int32  `json:"available_replicas"`
-	UnavailableReplicas int32  `json:"unavailable_replicas"`
+	// Namespace is the validated configured namespace of the reported
+	// Deployment.
+	Namespace string `json:"namespace"`
+	// Name is the validated DNS-compatible Deployment name.
+	Name string `json:"name"`
+	// Generation is the API object's desired configuration generation.
+	Generation int64 `json:"generation"`
+	// ObservedGeneration is the controller's last observed generation, not
+	// necessarily Generation.
+	ObservedGeneration int64 `json:"observed_generation"`
+	// DesiredReplicas is the reported spec replica count; absent Spec.Replicas
+	// projects to zero.
+	DesiredReplicas int32 `json:"desired_replicas"`
+	// UpdatedReplicas is the reported updated replica count.
+	UpdatedReplicas int32 `json:"updated_replicas"`
+	// ReadyReplicas is the reported ready replica count.
+	ReadyReplicas int32 `json:"ready_replicas"`
+	// AvailableReplicas is the reported available replica count.
+	AvailableReplicas int32 `json:"available_replicas"`
+	// UnavailableReplicas is the reported unavailable replica count.
+	UnavailableReplicas int32 `json:"unavailable_replicas"`
 }
 
 // Page is one bounded page of Deployment status.
 type Page struct {
-	Items     []Status `json:"items"`
-	Continue  string   `json:"continue,omitempty"`
-	Remaining int64    `json:"remaining"`
+	// Items is a newly projected status slice; the client must honor the
+	// requested page bound.
+	Items []Status `json:"items"`
+	// Continue is provider-supplied opaque pagination state, not authorization.
+	Continue string `json:"continue,omitempty"`
+	// Remaining is provider-reported remaining item count; zero also represents
+	// absent metadata.
+	Remaining int64 `json:"remaining"`
 }
 
 // ScaleResult is the Kubernetes acknowledgement of an authorized replica
 // update.
 type ScaleResult struct {
-	Namespace       string `json:"namespace"`
-	Name            string `json:"name"`
-	DesiredReplicas int32  `json:"desired_replicas"`
-	CurrentReplicas int32  `json:"current_replicas"`
+	// Namespace is configured namespace attribution; the provider must honor
+	// that scope.
+	Namespace string `json:"namespace"`
+	// Name is the requested workload attribution.
+	Name string `json:"name"`
+	// DesiredReplicas is the update response's desired replica count, not
+	// observed convergence.
+	DesiredReplicas int32 `json:"desired_replicas"`
+	// CurrentReplicas is the update response's observed replica count.
+	CurrentReplicas int32 `json:"current_replicas"`
+	// ResourceVersion is the update response's opaque resource version.
 	ResourceVersion string `json:"resource_version"`
 }
 
@@ -104,7 +141,10 @@ func (adapter *Adapter) Get(ctx context.Context, name string) (Status, error) {
 	return statusOf(deployment), nil
 }
 
-// List returns one server-paginated page of Deployment status.
+// List sends one bounded server-pagination request and projects its returned
+// Deployments after namespace/name validation. It does not independently cap
+// already materialized item counts or returned continuation metadata; custom
+// clients must honor the requested bound and scope.
 func (adapter *Adapter) List(ctx context.Context, limit int64, continueToken string) (Page, error) {
 	if limit < 1 || limit > MaxPageSize || len(continueToken) > MaxContinueTokenBytes {
 		return Page{}, ErrInvalidPage
@@ -140,7 +180,8 @@ func (adapter *Adapter) List(ctx context.Context, limit int64, continueToken str
 
 // Scale updates only the Deployment scale subresource. Authorization and
 // scale-to-zero confirmation are enforced by the control service before this
-// adapter is called.
+// adapter is called. The borrowed provider must honor workload/namespace
+// identity; a successful API update is not proof of replica convergence.
 func (adapter *Adapter) Scale(ctx context.Context, name string, replicas uint32) (ScaleResult, error) {
 	if len(validation.IsDNS1123Subdomain(name)) != 0 || replicas > controlplane.MaxScaleReplicas {
 		return ScaleResult{}, ErrInvalidWorkload

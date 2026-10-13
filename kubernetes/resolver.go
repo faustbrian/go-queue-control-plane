@@ -19,6 +19,8 @@ var (
 // TenantAdapter is the complete bounded Kubernetes surface for one tenant.
 type TenantAdapter interface {
 	Scaler
+	// List returns a page honoring requested namespace, limit and cursor; the
+	// resolver borrows the adapter and does not close it.
 	List(context.Context, int64, string) (Page, error)
 }
 

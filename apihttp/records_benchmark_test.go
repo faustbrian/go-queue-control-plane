@@ -9,6 +9,8 @@ import (
 	queue "github.com/faustbrian/go-queue/management"
 )
 
+// BenchmarkFailurePageTwoHundredRecords projects a prebuilt maximum metadata
+// page after ResetTimer, excluding backend access and response encoding.
 func BenchmarkFailurePageTwoHundredRecords(b *testing.B) {
 	observedAt := time.Date(2026, time.July, 16, 12, 0, 0, 0, time.UTC)
 	items := make([]queue.JobRecord, queue.MaxPageSize)
@@ -33,6 +35,9 @@ func BenchmarkFailurePageTwoHundredRecords(b *testing.B) {
 	}
 }
 
+// BenchmarkPrivilegedPayloadOneMebibyte measures permitted payload copying and
+// JSON/base64 encoding of a prebuilt maximum-size record. It excludes permission,
+// audit, transport and backend work rather than qualifying privileged latency.
 func BenchmarkPrivilegedPayloadOneMebibyte(b *testing.B) {
 	payload := make([]byte, queue.MaxAdministrativePayloadBytes)
 	for index := range payload {

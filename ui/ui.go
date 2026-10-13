@@ -1,4 +1,8 @@
 // Package ui serves the optional embedded administrative web console.
+// NewHandler serves repository-owned assets with defensive response headers,
+// without backend access or authentication itself. Compose it through the
+// administrative server's middleware. Assets are hand-maintained executable
+// HTML/JavaScript/CSS, not generated GoDoc or a separate policy authority.
 package ui
 
 import (

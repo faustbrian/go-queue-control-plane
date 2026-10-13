@@ -23,6 +23,9 @@ var (
 
 // WorkerStatusSource reads bounded queue worker status pages.
 type WorkerStatusSource interface {
+	// ListWorkers returns a validated bounded tenant page with progressing
+	// cursors; FleetSource traverses at most five pages and does not
+	// authenticate worker reports.
 	ListWorkers(
 		context.Context,
 		string,
@@ -93,6 +96,8 @@ func (s *FleetSource) SnapshotTenant(
 }
 
 func managementHeartbeat(tenant string, worker queue.WorkerStatus) fleet.Heartbeat {
+	// HeartbeatAt is the worker observation, not the status fetch's timestamp.
+	// Refreshing an HTTP response must not rejuvenate a stale worker heartbeat.
 	capabilities := make([]fleet.Capability, 0, len(worker.Capabilities))
 	for _, capability := range worker.Capabilities {
 		capabilities = append(capabilities, fleet.Capability(capability))
