@@ -2,10 +2,8 @@
 
 [![CI](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-100%25_required-blue)](CONTRIBUTING.md#verification)
-[![Mutation](https://img.shields.io/badge/mutation-full_qualification-blue)](CONTRIBUTING.md#verification)
-[![Documentation](https://img.shields.io/badge/docs-checked_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v2.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v2)
+[![Documentation](https://img.shields.io/badge/docs-structural_checks_in_CI-blue)](docs/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v3.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v3)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-queue-control-plane?sort=semver)](https://github.com/faustbrian/go-queue-control-plane/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -36,10 +34,9 @@ Published v3.0.0 uses root v3 with Authentication v2. The commands below pin
 that release and retain the supported historical v1 and v2 choices. See the
 [v3 migration guide](COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
 for the coherent nominal import migration and finite authentication admission.
-Current main also contains the upcoming PostgreSQL v2 pool integration;
-source on main alone is not publication of that later minor release. Confirm
-availability in [Releases](https://github.com/faustbrian/go-queue-control-plane/releases)
-before adopting that integration.
+Published v3.1.1 also includes PostgreSQL v2 pool integration. Select
+that release or a later compatible v3 maintenance release when adopting
+the pool integration; the v3.0.0 pins below do not include it.
 
 Use the official major suffix for published v3.0.0:
 
@@ -163,8 +160,8 @@ starting serving replicas.
 - [Changelog](CHANGELOG.md)
 
 For ecosystem-wide package selection and ownership guidance, see the versioned
-[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/README.md)
-and its [Persistence and durability family](https://github.com/faustbrian/go-library-tools/blob/v1.4.0/docs/ecosystem/design-language.md#package-families-and-selection).
+[Golib ecosystem index](https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/README.md)
+and its [Persistence and durability family](https://github.com/faustbrian/go-library-tools/blob/v1.8.4/docs/ecosystem/design-language.md#package-families-and-selection).
 
 ## Development
 
@@ -198,3 +195,5 @@ API baseline.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+Continue with the [documentation index](docs/README.md).

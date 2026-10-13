@@ -1,5 +1,7 @@
 # Laravel Horizon migration matrix
 
+[Documentation index](README.md)
+
 This project targets Horizon-equivalent operational outcomes, not Horizon's
 process-manager architecture. Kubernetes supervises processes, `queue`
 supervises worker concurrency and delivery, and the control plane remains an
@@ -50,3 +52,5 @@ During coexistence, keep Horizon and `queue` on separate queue ownership
 unless the data-plane migration explicitly proves compatible delivery and
 settlement semantics. The control plane must never inspect or mutate Horizon's
 Redis data directly.
+
+Continue with [HTTP API reference](api.md).

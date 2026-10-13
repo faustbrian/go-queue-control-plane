@@ -1,5 +1,7 @@
 # Compatibility and current capability status
 
+[Documentation index](README.md)
+
 This document distinguishes implemented contracts from deployable end-to-end
 capabilities. The public API can describe a command before its corresponding
 data-plane transport exists; that does not make the operation operational.

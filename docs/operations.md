@@ -1,5 +1,7 @@
 # Operations, retention, backup, and incidents
 
+[Documentation index](README.md)
+
 ## Routine checks
 
 Monitor liveness and readiness separately. Liveness proves the HTTP process can

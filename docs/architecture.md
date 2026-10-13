@@ -1,5 +1,7 @@
 # Architecture and trust boundaries
 
+[Documentation index](README.md)
+
 ## Responsibility split
 
 `queue` is the data plane. It owns delivery, acknowledgement, retry,
@@ -129,3 +131,5 @@ delivery because workers remain independent of the control plane.
 - `ui`: embedded administrative web assets and their HTTP handler.
 - `cmd/queue-control-plane`: deployable server process.
 - `cmd/queue-control`: administrative CLI.
+
+Continue with [HTTP API reference](api.md).

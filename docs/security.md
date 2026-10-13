@@ -1,5 +1,7 @@
 # Security, authorization, and privacy
 
+[Documentation index](README.md)
+
 ## Version and source applicability
 
 This model describes the published root `v2.0.1` contract and explicitly

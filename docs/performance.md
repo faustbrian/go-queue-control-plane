@@ -1,5 +1,7 @@
 # Performance and load benchmarks
 
+[Documentation index](README.md)
+
 The current load workloads answer eight bounded questions:
 
 - How much time and allocation does a complete snapshot of 10,000 workers,
@@ -84,3 +86,5 @@ command dispatches once through `queue` or Kubernetes. Ingress, TLS,
 PostgreSQL throughput, and multi-page backend load belong to deployment
 capacity testing because their limits depend on the selected infrastructure;
 they do not replace these repository bounds.
+
+Continue with [HTTP API reference](api.md).

@@ -1,5 +1,7 @@
 # CLI reference
 
+[Documentation index](README.md)
+
 The `queue-control` CLI emits one compact stable JSON value on standard output
 by default and errors on standard error. Prefix any command with
 `--output human` for indented, HTML-escaped JSON intended for terminal reading,
@@ -173,3 +175,5 @@ have native enforcement.
 Unavailable operations report a structured unsupported outcome. These
 fail-closed boundaries prevent the control plane from inventing backend queue
 semantics.
+
+Continue with [HTTP API reference](api.md).

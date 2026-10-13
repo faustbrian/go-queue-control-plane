@@ -1,5 +1,7 @@
 # Release process
 
+[Documentation index](README.md)
+
 No production release should be tagged until the attached project acceptance
 criteria and every required automation gate pass against the release commit.
 
@@ -123,3 +125,5 @@ Because `ALLOWED_SIGNERS` is distributed with the release, this procedure
 checks integrity against the release-declared signer; it does not independently
 authenticate the publisher.
 Do not treat a locally built image as one of those signed public artifacts.
+
+Continue with [HTTP API reference](api.md).

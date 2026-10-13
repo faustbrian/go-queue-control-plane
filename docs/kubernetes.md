@@ -1,5 +1,7 @@
 # Kubernetes, HPA, and KEDA
 
+[Documentation index](README.md)
+
 Kubernetes Deployments supervise control-plane and worker containers.
 Kubernetes restarts failed processes. `queue` owns worker goroutines and
 graceful drain. HPA or KEDA owns automatic pod scaling from exported metrics.
@@ -49,3 +51,5 @@ scale subresource. Avoid cluster-wide bindings.
 Tenant mappings are immutable until process restart. Duplicate tenant IDs,
 invalid namespace names, unknown fields, oversized input, and trailing JSON
 fail startup. Removing a tenant requires a new mapping and a rolling restart.
+
+Continue with [HTTP API reference](api.md).

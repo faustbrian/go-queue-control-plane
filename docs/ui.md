@@ -1,5 +1,7 @@
 # Embedded web UI guide
 
+[Documentation index](README.md)
+
 The optional console is a same-origin client of the versioned administrative
 API. Enable it with `QUEUE_CONTROL_UI_ENABLED=true`, start a serving replica,
 and open `/ui/`. It adds no private transport, persistence, authorization, or
@@ -69,3 +71,5 @@ If a tab is unavailable, check `/v1/capabilities` and the production mappings.
 If a command returns `dispatch_failed`, follow the incident guidance rather
 than assuming a queue mutation occurred. Reload immediately if a workstation
 or key may be compromised.
+
+Continue with [HTTP API reference](api.md).

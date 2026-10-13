@@ -1,5 +1,7 @@
 # Troubleshooting and FAQ
 
+[Documentation index](README.md)
+
 ## Why did a command return `dispatch_failed`?
 
 Without `QUEUE_CONTROL_MANAGEMENT_TENANTS_FILE`, the process durably records

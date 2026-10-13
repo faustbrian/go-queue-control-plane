@@ -1,5 +1,7 @@
 # Hardening evidence and release gates
 
+[Documentation index](README.md)
+
 This document maps the control plane's security, failure-isolation, mutation,
 and scale claims to executable evidence. A green unit test is not by itself a
 deployment claim: optional adapters remain unavailable unless discovery and
@@ -218,3 +220,5 @@ falsely successful; any tenant, payload, or credential can escape its boundary;
 any owned cardinality is unbounded; raw Redis/Valkey operations exist outside
 `queue`; meaningful coverage falls below 100%; or any required hosted gate
 fails.
+
+Continue with [HTTP API reference](api.md).

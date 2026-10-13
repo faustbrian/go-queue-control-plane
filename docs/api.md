@@ -1,5 +1,7 @@
 # HTTP API reference
 
+[Documentation index](README.md)
+
 The administrative API uses JSON over HTTP. Except for probes, version, and
 capability discovery, requests authenticate with both
 `X-Queue-Control-Key-ID` and `X-Queue-Control-Key`.

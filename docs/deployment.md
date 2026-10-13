@@ -1,5 +1,7 @@
 # Deployment and configuration
 
+[Documentation index](README.md)
+
 ## Server environment
 
 The server fails startup with a secret-safe error when required values are
