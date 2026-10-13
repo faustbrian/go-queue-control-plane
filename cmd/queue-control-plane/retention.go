@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
 )
 
 const (
@@ -92,6 +92,11 @@ func loadRetentionPolicies(reader io.Reader, maxBytes int64) ([]retentionPolicy,
 	policies := make([]retentionPolicy, 0, len(document.Tenants))
 	seen := make(map[string]struct{}, len(document.Tenants))
 	for _, entry := range document.Tenants {
+		// Admit seconds before multiplying; Duration arithmetic otherwise wraps.
+		if entry.RetentionSeconds < int64(minimumRetention/time.Second) ||
+			entry.RetentionSeconds > int64(maximumRetention/time.Second) {
+			return nil, ErrInvalidRetentionDocument
+		}
 		policy := retentionPolicy{
 			TenantID:   entry.TenantID,
 			RetainFor:  time.Duration(entry.RetentionSeconds) * time.Second,

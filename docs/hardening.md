@@ -100,7 +100,7 @@ that ingress; unsafe cookie requests still encounter the API's CSRF boundary.
 
 | Surface or failure | Bound or safe behavior | Evidence |
 | --- | --- | --- |
-| Fleet cardinality | Registry capacity is fixed; public pages cap at 1,000 and upstream traversal at five 200-item pages | fleet and API tests |
+| Fleet cardinality | Registry worker capacity and registered-tenant rejection detail are fixed; global refusals include unknown tenants, whose detail is explicitly unavailable; public pages cap at 1,000 and upstream traversal at five 200-item pages | fleet and API tests |
 | Reconnect and stale storms | 10,000 workers transition stale and reconnect without loss or false state | `fleet.TestRegistryBoundsTenThousandWorkerStaleAndReconnectStorms` |
 | Worker queues and capabilities | Per-worker arrays and concurrency are validated and capped | `fleet.TestHeartbeatValidateRejectsMalformedWorkerStatus` |
 | Queue and record backlog | Pages cap at 200; cursors and search are bounded; payload is hidden by default | queue/record API tests and maximum-page benchmarks |

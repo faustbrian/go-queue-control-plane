@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

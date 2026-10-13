@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## 4.0.0 - 2026-10-13
+
+This entry records a prepared root major; publication is separate. Update Go
+imports to `github.com/faustbrian/go-queue-control-plane/v4` after its public
+release. Use `RejectedKnown`/`rejected_known` when reporting tenant refusal
+counts: unknown tenants no longer retain individual counters. Keep audit
+expected-head checkpoints independently protected; the existing hash chain
+is not an authentication primitive.
+
+### Changed
+
+- Select the root `/v4` major for registered-tenant-only rejection details.
+  Preserve global refusal totals and expose `RejectedKnown`/`rejected_known`
+  rather than treating unknown tenant detail as an exact zero.
+
+### Fixed
+
+- Admit retention seconds before Duration multiplication, refusing overflow
+  aliases outside the selected one-hour to ten-year range.
+- Bound PostgreSQL terminal completion core work to five seconds while retaining
+  earlier direct caller deadlines and detached cancellation persistence; rollback
+  keeps its independent cleanup budget and provider I/O remains cooperative.
+
+### Source accountability
+
+This root source includes the following eight non-merge repository commits
+from public v3.1.1 (`8460f8a7c839a9ebfdf4a445acfdcea7fc40a36c`) through
+`05a0e2f15e893f59142a2e1b6a27fa1e4aeb3d53`. Earlier governance, tooling and
+source-contract work is distinct from the current runtime repairs. The current
+major migration is outside this frozen range; other pending Unreleased entries
+and previous release notes are retained.
+
+- [37c6c351e6](https://github.com/faustbrian/go-queue-control-plane/commit/37c6c351e62f57795252a76fb254da36b182571a),
+  [19ab213a6a](https://github.com/faustbrian/go-queue-control-plane/commit/19ab213a6ad90d86515ddf8c29bcdb482439bf3e),
+  [2e6d129f23](https://github.com/faustbrian/go-queue-control-plane/commit/2e6d129f23061778b08bcc82208bb806122afd5e).
+- [e918a2b21c](https://github.com/faustbrian/go-queue-control-plane/commit/e918a2b21c89dbb816bd2409392a4fe3ec7bb1ce),
+  [a4daeab3b1](https://github.com/faustbrian/go-queue-control-plane/commit/a4daeab3b172fa80621e0ed2d5d56ceece562886),
+  [09031a34f3](https://github.com/faustbrian/go-queue-control-plane/commit/09031a34f33beb78cb3c8962e42f0c1baa798e4f).
+- [f6ed3cc6ac](https://github.com/faustbrian/go-queue-control-plane/commit/f6ed3cc6ac1d90901ab0e2f15672e9eeaa56ed49),
+  [05a0e2f15e](https://github.com/faustbrian/go-queue-control-plane/commit/05a0e2f15e893f59142a2e1b6a27fa1e4aeb3d53).
+
 ## Unreleased
 
 ### Documentation

@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
-	"github.com/faustbrian/go-queue-control-plane/v3/dataplane"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	"github.com/faustbrian/go-queue-control-plane/v4/dataplane"
 	queue "github.com/faustbrian/go-queue/management"
 	"github.com/faustbrian/go-queue/managementhttp"
 )

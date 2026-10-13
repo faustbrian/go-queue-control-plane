@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
 )
 
 var (

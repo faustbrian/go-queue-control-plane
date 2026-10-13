@@ -139,3 +139,20 @@ Kubernetes scaling remains independent from worker protocol negotiation.
 
 The complete fault and protocol response table is in the
 [hardening evidence matrix](hardening.md).
+
+## Audit trust and cancellation completion
+
+Audit verification proves linkage relative to its supplied or stored anchor,
+not authenticity against database replacement. Record the expected verification
+head sequence and hash in independently protected storage before an incident
+or restore; compare that expected head with the verified report. A page's stored
+predecessor is not an independently authenticated root. A party that can rewrite
+both data and an unprotected root can reseal an unkeyed chain. No MAC or signature
+is implied by `VerifyTenant` or page verification.
+
+The PostgreSQL journal bounds terminal completion core work to five seconds,
+respecting an earlier deadline on the context passed to `Complete`. Pre-dispatch
+cancellation intentionally uses detached request values and a fresh journal
+budget so the accepted canceled result can be persisted. An error is not proof
+of commit; inspect durable state before retrying. Independent rollback cleanup
+may take another five seconds, and borrowed driver I/O remains cooperative.

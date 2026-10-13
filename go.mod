@@ -1,4 +1,4 @@
-module github.com/faustbrian/go-queue-control-plane/v3
+module github.com/faustbrian/go-queue-control-plane/v4
 
 go 1.27.0
 

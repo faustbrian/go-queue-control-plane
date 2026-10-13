@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

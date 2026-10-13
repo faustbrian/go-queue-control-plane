@@ -92,8 +92,8 @@ func TestRegistryAggregatesRejectedHeartbeatsAcrossTenants(t *testing.T) {
 	if snapshot.Rejected != 3 {
 		t.Fatalf("Snapshot().Rejected = %d, want 3", snapshot.Rejected)
 	}
-	if got := registry.SnapshotTenant("tenant-a", time.Unix(2, 0), time.Minute).Rejected; got != 2 {
-		t.Fatalf("SnapshotTenant(tenant-a).Rejected = %d, want 2", got)
+	if got := registry.SnapshotTenant("tenant-a", time.Unix(2, 0), time.Minute); got.Rejected != 0 || got.RejectedKnown {
+		t.Fatalf("unregistered tenant detail = %+v, want unknown", got)
 	}
 }
 

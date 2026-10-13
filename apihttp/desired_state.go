@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

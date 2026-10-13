@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
 	queue "github.com/faustbrian/go-queue/management"
 )
 
@@ -166,7 +166,8 @@ func TestClientListsBoundedWorkerPage(t *testing.T) {
 			t.Errorf("query = %v, want bounded worker filters", query)
 		}
 		_ = json.NewEncoder(writer).Encode(apihttp.WorkerPage{
-			Workers: []apihttp.Worker{{TenantID: "tenant one", WorkerID: "worker-b", State: fleet.StateStale}},
+			Workers:       []apihttp.Worker{{TenantID: "tenant one", WorkerID: "worker-b", State: fleet.StateStale}},
+			RejectedKnown: true,
 		})
 	}))
 	defer server.Close()
@@ -184,7 +185,7 @@ func TestClientListsBoundedWorkerPage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListWorkers() error = %v", err)
 	}
-	if len(page.Workers) != 1 || page.Workers[0].WorkerID != "worker-b" {
+	if len(page.Workers) != 1 || page.Workers[0].WorkerID != "worker-b" || !page.RejectedKnown {
 		t.Fatalf("ListWorkers() = %+v, want worker-b", page)
 	}
 }

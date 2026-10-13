@@ -226,3 +226,11 @@ Do not automatically retry `outcome_unknown`. Read the command result first.
 An idempotent retry must reuse the identical command envelope and key.
 The complete protocol, mutation, and fault evidence is maintained in the
 [hardening matrix](hardening.md).
+
+## Worker rejection knowledge (v4 candidate)
+
+Worker pages include `rejected_known`. True denotes an exact registered-tenant
+capacity-refusal count, including zero. False means detail is unavailable, not
+that no heartbeat was refused. The in-memory registry retains tenant detail
+only for successfully registered workers; every refusal remains in its exact
+global snapshot count. Custom/remote providers must preserve unknown state.

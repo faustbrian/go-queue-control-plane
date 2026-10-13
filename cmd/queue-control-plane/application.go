@@ -13,11 +13,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
-	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
-	"github.com/faustbrian/go-queue-control-plane/v3/server"
-	controlui "github.com/faustbrian/go-queue-control-plane/v3/ui"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v4/server"
+	controlui "github.com/faustbrian/go-queue-control-plane/v4/ui"
 	"go.opentelemetry.io/otel/metric"
 )
 

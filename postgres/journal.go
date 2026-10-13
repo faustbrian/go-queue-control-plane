@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/history"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/history"
 )
 
 // ErrResultNotTerminal rejects accepted results at the completion boundary.
@@ -99,6 +100,11 @@ func (j *Journal) accept(
 }
 
 // Complete atomically records a terminal command result and audit event.
+// Core transaction work receives at most five seconds, or the earlier deadline
+// of the context passed here; values and cancellation are preserved. Service
+// intentionally detaches pre-dispatch cancellation before calling Complete.
+// PostgreSQL rollback has its separate five-second cleanup budget; cooperative
+// driver I/O means this is not a forced total end-to-end completion limit.
 func (j *Journal) Complete(
 	ctx context.Context,
 	result controlplane.CommandResult,
@@ -110,7 +116,10 @@ func (j *Journal) Complete(
 		return ErrResultNotTerminal
 	}
 
-	return j.runner.WithinTransaction(ctx, func(ctx context.Context, tx journalTransaction) error {
+	completion, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	return j.runner.WithinTransaction(completion, func(ctx context.Context, tx journalTransaction) error {
 		command, changed, err := tx.Complete(ctx, result)
 		if err != nil || !changed {
 			return err

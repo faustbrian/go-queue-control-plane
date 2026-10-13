@@ -17,6 +17,29 @@ Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs
 follow [`DEPRECATION.md`](DEPRECATION.md).
 
+## Queue control plane v4 migration on main
+
+Current main selects `github.com/faustbrian/go-queue-control-plane/v4`.
+V4 is a candidate until tagged and published; confirm release availability
+before adopting it. Move all control-plane imports together to `/v4`.
+Published v3 remains unchanged and is a distinct nominal Go API.
+
+Registry capacity refusals still contribute to the exact global count. Tenant
+rejection detail is now retained only for tenants with successfully registered
+workers. `RegistrySnapshot.RejectedKnown` and HTTP `rejected_known` distinguish
+exact zero from unavailable detail. Unknown tenants return zero with false
+knowledge; remote status providers that expose no rejection accounting must
+also report false. Update custom providers and consumers to propagate the flag.
+There is no eviction or unregister API; registered identities remain retained.
+
+Retention seconds are admitted within one hour to ten years before Duration
+conversion. PostgreSQL journal completion receives a five-second core budget,
+or the earlier deadline of the context actually passed to it. Service still
+intentionally detaches canceled pre-dispatch requests to persist their terminal
+outcome. Rollback owns a separate five-second budget; borrowed driver calls
+remain cooperative, so this is not a forced five-second end-to-end guarantee.
+SQL schemas, audit encodings and management protocol versions are unchanged.
+
 ## Queue control plane v3 migration on main
 
 Published v3.0.0 uses `github.com/faustbrian/go-queue-control-plane/v3`.

@@ -25,7 +25,7 @@ const (
 	// HeartbeatInvalid refuses a malformed report without retaining it.
 	HeartbeatInvalid HeartbeatDisposition = "invalid"
 	// HeartbeatCapacityExceeded refuses a new worker identity at capacity and
-	// increments the tenant rejection counter.
+	// increments the global count and any registered tenant detail.
 	HeartbeatCapacityExceeded HeartbeatDisposition = "capacity_exceeded"
 )
 
@@ -43,19 +43,25 @@ type RegistrySnapshot struct {
 	// Workers is a newly owned tenant/worker-sorted slice with copied
 	// queue/capability slices.
 	Workers []WorkerSnapshot
-	// Rejected counts capacity refusals in the selected tenant or whole-registry view.
+	// Rejected counts capacity refusals when RejectedKnown is true.
 	Rejected uint64
+	// RejectedKnown distinguishes exact counts from unavailable tenant detail.
+	// Whole-registry counts are always known; tenant counts are known only for
+	// tenants with a successfully registered worker.
+	RejectedKnown bool
 }
 
 // Registry synchronizes a bounded set of latest copied worker heartbeats.
 // Construct with NewRegistry and do not copy after use. There is no eviction or
-// close operation. Worker cardinality is bounded, but rejection-counter tenant
-// cardinality is not: this is not a total memory bound for arbitrary tenants.
+// close operation. Rejection detail belongs only to successfully registered
+// tenants, so retained detail cardinality cannot exceed maxWorkers. Refused
+// unknown tenants contribute only to the exact global count.
 type Registry struct {
-	mu         sync.RWMutex
-	maxWorkers int
-	workers    map[workerKey]workerRecord
-	rejected   map[string]uint64
+	mu            sync.RWMutex
+	maxWorkers    int
+	workers       map[workerKey]workerRecord
+	rejected      map[string]uint64
+	rejectedTotal uint64
 }
 
 type workerKey struct {
@@ -92,7 +98,10 @@ func (r *Registry) Upsert(heartbeat Heartbeat) HeartbeatDisposition {
 	key := workerKey{tenant: heartbeat.TenantID, worker: heartbeat.WorkerID}
 	record, exists := r.workers[key]
 	if !exists && len(r.workers) >= r.maxWorkers {
-		r.rejected[heartbeat.TenantID]++
+		r.rejectedTotal++
+		if _, registered := r.rejected[heartbeat.TenantID]; registered {
+			r.rejected[heartbeat.TenantID]++
+		}
 
 		return HeartbeatCapacityExceeded
 	}
@@ -101,6 +110,9 @@ func (r *Registry) Upsert(heartbeat Heartbeat) HeartbeatDisposition {
 	}
 	if !exists {
 		r.workers[key] = workerRecord{heartbeat: cloneHeartbeat(heartbeat)}
+		if _, registered := r.rejected[heartbeat.TenantID]; !registered {
+			r.rejected[heartbeat.TenantID] = 0
+		}
 
 		return HeartbeatAccepted
 	}
@@ -130,14 +142,15 @@ func (r *Registry) Snapshot(now time.Time, staleAfter time.Duration) RegistrySna
 	defer r.mu.RUnlock()
 
 	snapshot := r.snapshotLocked("", now, staleAfter)
-	for _, rejected := range r.rejected {
-		snapshot.Rejected += rejected
-	}
+	snapshot.Rejected = r.rejectedTotal
+	snapshot.RejectedKnown = true
 
 	return snapshot
 }
 
-// SnapshotTenant returns only one tenant's workers and rejection count.
+// SnapshotTenant returns only one tenant's workers and available rejection
+// detail. An unregistered tenant has RejectedKnown=false and Rejected=0; that
+// zero is not an assertion that no heartbeat was refused.
 func (r *Registry) SnapshotTenant(
 	tenant string,
 	now time.Time,
@@ -147,7 +160,7 @@ func (r *Registry) SnapshotTenant(
 	defer r.mu.RUnlock()
 
 	snapshot := r.snapshotLocked(tenant, now, staleAfter)
-	snapshot.Rejected = r.rejected[tenant]
+	snapshot.Rejected, snapshot.RejectedKnown = r.rejected[tenant]
 
 	return snapshot
 }

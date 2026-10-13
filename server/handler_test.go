@@ -9,7 +9,7 @@ import (
 
 	authentication "github.com/faustbrian/go-authentication/v2"
 	authhttp "github.com/faustbrian/go-authentication/v2/adapters/http"
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
 )
 
 func TestAdministrativeHandlerRejectsInvalidComposition(t *testing.T) {

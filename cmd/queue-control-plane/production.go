@@ -8,10 +8,10 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres/v2"
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
-	"github.com/faustbrian/go-queue-control-plane/v3/server"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	"github.com/faustbrian/go-queue-control-plane/v4/server"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )

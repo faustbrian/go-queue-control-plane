@@ -9,7 +9,7 @@ import (
 	authentication "github.com/faustbrian/go-authentication/v2"
 	authorization "github.com/faustbrian/go-authorization"
 	"github.com/faustbrian/go-authorization/authn"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
 )
 
 func TestAuthorizerMapsAuthenticatedPrincipalToTenantDecision(t *testing.T) {

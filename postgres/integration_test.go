@@ -13,9 +13,9 @@ import (
 
 	identifierulid "github.com/faustbrian/go-identifier/ulid"
 	gopostgres "github.com/faustbrian/go-postgres/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"

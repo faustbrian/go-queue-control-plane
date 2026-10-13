@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v3/client"
-	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/client"
+	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
 	queue "github.com/faustbrian/go-queue/management"
 )
 

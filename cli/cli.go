@@ -17,11 +17,11 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v3/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v3/client"
-	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v4/client"
+	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
 	queue "github.com/faustbrian/go-queue/management"
 )
 
@@ -146,9 +146,10 @@ func (r Runner) Run(ctx context.Context, args []string) int {
 }
 
 type retentionPage struct {
-	Workers    []retentionStatus `json:"workers"`
-	Rejected   uint64            `json:"rejected"`
-	NextCursor string            `json:"next_cursor,omitempty"`
+	Workers       []retentionStatus `json:"workers"`
+	Rejected      uint64            `json:"rejected"`
+	RejectedKnown bool              `json:"rejected_known"`
+	NextCursor    string            `json:"next_cursor,omitempty"`
 }
 
 type retentionStatus struct {
@@ -201,7 +202,7 @@ func (r Runner) runRetention(ctx context.Context, args []string) error {
 
 	status := retentionPage{
 		Workers:  make([]retentionStatus, 0, len(page.Workers)),
-		Rejected: page.Rejected, NextCursor: page.NextCursor,
+		Rejected: page.Rejected, RejectedKnown: page.RejectedKnown, NextCursor: page.NextCursor,
 	}
 	for _, worker := range page.Workers {
 		status.Workers = append(status.Workers, workerRetentionStatus(worker))

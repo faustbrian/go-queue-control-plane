@@ -3,7 +3,7 @@
 [![CI](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![Documentation](https://img.shields.io/badge/docs-structural_checks_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v3.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v3)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v4.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v4)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-queue-control-plane?sort=semver)](https://github.com/faustbrian/go-queue-control-plane/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -29,6 +29,12 @@ also consume durable desired state through the typed client. See
 [Current capability status](docs/compatibility.md) before evaluating a rollout.
 
 ## Install
+
+Main now selects the candidate `/v4` module for bounded rejection detail and
+explicit known-state reporting. V4 is not published by this source change;
+see the [v4 migration guide](COMPATIBILITY.md#queue-control-plane-v4-migration-on-main)
+and confirm release availability before adoption. The commands below retain
+existing published v3 choices.
 
 Published v3.0.0 uses root v3 with Authentication v2. The commands below pin
 that release and retain the supported historical v1 and v2 choices. See the

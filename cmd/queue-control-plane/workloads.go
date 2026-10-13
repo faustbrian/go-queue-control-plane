@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v3/control"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v4/control"
 	kubernetesclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )

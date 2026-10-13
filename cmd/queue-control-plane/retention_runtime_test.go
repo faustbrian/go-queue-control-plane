@@ -10,7 +10,7 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres/v2"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v3/postgres"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
 	"github.com/jackc/pgx/v5"
 )
 

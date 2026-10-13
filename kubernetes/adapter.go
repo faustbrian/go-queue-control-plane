@@ -7,14 +7,14 @@
 // watch, cluster client, HPA/KEDA controller or shutdown loop. It preserves
 // released type identities through the canonical adapter aliases.
 //
-// Deprecated: use github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes.
+// Deprecated: use github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes.
 package kubernetes
 
 import (
 	"context"
 	"errors"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

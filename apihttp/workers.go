@@ -9,8 +9,8 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v3"
-	"github.com/faustbrian/go-queue-control-plane/v3/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
 )
 
 const (
@@ -25,8 +25,11 @@ type WorkerPage struct {
 	// Workers contains sorted/filtered worker projections; the source snapshot
 	// is materialized before pagination.
 	Workers []Worker `json:"workers"`
-	// Rejected is the tenant snapshot capacity-refusal count.
+	// Rejected is the tenant count only when RejectedKnown is true.
 	Rejected uint64 `json:"rejected"`
+	// RejectedKnown distinguishes exact registered-tenant counts from unknown
+	// detail, including providers that do not expose rejection accounting.
+	RejectedKnown bool `json:"rejected_known"`
 	// NextCursor is the exclusive last worker identity for another page; empty
 	// means no further page was detected.
 	NextCursor string `json:"next_cursor,omitempty"`
@@ -120,7 +123,7 @@ func (h *handler) listWorkers(writer http.ResponseWriter, request *http.Request)
 		return workerComesBefore(workers[i], workers[j])
 	})
 
-	page := WorkerPage{Workers: make([]Worker, 0, len(workers)), Rejected: snapshot.Rejected}
+	page := WorkerPage{Workers: make([]Worker, 0, len(workers)), Rejected: snapshot.Rejected, RejectedKnown: snapshot.RejectedKnown}
 	for _, snapshot := range workers {
 		if !query.matches(snapshot) {
 			continue
