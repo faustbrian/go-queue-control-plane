@@ -328,3 +328,23 @@ operator can adopt it without reading implementation source.
 - Every advertised workflow has real backend and end-to-end evidence.
 - Meaningful coverage and every required local and GitHub Actions gate pass.
 - Documentation, API schema, client, CLI, UI, and changelog remain synchronized.
+
+## Supported-Scope Disposition — 2026-10-14
+
+The Required Reconciliation rule permits an explicitly unsupported capability
+when the published data-plane contract cannot supply it. Queue v1.1.3 at
+`376b2ea5c2bd25ace6af4374e464852203df1f8c` does not export per-record bulk
+results, bulk delete, post-dispatch cancellation, retention configuration,
+the requested advanced record filters, or snapshot pagination. These extensions
+remain explicitly unsupported, not emulated through raw broker access or local
+page loops. Runtime queue purge and time/byte retention likewise remain outside
+the supported backend capabilities.
+
+Published v4 supports the capability-negotiated operations in
+[`docs/hardening.md`](../docs/hardening.md#real-backend-dead-letter-matrix),
+with truthful partial and unknown outcomes. The unavailable extensions do not
+block publication of that supported contract. This broader goal remains pending
+for its wider workflow set: supporting an extension requires a published Queue
+contract and real Redis/Valkey evidence before advertisement. This disposition
+does not claim new runtime verification, complete the goal, or authorize
+duplicating data-plane behavior in the control plane.

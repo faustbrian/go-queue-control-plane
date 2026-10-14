@@ -151,10 +151,13 @@ client. Queue purge, time/byte retention, and runtime retention configuration
 remain explicitly unsupported because the pinned `queue` contract does not
 export those operations.
 
-## Upstream contract blockers
+## Unsupported upstream capabilities
 
-The following workflows are release blockers rather than simulated control-
-plane features at the pinned `queue` revision:
+The published v4 capability-limited contract supports only the operations in
+the real backend matrix above. The following extensions are explicitly
+unsupported at the pinned `queue` v1.1.3 revision; they are pending scope of
+the broader dead-letter goal, not release blockers for that supported contract.
+The control plane does not simulate missing data-plane guarantees:
 
 - `management.CommandResult` has one terminal status and no bounded per-record
   bulk result collection. Bulk retry therefore preserves `partial` and
@@ -173,8 +176,10 @@ plane features at the pinned `queue` revision:
   and no snapshot token. The API rejects unknown filters and does not emulate
   unstable client-side pagination across changing backend pages.
 
-Removing any blocker requires a published `queue` contract with equivalent
+Supporting an extension requires a published `queue` contract with equivalent
 Redis and Valkey evidence before the control plane may advertise the workflow.
+The broader goal remains pending; this supported-scope disposition does not
+mark its unavailable extensions implemented or its complete workflow set done.
 
 Scheduled alert evaluation is a deployment blocker, not an in-process control-
 plane responsibility. `alerts.TelemetryExporter` supplies the bounded, fixed-
