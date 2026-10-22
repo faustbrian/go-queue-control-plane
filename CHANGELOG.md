@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## 4.0.1 - 2026-10-22
+
+### Changed
+
+- Publish the current source and documentation with a fresh immutable tag.
+
 ## 4.0.0 - 2026-10-13
 
 This entry records a prepared root major; publication is separate. Update Go
