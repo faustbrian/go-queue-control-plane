@@ -2,12 +2,10 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"strings"
 	"testing"
 
-	migrations "github.com/faustbrian/go-migrations/v2"
+	migrations "github.com/faustbrian/go-migrations/v4"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -219,84 +217,44 @@ func TestMigrationSourceLoadsTenantScopedControlSchema(t *testing.T) {
 	}
 }
 
-func TestNewMigrationRunnerRequiresDatabase(t *testing.T) {
+// Applications fold these migrations into their own ledgers (Postal's
+// migration 54 among them), so every checksum must match the published
+// history byte for byte.
+func TestMigrationSourceMatchesPublishedChecksums(t *testing.T) {
 	t.Parallel()
 
-	runner, err := NewMigrationRunner(nil)
-	if !errors.Is(err, ErrInvalidMigrationDatabase) || runner != nil {
-		t.Fatalf(
-			"NewMigrationRunner(nil) = (%v, %v), want (nil, ErrInvalidMigrationDatabase)",
-			runner,
-			err,
-		)
-	}
-}
-
-func TestNewMigrationRunnerBuildsEmbeddedPostgresRunner(t *testing.T) {
-	t.Parallel()
-
-	database, err := sql.Open("pgx", "postgres://localhost/control_plane")
-	if err != nil {
-		t.Fatalf("sql.Open() error = %v", err)
-	}
-	t.Cleanup(func() { _ = database.Close() })
-
-	runner, err := NewMigrationRunner(database)
-	if err != nil || runner == nil {
-		t.Fatalf("NewMigrationRunner() = (%v, %v), want runner and nil", runner, err)
-	}
-}
-
-func TestNewMigrationRunnerPropagatesCompositionFailures(t *testing.T) {
-	t.Parallel()
-
-	database, err := sql.Open("pgx", "postgres://localhost/control_plane")
-	if err != nil {
-		t.Fatalf("sql.Open() error = %v", err)
-	}
-	t.Cleanup(func() { _ = database.Close() })
-
-	sourceErr := errors.New("source failed")
-	backendErr := errors.New("backend failed")
-	runnerErr := errors.New("runner failed")
-	tests := map[string]struct {
-		factories migrationFactories
-		want      error
+	want := []struct {
+		version  uint64
+		name     string
+		checksum string
 	}{
-		"source": {
-			factories: migrationFactories{
-				source: func() (migrations.Source, error) { return nil, sourceErr },
-			},
-			want: sourceErr,
-		},
-		"backend": {
-			factories: migrationFactories{
-				source: MigrationSource,
-				backend: func(*sql.DB) (migrations.Backend, error) {
-					return nil, backendErr
-				},
-			},
-			want: backendErr,
-		},
-		"runner": {
-			factories: migrationFactories{
-				source:  MigrationSource,
-				backend: func(*sql.DB) (migrations.Backend, error) { return nil, nil },
-				runner: func(migrations.Source, migrations.Backend) (*migrations.Runner, error) {
-					return nil, runnerErr
-				},
-			},
-			want: runnerErr,
-		},
+		{1, "control_plane", "sha256:3b1fbf69322ecab2547744d506d2da2e7631efa033b33ca08f9841200d63d22b"},
+		{2, "command_outcomes", "sha256:e9aa64d3f2cc5fc35a42f80e4629bb572af1bfb09229f28f6cfa35a481f1b2b6"},
+		{3, "command_identifiers", "sha256:4f7d1b727ce3b19f694910cec06a4a56ed668bf91351347c7da228775a6eeccf"},
+		{4, "sensitive_access_audit", "sha256:cde3cc2119e69e141730ef9f57e3570afc40e4aae744283eb00a42c547912e62"},
+		{5, "command_lifecycle", "sha256:4d82a4e3a241d397fe2c8c7e42cd3f1ee03b0f6b59f73df258d41610327418af"},
+		{6, "command_deadlines", "sha256:5a7c62ecbc6329d847a572223a8a51950cc2cd9e61e848ec6869cfa2d599f49f"},
+		{7, "authentication_method", "sha256:e3263fa58af24deff3ed4fe45f3d44f2e1d7b6e14018fd634dbf062a37dfb533"},
+		{8, "capability_snapshots", "sha256:577223bcfa465e16c852e3b38f97ffd0ace88ed0c928453f4241569f744f1ab1"},
+		{9, "ulid_command_identifiers", "sha256:cf34bfdb9035f38560c6a3154f49609f94051a06c18d5bf8f7f1a07319a733e4"},
 	}
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			runner, err := newMigrationRunner(database, tt.factories)
-			if runner != nil || !errors.Is(err, tt.want) {
-				t.Fatalf("newMigrationRunner() = (%v, %v), want nil and %v", runner, err, tt.want)
-			}
-		})
+	source, err := MigrationSource()
+	if err != nil {
+		t.Fatalf("MigrationSource() error = %v", err)
+	}
+	loaded, err := source.Load(context.Background())
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	if len(loaded) != len(want) {
+		t.Fatalf("len(Load()) = %d, want %d", len(loaded), len(want))
+	}
+	for index, migration := range loaded {
+		if uint64(migration.Version()) != want[index].version || migration.Name() != want[index].name ||
+			migration.TransactionMode() != migrations.TransactionModeDefault ||
+			migration.DownSQL() == "" || migration.Checksum().String() != want[index].checksum {
+			t.Fatalf("migration %d = %d/%s/%s, want %+v", index, migration.Version(), migration.Name(),
+				migration.Checksum(), want[index])
+		}
 	}
 }

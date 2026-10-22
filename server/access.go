@@ -6,7 +6,7 @@ import (
 	"github.com/faustbrian/go-authentication/v2/apikey"
 	authorization "github.com/faustbrian/go-authorization"
 	"github.com/faustbrian/go-authorization/acl"
-	controlauthz "github.com/faustbrian/go-queue-control-plane/v4/authz"
+	controlauthz "github.com/faustbrian/go-queue-control-plane/v5/authz"
 )
 
 const (

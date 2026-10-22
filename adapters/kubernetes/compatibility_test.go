@@ -6,8 +6,8 @@ import (
 	"errors"
 	"testing"
 
-	canonical "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
-	legacy "github.com/faustbrian/go-queue-control-plane/v4/kubernetes"
+	canonical "github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes"
+	legacy "github.com/faustbrian/go-queue-control-plane/v5/kubernetes"
 )
 
 func TestCanonicalAndLegacyPathsShareConstructionContract(t *testing.T) {

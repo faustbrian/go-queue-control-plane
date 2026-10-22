@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/fs"
 
-	migrations "github.com/faustbrian/go-migrations/v2"
+	migrations "github.com/faustbrian/go-migrations/v4"
 )
 
 // embeddedMigrationSource serves only compiler-owned immutable files. It checks

@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/dataplane"
-	queue "github.com/faustbrian/go-queue/management"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/dataplane"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestLoadManagementRuntimeBuildsTenantStatusSource(t *testing.T) {

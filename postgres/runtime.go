@@ -4,8 +4,7 @@ import (
 	"context"
 	"errors"
 
-	gopostgres "github.com/faustbrian/go-postgres"
-	gopostgresv2 "github.com/faustbrian/go-postgres/v2"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -40,19 +39,10 @@ func (readiness *PoolReadiness) Ready(ctx context.Context) error {
 	return readiness.pool.Ping(ctx)
 }
 
-// NewRuntime wires all control-plane persistence services to a legacy v1 pool.
-// The caller retains ownership; use NewRuntimeWithPool for go-postgres/v2.
+// NewRuntime wires persistence services to a go-postgres/v3 pool. It refuses
+// nil or uninitialized pools. The caller retains pool ownership; transactions
+// use the native pgxpool, and readiness uses the pool's bounded Ping.
 func NewRuntime(pool *gopostgres.Pool) (*Runtime, error) {
-	if pool == nil || pool.Raw() == nil {
-		return nil, ErrInvalidRuntimePool
-	}
-	return newRuntime(pool.Raw(), pool)
-}
-
-// NewRuntimeWithPool wires persistence services to a go-postgres/v2 pool.
-// It refuses nil or uninitialized pools. The caller retains pool ownership;
-// transactions use the native pgxpool, and readiness uses the pool's bounded Ping.
-func NewRuntimeWithPool(pool *gopostgresv2.Pool) (*Runtime, error) {
 	if pool == nil || pool.Raw() == nil {
 		return nil, ErrInvalidRuntimePool
 	}

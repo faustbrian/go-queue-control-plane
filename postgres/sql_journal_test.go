@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/history"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/history"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )

@@ -13,13 +13,13 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/dataplane"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
-	"github.com/faustbrian/go-queue-control-plane/v4/server"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/dataplane"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	"github.com/faustbrian/go-queue-control-plane/v5/server"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestBuildInfoAcceptsExactIdentityBounds(t *testing.T) {
@@ -100,7 +100,6 @@ func TestConfigRejectsUIInEachOneShotMode(t *testing.T) {
 	t.Parallel()
 
 	for _, mode := range []map[string]string{
-		{"QUEUE_CONTROL_MIGRATE_ONLY": "true"},
 		{"QUEUE_CONTROL_RETENTION_ONLY": "true", "QUEUE_CONTROL_RETENTION_FILE": "retention.json"},
 	} {
 		environment := map[string]string{
@@ -123,7 +122,6 @@ func TestInvalidProcessDependenciesRejectsEveryMissingDependency(t *testing.T) {
 		func(value *processDependencies) { value.buildInfo = nil },
 		func(value *processDependencies) { value.buildTelemetry = nil },
 		func(value *processDependencies) { value.loadAccess = nil },
-		func(value *processDependencies) { value.migrate = nil },
 		func(value *processDependencies) { value.retain = nil },
 		func(value *processDependencies) { value.loadWorkloads = nil },
 		func(value *processDependencies) { value.routeDispatchers = nil },

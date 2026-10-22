@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
 	"github.com/jackc/pgx/v5"
 )
 

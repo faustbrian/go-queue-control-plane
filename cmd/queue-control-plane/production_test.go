@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/server"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/server"
 )
 
 func TestProductionDependenciesUseBoundedImplementations(t *testing.T) {
@@ -75,12 +75,6 @@ func TestProductionDependenciesUseBoundedImplementations(t *testing.T) {
 
 	if pool, err := dependencies.openPool(context.Background(), postgresPoolConfig("://")); err == nil || pool != nil {
 		t.Fatalf("openPool(malformed) = (%v, %v), want safe parse failure", pool, err)
-	}
-
-	cancelled, cancel := context.WithCancel(context.Background())
-	cancel()
-	if err := dependencies.migrate(cancelled, "postgres://localhost/control_plane"); !errors.Is(err, context.Canceled) {
-		t.Fatalf("migrate(cancelled) error = %v, want context canceled", err)
 	}
 
 	listener, err := dependencies.listen("tcp", "127.0.0.1:0")

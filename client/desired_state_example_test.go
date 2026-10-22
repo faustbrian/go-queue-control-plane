@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v4/client"
-	queue "github.com/faustbrian/go-queue/management"
+	"github.com/faustbrian/go-queue-control-plane/v5/client"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 // ExampleClient_DesiredStateReader composes one caller-scheduled reconciliation

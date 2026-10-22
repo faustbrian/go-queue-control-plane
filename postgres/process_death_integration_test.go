@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -31,7 +31,7 @@ func TestPostgresProcessDeathRollbackIntegration(t *testing.T) {
 	if err := migrateProcessDeathDatabase(ctx, dsn); err != nil {
 		t.Fatalf("migrate PostgreSQL: %v", err)
 	}
-	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, DatabaseTestPoolConfig(dsn))
 	if err != nil {
 		t.Fatalf("open runtime pool: %v", err)
 	}
@@ -149,7 +149,7 @@ func TestPostgresProcessDeathHelper(t *testing.T) {
 		t.Skip("process-death helper")
 	}
 	ctx := context.Background()
-	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: os.Getenv("TEST_DATABASE_URL")})
+	pool, err := gopostgres.Connect(ctx, DatabaseTestPoolConfig(os.Getenv("TEST_DATABASE_URL")))
 	if err != nil {
 		t.Fatalf("open helper pool: %v", err)
 	}

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestCommandResultMatchesEveryEnvelopeFieldExactly(t *testing.T) {

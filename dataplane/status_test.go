@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	queue "github.com/faustbrian/go-queue/management"
-	"github.com/faustbrian/go-queue/managementhttp"
+	queue "github.com/faustbrian/go-queue/v2/management"
+	"github.com/faustbrian/go-queue/v2/managementhttp"
 )
 
 func TestManagementHTTPClientComposesStatusWithoutRedirects(t *testing.T) {

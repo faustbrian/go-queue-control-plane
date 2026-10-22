@@ -14,9 +14,7 @@ missing or invalid.
 | `QUEUE_CONTROL_LISTEN_ADDRESS` | no | `:8080` | TCP listen address. |
 | `QUEUE_CONTROL_ACCESS_MAX_BYTES` | no | `1048576` | Access-file bound, from 1 byte to 1 MiB. |
 | `QUEUE_CONTROL_ALLOWED_ORIGINS` | no | none | Comma-separated exact browser origins. |
-| `QUEUE_CONTROL_RUN_MIGRATIONS` | no | `false` | Apply embedded migrations at startup. |
 | `QUEUE_CONTROL_UI_ENABLED` | no | `false` | Serve the embedded console at `/ui/`. |
-| `QUEUE_CONTROL_MIGRATE_ONLY` | no | `false` | Apply migrations and exit without serving. |
 | `QUEUE_CONTROL_RETENTION_ONLY` | no | `false` | Apply one bounded audit-retention plan and exit. |
 | `QUEUE_CONTROL_RETENTION_FILE` | with retention | none | Strict tenant retention-policy JSON path. |
 | `QUEUE_CONTROL_RETENTION_MAX_BYTES` | no | `1048576` | Retention-file bound, from 1 byte to 1 MiB. |
@@ -126,14 +124,13 @@ the versioned command and backend behavior.
 
 ## PostgreSQL migrations
 
-For a local evaluation, setting `QUEUE_CONTROL_RUN_MIGRATIONS=true` applies the
-embedded schema before opening the runtime pool. In production, run the same
-server image as a one-shot migration Job with only `DATABASE_URL` and
-`QUEUE_CONTROL_MIGRATE_ONLY=true`. This mode applies every pending embedded
-migration under the migration backend's lock and exits without reading the
-access document, opening the runtime pool, binding a listener, or serving HTTP.
-Start serving instances only after that Job succeeds, with both migration flags
-disabled.
+The server does not apply schema migrations. The deploying application owns
+them: add `postgres.MigrationSource()` to its go-migrations v4 runner (or fold
+the embedded SQL into its own ledger, as Postal does) and apply it before
+starting serving instances. The process refuses to start, with exit status 1
+and before opening a pool or listener, when the removed
+`QUEUE_CONTROL_MIGRATE_ONLY` or `QUEUE_CONTROL_RUN_MIGRATIONS` variable is set
+to any value.
 
 ## Audit retention Job
 

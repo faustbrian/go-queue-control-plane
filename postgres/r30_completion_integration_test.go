@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 )
 
 // A real row lock causes cooperative completion timeout before result/audit
@@ -37,7 +37,7 @@ func TestR30PostgresCompletionTimeoutRollsBackAndDetachedCompletionPersists(t *t
 			t.Error(err)
 		}
 	}()
-	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
+	runtime, err := controlpostgres.NewRuntime(pool)
 	if err != nil {
 		t.Fatal(err)
 	}

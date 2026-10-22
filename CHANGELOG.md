@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## 5.0.0 - 2026-10-22
+
+### Changed
+
+- Move the module to `github.com/faustbrian/go-queue-control-plane/v5` and
+  adopt `go-queue/v2`, `go-postgres/v3`, `go-migrations/v4` and
+  `go-telemetry/v4`. Embedded SQL, migration identities and checksums,
+  persistence formats and HTTP API versions are unchanged.
+- `postgres.NewRuntime` takes a `go-postgres/v3` pool and is the only
+  persistence constructor.
+- The HTTP instrumentation scope follows Telemetry v4:
+  `github.com/faustbrian/go-telemetry/v4/instrumentation/nethttp`.
+
+### Removed
+
+- Remove `postgres.NewRuntimeWithPool`, the PostgreSQL v1 pool path and
+  `postgres.NewMigrationRunner`.
+- Remove the server's migrate-only and migrate-at-startup modes. Apply
+  `postgres.MigrationSource()` through the deploying application's runner.
+  Setting `QUEUE_CONTROL_MIGRATE_ONLY` or `QUEUE_CONTROL_RUN_MIGRATIONS` now
+  stops startup with exit status 1.
+
 ## 4.0.1 - 2026-10-22
 
 ### Changed

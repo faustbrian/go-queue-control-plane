@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 )
 
 const (

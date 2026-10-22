@@ -5,7 +5,7 @@ import (
 
 	authentication "github.com/faustbrian/go-authentication/v2"
 	authhttp "github.com/faustbrian/go-authentication/v2/adapters/http"
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
 )
 
 // NewAdministrativeHandler composes browser admission and fail-closed

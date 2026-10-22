@@ -6,11 +6,11 @@ import (
 	"net"
 	"net/http"
 
-	gopostgres "github.com/faustbrian/go-postgres/v2"
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
-	"github.com/faustbrian/go-queue-control-plane/v4/server"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	"github.com/faustbrian/go-queue-control-plane/v5/server"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -42,7 +42,6 @@ type processDependencies struct {
 	buildInfo        func() (apihttp.BuildInfo, error)
 	buildTelemetry   func(context.Context, Config, apihttp.BuildInfo) (processTelemetry, error)
 	loadAccess       func(string, int64) (*server.StaticAccess, error)
-	migrate          func(context.Context, string) error
 	retain           func(context.Context, string, string, int64) error
 	loadWorkloads    func(string, int64) (workloadRuntime, error)
 	loadManagement   func(string, int64) (managementRuntime, error)
@@ -63,13 +62,6 @@ func runProcess(
 	config, err := LoadConfig(getenv)
 	if err != nil {
 		return err
-	}
-	if config.MigrateOnly {
-		if dependencies.migrate == nil {
-			return ErrInvalidProcessDependencies
-		}
-
-		return dependencies.migrate(ctx, config.DatabaseURL)
 	}
 	if config.RetentionOnly {
 		if dependencies.retain == nil {
@@ -103,11 +95,6 @@ func runProcess(
 	access, err := dependencies.loadAccess(config.AccessDocumentPath, config.AccessDocumentSize)
 	if err != nil {
 		return err
-	}
-	if config.RunMigrations {
-		if err := dependencies.migrate(ctx, config.DatabaseURL); err != nil {
-			return err
-		}
 	}
 	dispatcher := dependencies.dispatcher
 	var workloads apihttp.WorkloadSource
@@ -208,7 +195,7 @@ func runProcess(
 
 func invalidProcessDependencies(dependencies processDependencies) bool {
 	return dependencies.buildInfo == nil || dependencies.buildTelemetry == nil ||
-		dependencies.loadAccess == nil || dependencies.migrate == nil || dependencies.retain == nil ||
+		dependencies.loadAccess == nil || dependencies.retain == nil ||
 		dependencies.loadWorkloads == nil || dependencies.routeDispatchers == nil ||
 		dependencies.loadManagement == nil ||
 		dependencies.openPool == nil || dependencies.buildPersistence == nil ||

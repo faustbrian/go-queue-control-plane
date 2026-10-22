@@ -3,7 +3,7 @@
 [![CI](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![Documentation](https://img.shields.io/badge/docs-structural_checks_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v4.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v4)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v5.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v5)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-queue-control-plane?sort=semver)](https://github.com/faustbrian/go-queue-control-plane/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -118,12 +118,12 @@ Create `/tmp/queue-control-access.json` outside version control:
 }
 ```
 
-Start the API and apply its embedded migration:
+Apply the embedded schema from `postgres.MigrationSource()` with your
+application's go-migrations v4 runner, then start the API:
 
 ```sh
 export DATABASE_URL='postgres://user:password@localhost/control_plane?sslmode=disable'
 export QUEUE_CONTROL_ACCESS_FILE=/tmp/queue-control-access.json
-export QUEUE_CONTROL_RUN_MIGRATIONS=true
 queue-control-plane
 ```
 
@@ -140,8 +140,8 @@ queue-control audit list --tenant tenant-1
 ```
 
 Do not commit the local access document. For production, inject it from a
-secret volume and run a one-shot `QUEUE_CONTROL_MIGRATE_ONLY=true` Job before
-starting serving replicas.
+secret volume and apply the schema through the deploying application's
+migration runner before starting serving replicas.
 
 ## Documentation
 
@@ -185,8 +185,7 @@ browser, benchmark and release-risk qualification. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for focused fuzzing, cancellation/shutdown
 checks, and fixture requirements.
 
-The same server image supports separate migrate-only and bounded
-retention-only Jobs. See [Deployment and configuration](docs/deployment.md) for
+The same server image supports a separate bounded retention-only Job. See [Deployment and configuration](docs/deployment.md) for
 their strict inputs and failure semantics. Retention verifies and advances the
 audit anchor before removing unreferenced old terminal commands; active and
 current desired-state commands remain durable.

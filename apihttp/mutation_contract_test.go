@@ -10,10 +10,10 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestAdministrativeEndpointsRejectExplicitAnonymousPrincipal(t *testing.T) {

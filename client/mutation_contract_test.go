@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v4/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestClientUsesExactDefaultTimeout(t *testing.T) {

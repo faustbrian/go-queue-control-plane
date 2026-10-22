@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres/v2"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 )
 
 type retentionFileOpener func(string) (io.ReadCloser, error)
@@ -70,7 +70,7 @@ func executeProductionRetention(
 }
 
 func buildProductionRetentionAudit(pool *gopostgres.Pool) (retentionAudit, error) {
-	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
+	runtime, err := controlpostgres.NewRuntime(pool)
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	queue "github.com/faustbrian/go-queue/management"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 // BenchmarkQueuePageTwoHundredMeasurements measures projection of a prebuilt

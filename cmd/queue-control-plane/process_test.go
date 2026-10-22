@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
-	"github.com/faustbrian/go-queue-control-plane/v4/server"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	"github.com/faustbrian/go-queue-control-plane/v5/server"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel/metric"
 	metricnoop "go.opentelemetry.io/otel/metric/noop"
@@ -41,52 +41,44 @@ func TestRunProcessRejectsConfigurationBeforeDependencies(t *testing.T) {
 	}
 }
 
-func TestRunProcessMigratesAndExitsWithoutServingDependencies(t *testing.T) {
+// Schema migration moved to the deploying application's migration runner;
+// a leftover setting must stop startup before any database or listener work
+// rather than serve against an unmigrated schema.
+func TestRunProcessRejectsRemovedMigrationSettingsBeforeDependencies(t *testing.T) {
 	t.Parallel()
 
-	migrated := false
-	err := runProcess(context.Background(), mapEnvironment(map[string]string{
-		"DATABASE_URL":               "postgres://database/control",
-		"QUEUE_CONTROL_MIGRATE_ONLY": "true",
-	}), processDependencies{
-		migrate: func(_ context.Context, dsn string) error {
-			if dsn != "postgres://database/control" {
-				t.Fatalf("migration DSN = %q", dsn)
-			}
-			migrated = true
+	for _, name := range []string{"QUEUE_CONTROL_MIGRATE_ONLY", "QUEUE_CONTROL_RUN_MIGRATIONS"} {
+		for _, value := range []string{"true", "false", "1"} {
+			t.Run(name+"="+value, func(t *testing.T) {
+				t.Parallel()
 
-			return nil
-		},
-	})
-	if err != nil || !migrated {
-		t.Fatalf("runProcess() = %v, migrated = %t", err, migrated)
-	}
-}
+				touched := false
+				dependencies := validProcessDependencies(t)
+				dependencies.loadAccess = func(string, int64) (*server.StaticAccess, error) {
+					touched = true
 
-func TestRunProcessMigrationOnlyPropagatesFailure(t *testing.T) {
-	t.Parallel()
+					return applicationAccess(t), nil
+				}
+				dependencies.openPool = func(context.Context, gopostgres.Config) (*gopostgres.Pool, error) {
+					touched = true
 
-	stageErr := errors.New("migration failed")
-	err := runProcess(context.Background(), mapEnvironment(map[string]string{
-		"DATABASE_URL":               "postgres://database/control",
-		"QUEUE_CONTROL_MIGRATE_ONLY": "true",
-	}), processDependencies{
-		migrate: func(context.Context, string) error { return stageErr },
-	})
-	if !errors.Is(err, stageErr) {
-		t.Fatalf("runProcess() error = %v, want %v", err, stageErr)
-	}
-}
+					return lazyProcessPool(t), nil
+				}
+				dependencies.listen = func(string, string) (net.Listener, error) {
+					touched = true
 
-func TestRunProcessMigrationOnlyRequiresMigrator(t *testing.T) {
-	t.Parallel()
-
-	err := runProcess(context.Background(), mapEnvironment(map[string]string{
-		"DATABASE_URL":               "postgres://database/control",
-		"QUEUE_CONTROL_MIGRATE_ONLY": "true",
-	}), processDependencies{})
-	if !errors.Is(err, ErrInvalidProcessDependencies) {
-		t.Fatalf("runProcess() error = %v, want %v", err, ErrInvalidProcessDependencies)
+					return &processListener{}, nil
+				}
+				err := runProcess(context.Background(), mapEnvironment(map[string]string{
+					"DATABASE_URL":              "postgres://database/control",
+					"QUEUE_CONTROL_ACCESS_FILE": "/run/secrets/access.json",
+					name:                        value,
+				}), dependencies)
+				if !errors.Is(err, ErrInvalidRuntimeConfiguration) || touched {
+					t.Fatalf("runProcess() = %v, dependency touched = %t", err, touched)
+				}
+			})
+		}
 	}
 }
 
@@ -150,13 +142,11 @@ func TestRunProcessComposesAndClosesRuntime(t *testing.T) {
 
 	pool := lazyProcessPool(t)
 	served := false
-	migrated := false
 	telemetryStopped := false
 	listener := &processListener{}
 	err := runProcess(context.Background(), mapEnvironment(map[string]string{
 		"DATABASE_URL":                               "postgres://database/control",
 		"QUEUE_CONTROL_ACCESS_FILE":                  "/run/secrets/access.json",
-		"QUEUE_CONTROL_RUN_MIGRATIONS":               "true",
 		"QUEUE_CONTROL_ALLOWED_ORIGINS":              "https://control.example",
 		"QUEUE_CONTROL_LISTEN_ADDRESS":               "127.0.0.1:9090",
 		"QUEUE_CONTROL_ACCESS_MAX_BYTES":             "2048",
@@ -177,11 +167,6 @@ func TestRunProcessComposesAndClosesRuntime(t *testing.T) {
 			}
 
 			return applicationAccess(t), nil
-		},
-		migrate: func(context.Context, string) error {
-			migrated = true
-
-			return nil
 		},
 		retain: func(context.Context, string, string, int64) error { return nil },
 		loadWorkloads: func(path string, maxBytes int64) (workloadRuntime, error) {
@@ -215,7 +200,7 @@ func TestRunProcessComposesAndClosesRuntime(t *testing.T) {
 			assertProcessPoolConfig(t, ctx, config)
 			return pool, nil
 		},
-		buildPersistence: controlpostgres.NewRuntimeWithPool,
+		buildPersistence: controlpostgres.NewRuntime,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return applicationRateLimiter{}, nil
 		},
@@ -260,10 +245,9 @@ func TestRunProcessComposesAndClosesRuntime(t *testing.T) {
 	if err != nil {
 		t.Fatalf("runProcess() error = %v", err)
 	}
-	if !migrated || !served || !telemetryStopped {
+	if !served || !telemetryStopped {
 		t.Fatalf(
-			"migrated = %t, served = %t, telemetry stopped = %t, want true",
-			migrated,
+			"served = %t, telemetry stopped = %t, want true",
 			served,
 			telemetryStopped,
 		)
@@ -318,13 +302,6 @@ func TestRunProcessStopsAtEveryStartupFailure(t *testing.T) {
 				deps.loadAccess = func(string, int64) (*server.StaticAccess, error) {
 					return nil, stageErr
 				}
-			},
-			want: stageErr,
-		},
-		"migration": {
-			environment: map[string]string{"QUEUE_CONTROL_RUN_MIGRATIONS": "true"},
-			mutate: func(deps *processDependencies) {
-				deps.migrate = func(context.Context, string) error { return stageErr }
 			},
 			want: stageErr,
 		},
@@ -484,8 +461,7 @@ func validProcessDependencies(t *testing.T) processDependencies {
 		loadAccess: func(string, int64) (*server.StaticAccess, error) {
 			return applicationAccess(t), nil
 		},
-		migrate: func(context.Context, string) error { return nil },
-		retain:  func(context.Context, string, string, int64) error { return nil },
+		retain: func(context.Context, string, string, int64) error { return nil },
 		loadWorkloads: func(string, int64) (workloadRuntime, error) {
 			return workloadRuntime{}, nil
 		},
@@ -498,7 +474,7 @@ func validProcessDependencies(t *testing.T) processDependencies {
 		openPool: func(context.Context, gopostgres.Config) (*gopostgres.Pool, error) {
 			return lazyProcessPool(t), nil
 		},
-		buildPersistence: controlpostgres.NewRuntimeWithPool,
+		buildPersistence: controlpostgres.NewRuntime,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return applicationRateLimiter{}, nil
 		},

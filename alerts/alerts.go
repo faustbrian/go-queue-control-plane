@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 const (

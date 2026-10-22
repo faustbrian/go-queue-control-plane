@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/authz"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/authz"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestHandlerListsAuthorizedFailuresAndDeadLetters(t *testing.T) {

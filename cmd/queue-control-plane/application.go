@@ -1,5 +1,6 @@
-// Package main implements the deployable administrative service and one-shot
-// migration/retention modes. LoadConfig validates trusted startup settings;
+// Package main implements the deployable administrative service and its
+// one-shot retention mode. Schema migrations belong to the deploying
+// application's runner. LoadConfig validates trusted startup settings;
 // serving composition owns listener, PostgreSQL pool and optional non-global
 // telemetry lifetime. Queue/Kubernetes providers are explicit optional adapters,
 // not worker supervisors. Serving never schedules retention or starts worker
@@ -13,11 +14,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
-	"github.com/faustbrian/go-queue-control-plane/v4/server"
-	controlui "github.com/faustbrian/go-queue-control-plane/v4/ui"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v5/server"
+	controlui "github.com/faustbrian/go-queue-control-plane/v5/ui"
 	"go.opentelemetry.io/otel/metric"
 )
 

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication/v2"
-	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
 )
 
 // BenchmarkWorkerAPIThousandWorkerMaximumPage measures in-process authenticated

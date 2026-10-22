@@ -7,8 +7,8 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 const defaultQueuePageSize uint32 = 100

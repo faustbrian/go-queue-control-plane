@@ -12,10 +12,10 @@ import (
 	"time"
 
 	identifierulid "github.com/faustbrian/go-identifier/ulid"
-	gopostgres "github.com/faustbrian/go-postgres/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -179,7 +179,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})
-	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
+	runtime, err := controlpostgres.NewRuntime(pool)
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}
@@ -443,7 +443,7 @@ func TestPostgresRetentionJobResultIntegration(t *testing.T) {
 			t.Errorf("close runtime pool: %v", err)
 		}
 	})
-	runtime, err := controlpostgres.NewRuntimeWithPool(pool)
+	runtime, err := controlpostgres.NewRuntime(pool)
 	if err != nil {
 		t.Fatalf("NewRuntime() error = %v", err)
 	}

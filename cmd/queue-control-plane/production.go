@@ -2,16 +2,15 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"net"
 	"net/http"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres/v2"
-	"github.com/faustbrian/go-queue-control-plane/v4/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
-	"github.com/faustbrian/go-queue-control-plane/v4/server"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	"github.com/faustbrian/go-queue-control-plane/v5/server"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -68,14 +67,9 @@ func productionDependencies() processDependencies {
 		routeDispatchers: func(dataPlane, workloads control.Dispatcher) (control.Dispatcher, error) {
 			return control.NewRoutingDispatcher(dataPlane, workloads)
 		},
-		migrate: func(ctx context.Context, dsn string) error {
-			return executeMigrations(ctx, dsn, sql.Open, func(database *sql.DB) (migrationApplier, error) {
-				return controlpostgres.NewMigrationRunner(database)
-			})
-		},
 		retain:           executeProductionRetention,
 		openPool:         gopostgres.Connect,
-		buildPersistence: controlpostgres.NewRuntimeWithPool,
+		buildPersistence: controlpostgres.NewRuntime,
 		buildRateLimiter: func() (apihttp.RateLimiter, error) {
 			return apihttp.NewFixedWindowRateLimiter(
 				productionRateLimit,

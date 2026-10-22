@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	gopostgres "github.com/faustbrian/go-postgres"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	"github.com/faustbrian/go-queue-control-plane/v4/history"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	gopostgres "github.com/faustbrian/go-postgres/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	"github.com/faustbrian/go-queue-control-plane/v5/history"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -39,7 +39,7 @@ func TestPostgresDisasterRecoveryIntegration(t *testing.T) {
 		t.Fatalf("restored migration result = (%d records, %v)", len(result.Records()), err)
 	}
 
-	pool, err := gopostgres.Connect(ctx, gopostgres.Config{DSN: dsn})
+	pool, err := gopostgres.Connect(ctx, controlpostgres.DatabaseTestPoolConfig(dsn))
 	if err != nil {
 		t.Fatalf("open restored runtime pool: %v", err)
 	}

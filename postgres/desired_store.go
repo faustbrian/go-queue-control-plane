@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
 	"github.com/jackc/pgx/v5"
 )
 

@@ -48,32 +48,6 @@ func TestLoadConfigAppliesProductionDefaults(t *testing.T) {
 	}
 }
 
-func TestLoadConfigAllowsMigrationOnlyWithoutAccessDocument(t *testing.T) {
-	t.Parallel()
-
-	config, err := LoadConfig(mapEnvironment(map[string]string{
-		"DATABASE_URL":                   "postgres://database/control",
-		"QUEUE_CONTROL_MIGRATE_ONLY":     "true",
-		"QUEUE_CONTROL_LISTEN_ADDRESS":   "127.0.0.1:9090",
-		"QUEUE_CONTROL_ALLOWED_ORIGINS":  "https://control.example",
-		"QUEUE_CONTROL_RUN_MIGRATIONS":   "false",
-		"QUEUE_CONTROL_ACCESS_MAX_BYTES": "2048",
-	}))
-	if err != nil {
-		t.Fatalf("LoadConfig() error = %v", err)
-	}
-	want := Config{
-		ListenAddress:      "127.0.0.1:9090",
-		DatabaseURL:        "postgres://database/control",
-		AccessDocumentSize: 2048,
-		AllowedOrigins:     []string{"https://control.example"},
-		MigrateOnly:        true,
-	}
-	if !reflect.DeepEqual(config, want) {
-		t.Fatalf("LoadConfig() = %+v, want %+v", config, want)
-	}
-}
-
 func TestLoadConfigAllowsRetentionOnlyWithoutServingConfiguration(t *testing.T) {
 	t.Parallel()
 
@@ -108,7 +82,6 @@ func TestLoadConfigParsesExplicitOptions(t *testing.T) {
 		"QUEUE_CONTROL_LISTEN_ADDRESS":               "127.0.0.1:9090",
 		"QUEUE_CONTROL_ACCESS_MAX_BYTES":             "2048",
 		"QUEUE_CONTROL_ALLOWED_ORIGINS":              "https://one.example, https://two.example",
-		"QUEUE_CONTROL_RUN_MIGRATIONS":               "true",
 		"QUEUE_CONTROL_UI_ENABLED":                   "true",
 		"QUEUE_CONTROL_KUBERNETES_TENANTS_FILE":      "/etc/control/tenants.json",
 		"QUEUE_CONTROL_KUBERNETES_TENANTS_MAX_BYTES": "4096",
@@ -131,7 +104,6 @@ func TestLoadConfigParsesExplicitOptions(t *testing.T) {
 		AccessDocumentPath:      "/run/secrets/access.json",
 		AccessDocumentSize:      2048,
 		AllowedOrigins:          []string{"https://one.example", "https://two.example"},
-		RunMigrations:           true,
 		UIEnabled:               true,
 		KubernetesTenantPath:    "/etc/control/tenants.json",
 		KubernetesTenantSize:    4096,
@@ -154,19 +126,13 @@ func TestLoadConfigRejectsMalformedBoundsAndFlags(t *testing.T) {
 	t.Parallel()
 
 	for name, values := range map[string]map[string]string{
-		"nil environment":           nil,
-		"blank address":             {"QUEUE_CONTROL_LISTEN_ADDRESS": " "},
-		"zero access bound":         {"QUEUE_CONTROL_ACCESS_MAX_BYTES": "0"},
-		"oversized access bound":    {"QUEUE_CONTROL_ACCESS_MAX_BYTES": "1048577"},
-		"invalid access bound":      {"QUEUE_CONTROL_ACCESS_MAX_BYTES": "many"},
-		"invalid migration flag":    {"QUEUE_CONTROL_RUN_MIGRATIONS": "sometimes"},
-		"invalid UI flag":           {"QUEUE_CONTROL_UI_ENABLED": "sometimes"},
-		"invalid migrate-only flag": {"QUEUE_CONTROL_MIGRATE_ONLY": "sometimes"},
-		"invalid retention flag":    {"QUEUE_CONTROL_RETENTION_ONLY": "sometimes"},
-		"conflicting one-shot modes": {
-			"QUEUE_CONTROL_MIGRATE_ONLY":   "true",
-			"QUEUE_CONTROL_RETENTION_ONLY": "true",
-		},
+		"nil environment":        nil,
+		"blank address":          {"QUEUE_CONTROL_LISTEN_ADDRESS": " "},
+		"zero access bound":      {"QUEUE_CONTROL_ACCESS_MAX_BYTES": "0"},
+		"oversized access bound": {"QUEUE_CONTROL_ACCESS_MAX_BYTES": "1048577"},
+		"invalid access bound":   {"QUEUE_CONTROL_ACCESS_MAX_BYTES": "many"},
+		"invalid UI flag":        {"QUEUE_CONTROL_UI_ENABLED": "sometimes"},
+		"invalid retention flag": {"QUEUE_CONTROL_RETENTION_ONLY": "sometimes"},
 		"retention without file": {"QUEUE_CONTROL_RETENTION_ONLY": "true"},
 		"retention file without mode": {
 			"QUEUE_CONTROL_RETENTION_FILE": "/etc/control/retention.json",
@@ -176,11 +142,6 @@ func TestLoadConfigRejectsMalformedBoundsAndFlags(t *testing.T) {
 			"QUEUE_CONTROL_RETENTION_ONLY":      "true",
 			"QUEUE_CONTROL_RETENTION_FILE":      "/etc/control/retention.json",
 			"QUEUE_CONTROL_RETENTION_MAX_BYTES": "many",
-		},
-		"retention with migrations": {
-			"QUEUE_CONTROL_RETENTION_ONLY": "true",
-			"QUEUE_CONTROL_RETENTION_FILE": "/etc/control/retention.json",
-			"QUEUE_CONTROL_RUN_MIGRATIONS": "true",
 		},
 		"retention with telemetry": {
 			"QUEUE_CONTROL_RETENTION_ONLY":    "true",

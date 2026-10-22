@@ -17,12 +17,26 @@ Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs
 follow [`DEPRECATION.md`](DEPRECATION.md).
 
-## Queue control plane v4 migration on main
+## Queue control plane v5 migration
 
-Current main selects `github.com/faustbrian/go-queue-control-plane/v4`.
-V4 is a candidate until tagged and published; confirm release availability
-before adopting it. Move all control-plane imports together to `/v4`.
-Published v3 remains unchanged and is a distinct nominal Go API.
+Current main selects `github.com/faustbrian/go-queue-control-plane/v5`. Move all
+control-plane imports together to `/v5`; published v4 remains a distinct
+nominal Go API.
+
+V5 adopts Queue v2, PostgreSQL v3, Migrations v4 and Telemetry v4.
+`postgres.NewRuntime` is the single persistence constructor and takes a
+`*github.com/faustbrian/go-postgres/v3.Pool`; `NewRuntimeWithPool` and the v1
+pool path are removed. `postgres.MigrationSource` returns a
+`go-migrations/v4.Source` with unchanged SQL, versions, names and checksums;
+`postgres.NewMigrationRunner` is removed, and the server no longer migrates.
+Apply the source through the deploying application's runner. Setting the
+removed `QUEUE_CONTROL_MIGRATE_ONLY` or `QUEUE_CONTROL_RUN_MIGRATIONS`
+variable now stops startup with exit status 1. The HTTP instrumentation scope
+is `github.com/faustbrian/go-telemetry/v4/instrumentation/nethttp`.
+
+## Queue control plane v4 migration
+
+V4 moved all control-plane imports to `/v4`.
 
 Registry capacity refusals still contribute to the exact global count. Tenant
 rejection detail is now retained only for tenants with successfully registered

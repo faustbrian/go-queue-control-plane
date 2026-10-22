@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v4/fleet"
-	queue "github.com/faustbrian/go-queue/management"
-	"github.com/faustbrian/go-queue/managementhttp"
+	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	queue "github.com/faustbrian/go-queue/v2/management"
+	"github.com/faustbrian/go-queue/v2/managementhttp"
 )
 
 func TestRollingGoQueueHTTPCompatibilityIntegration(t *testing.T) {

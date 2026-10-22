@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	queue "github.com/faustbrian/go-queue/management"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
 func TestManagementRuntimeDispatchesTenantCommandsThroughRemoteClient(t *testing.T) {

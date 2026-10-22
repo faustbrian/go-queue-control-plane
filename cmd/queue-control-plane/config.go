@@ -28,15 +28,9 @@ type Config struct {
 	// AllowedOrigins contains trimmed configured browser origins; transport
 	// construction validates exact HTTP(S) origins.
 	AllowedOrigins []string
-	// RunMigrations opts into schema migration before serving; retention-only
-	// mode refuses it.
-	RunMigrations bool
 	// UIEnabled opts into embedded console routes and is refused in
-	// migration/retention-only modes.
+	// retention-only mode.
 	UIEnabled bool
-	// MigrateOnly selects one migration invocation without HTTP startup;
-	// mutually exclusive with RetentionOnly.
-	MigrateOnly bool
 	// RetentionOnly selects one bounded-batch retention plan without HTTP or
 	// telemetry startup.
 	RetentionOnly bool
@@ -106,12 +100,11 @@ func LoadConfig(getenv func(string) string) (Config, error) {
 	if config.DatabaseURL == "" {
 		return Config{}, ErrInvalidRuntimeConfiguration
 	}
-	if encoded := getenv("QUEUE_CONTROL_MIGRATE_ONLY"); encoded != "" {
-		value, err := strconv.ParseBool(encoded)
-		if err != nil {
-			return Config{}, ErrInvalidRuntimeConfiguration
-		}
-		config.MigrateOnly = value
+	// The process no longer applies schema migrations; the deploying
+	// application's runner owns them. Any leftover setting fails startup so a
+	// deployment cannot silently serve against an unmigrated schema.
+	if getenv("QUEUE_CONTROL_MIGRATE_ONLY") != "" || getenv("QUEUE_CONTROL_RUN_MIGRATIONS") != "" {
+		return Config{}, ErrInvalidRuntimeConfiguration
 	}
 	if encoded := getenv("QUEUE_CONTROL_RETENTION_ONLY"); encoded != "" {
 		value, err := strconv.ParseBool(encoded)
@@ -120,15 +113,12 @@ func LoadConfig(getenv func(string) string) (Config, error) {
 		}
 		config.RetentionOnly = value
 	}
-	if config.MigrateOnly && config.RetentionOnly {
-		return Config{}, ErrInvalidRuntimeConfiguration
-	}
 	uiEnabled, ok := parseOptionalBool(getenv("QUEUE_CONTROL_UI_ENABLED"))
-	if !ok || (uiEnabled && (config.MigrateOnly || config.RetentionOnly)) {
+	if !ok || (uiEnabled && config.RetentionOnly) {
 		return Config{}, ErrInvalidRuntimeConfiguration
 	}
 	config.UIEnabled = uiEnabled
-	if !config.MigrateOnly && !config.RetentionOnly && config.AccessDocumentPath == "" {
+	if !config.RetentionOnly && config.AccessDocumentPath == "" {
 		return Config{}, ErrInvalidRuntimeConfiguration
 	}
 
@@ -150,18 +140,11 @@ func LoadConfig(getenv func(string) string) (Config, error) {
 		config.AccessDocumentSize = value
 	}
 
-	if encoded := getenv("QUEUE_CONTROL_RUN_MIGRATIONS"); encoded != "" {
-		value, err := strconv.ParseBool(encoded)
-		if err != nil {
-			return Config{}, ErrInvalidRuntimeConfiguration
-		}
-		config.RunMigrations = value
-	}
 	retentionPath := getenv("QUEUE_CONTROL_RETENTION_FILE")
 	retentionSize := getenv("QUEUE_CONTROL_RETENTION_MAX_BYTES")
 	if config.RetentionOnly {
 		config.RetentionDocumentPath = strings.TrimSpace(retentionPath)
-		if config.RetentionDocumentPath == "" || config.RunMigrations {
+		if config.RetentionDocumentPath == "" {
 			return Config{}, ErrInvalidRuntimeConfiguration
 		}
 		config.RetentionDocumentSize = defaultAccessDocumentSize

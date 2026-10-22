@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
 )
 
 func TestNewScaleDispatcherRequiresResolver(t *testing.T) {

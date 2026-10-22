@@ -13,10 +13,10 @@ import (
 	"time"
 
 	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v4"
-	"github.com/faustbrian/go-queue-control-plane/v4/authz"
-	"github.com/faustbrian/go-queue-control-plane/v4/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v4/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	"github.com/faustbrian/go-queue-control-plane/v5/authz"
+	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
@@ -106,6 +106,12 @@ func TestHandlerUsesBoundedGoTelemetryInstrumentation(t *testing.T) {
 	}
 	if len(data.ScopeMetrics) != 1 {
 		t.Fatalf("metric scopes = %+v, want one bounded HTTP server scope", data.ScopeMetrics)
+	}
+	// Dashboards select on this scope; it follows the telemetry module major.
+	const scope = "github.com/faustbrian/go-telemetry/v4/instrumentation/nethttp"
+	if data.ScopeMetrics[0].Scope.Name != scope || finished[0].InstrumentationScope.Name != scope {
+		t.Fatalf("instrumentation scopes = %q, %q, want %q",
+			data.ScopeMetrics[0].Scope.Name, finished[0].InstrumentationScope.Name, scope)
 	}
 	wantMetrics := map[string]bool{
 		"http.server.active_requests":    true,
