@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -103,8 +104,11 @@ func LoadConfig(getenv func(string) string) (Config, error) {
 	// The process no longer applies schema migrations; the deploying
 	// application's runner owns them. Any leftover setting fails startup so a
 	// deployment cannot silently serve against an unmigrated schema.
-	if getenv("QUEUE_CONTROL_MIGRATE_ONLY") != "" || getenv("QUEUE_CONTROL_RUN_MIGRATIONS") != "" {
-		return Config{}, ErrInvalidRuntimeConfiguration
+	for _, removed := range []string{"QUEUE_CONTROL_MIGRATE_ONLY", "QUEUE_CONTROL_RUN_MIGRATIONS"} {
+		if getenv(removed) != "" {
+			// Only the variable name is reported; its value is never echoed.
+			return Config{}, fmt.Errorf("%w: %s was removed in v5", ErrInvalidRuntimeConfiguration, removed)
+		}
 	}
 	if encoded := getenv("QUEUE_CONTROL_RETENTION_ONLY"); encoded != "" {
 		value, err := strconv.ParseBool(encoded)

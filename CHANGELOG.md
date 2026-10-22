@@ -19,12 +19,15 @@ Versioning.
 
 ### Removed
 
-- Remove `postgres.NewRuntimeWithPool`, the PostgreSQL v1 pool path and
-  `postgres.NewMigrationRunner`.
+- Remove `postgres.NewRuntimeWithPool`, the PostgreSQL v1 pool path,
+  `postgres.NewMigrationRunner` and `postgres.ErrInvalidMigrationDatabase`.
+  Callers building the go-postgres v3 pool for `NewRuntime` supply their own
+  `ResolveDSN` and select `StartupPing` when they need a startup check.
 - Remove the server's migrate-only and migrate-at-startup modes. Apply
   `postgres.MigrationSource()` through the deploying application's runner.
   Setting `QUEUE_CONTROL_MIGRATE_ONLY` or `QUEUE_CONTROL_RUN_MIGRATIONS` now
-  stops startup with exit status 1.
+  stops startup with exit status 1. Databases migrated by earlier servers
+  need the go-migrations [ledger name upgrade](https://github.com/faustbrian/go-migrations/blob/v4.0.0/docs/operations.md#ledger-name-upgrade) before the first v4 run.
 
 ## 4.0.1 - 2026-10-22
 

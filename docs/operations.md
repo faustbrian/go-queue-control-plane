@@ -129,7 +129,7 @@ quality run this drill without reusing a database from another job.
 
 Roll out database-compatible server revisions gradually. Run migrations under
 a single owner, verify readiness, version, and capabilities, then add replicas.
-The current schema has eight embedded forward migrations; downgrade automation
+The current schema has nine embedded forward migrations; downgrade automation
 is not provided.
 
 Workers continue normal queue processing without the control plane. During a

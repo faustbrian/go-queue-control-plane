@@ -30,61 +30,18 @@ also consume durable desired state through the typed client. See
 
 ## Install
 
-Main now selects the candidate `/v4` module for bounded rejection detail and
-explicit known-state reporting. V4 is not published by this source change;
-see the [v4 migration guide](COMPATIBILITY.md#queue-control-plane-v4-migration-on-main)
-and confirm release availability before adoption. The commands below retain
-existing published v3 choices.
-
-Published v3.0.0 uses root v3 with Authentication v2. The commands below pin
-that release and retain the supported historical v1 and v2 choices. See the
-[v3 migration guide](COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
-for the coherent nominal import migration and finite authentication admission.
-Published v3.1.1 also includes PostgreSQL v2 pool integration. Select
-that release or a later compatible v3 maintenance release when adopting
-the pool integration; the v3.0.0 pins below do not include it.
-
-Use the official major suffix for published v3.0.0:
+The current major is `/v5`. It adopts Queue v2, PostgreSQL v3, Migrations v4
+and Telemetry v4 and no longer applies schema migrations itself; see the
+[v5 migration guide](COMPATIBILITY.md#queue-control-plane-v5-migration):
 
 ```sh
-go get github.com/faustbrian/go-queue-control-plane/v3@v3.0.0
-go install github.com/faustbrian/go-queue-control-plane/v3/cmd/queue-control-plane@v3.0.0
-go install github.com/faustbrian/go-queue-control-plane/v3/cmd/queue-control@v3.0.0
+go get github.com/faustbrian/go-queue-control-plane/v5@v5.0.0
+go install github.com/faustbrian/go-queue-control-plane/v5/cmd/queue-control-plane@v5.0.0
+go install github.com/faustbrian/go-queue-control-plane/v5/cmd/queue-control@v5.0.0
 ```
 
-The published v1 line remains available. Add that module to an application with:
-
-```sh
-go get github.com/faustbrian/go-queue-control-plane@latest
-```
-
-Install the server and administrative CLI for local evaluation with:
-
-```sh
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@latest
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@latest
-```
-
-Pin the published `v1.1.2` release exactly with:
-
-```sh
-go get github.com/faustbrian/go-queue-control-plane@v1.1.2
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control-plane@v1.1.2
-go install github.com/faustbrian/go-queue-control-plane/cmd/queue-control@v1.1.2
-```
-
-The supported security-related `v2.0.1` release is published. Use the official
-major suffix:
-
-```sh
-go get github.com/faustbrian/go-queue-control-plane/v2@v2.0.1
-go install github.com/faustbrian/go-queue-control-plane/v2/cmd/queue-control-plane@v2.0.1
-go install github.com/faustbrian/go-queue-control-plane/v2/cmd/queue-control@v2.0.1
-```
-
-The public migration helpers now compose Migrations v2 types. See the
-[v2 migration guide](COMPATIBILITY.md#queue-control-plane-v2-migration) for the
-nominal API change and unchanged schema history. The Go floor remains 1.27.0.
+Earlier majors remain published at their own module paths; the
+[security policy](SECURITY.md) lists the supported lines.
 
 The Go-installed server does not carry the release pipeline's commit and build
 time metadata, so its `/version` response uses the development build identity.
@@ -118,8 +75,17 @@ Create `/tmp/queue-control-access.json` outside version control:
 }
 ```
 
-Apply the embedded schema from `postgres.MigrationSource()` with your
-application's go-migrations v4 runner, then start the API:
+Apply the embedded schema with a go-migrations v4 runner owned by your
+application, for example:
+
+```go
+source, _ := controlpostgres.MigrationSource()
+backend, _ := migrationpostgres.New(database) // go-migrations/v4/postgres
+runner, _ := migrations.NewRunner(source, backend)
+_, err := runner.Up(ctx)
+```
+
+Then start the API:
 
 ```sh
 export DATABASE_URL='postgres://user:password@localhost/control_plane?sslmode=disable'

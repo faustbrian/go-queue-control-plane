@@ -31,7 +31,10 @@ pool path are removed. `postgres.MigrationSource` returns a
 `postgres.NewMigrationRunner` is removed, and the server no longer migrates.
 Apply the source through the deploying application's runner. Setting the
 removed `QUEUE_CONTROL_MIGRATE_ONLY` or `QUEUE_CONTROL_RUN_MIGRATIONS`
-variable now stops startup with exit status 1. The HTTP instrumentation scope
+variable now stops startup with exit status 1. Databases migrated by earlier
+servers keep their history in go-migrations v2's `public.go_schema_migrations`;
+stop all earlier servers and complete the
+[ledger name upgrade](https://github.com/faustbrian/go-migrations/blob/v4.0.0/docs/operations.md#ledger-name-upgrade) before the first v4 run. The HTTP instrumentation scope
 is `github.com/faustbrian/go-telemetry/v4/instrumentation/nethttp`.
 
 ## Queue control plane v4 migration

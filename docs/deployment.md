@@ -39,9 +39,9 @@ path, query, or fragment. When no origins are configured, requests carrying an
 `Origin` header are rejected. Non-browser clients without an `Origin` header
 are unaffected.
 
-The optional UI is served only when `QUEUE_CONTROL_UI_ENABLED=true`; one-shot
-migration and retention modes reject that setting because they never open an
-HTTP listener. The console uses same-origin public API requests and does not
+The optional UI is served only when `QUEUE_CONTROL_UI_ENABLED=true`; the
+one-shot retention mode rejects that setting because it never opens an HTTP
+listener. The console uses same-origin public API requests and does not
 add private endpoints. See the [web UI guide](ui.md) for its operator model.
 
 ## Telemetry export
@@ -131,6 +131,14 @@ starting serving instances. The process refuses to start, with exit status 1
 and before opening a pool or listener, when the removed
 `QUEUE_CONTROL_MIGRATE_ONLY` or `QUEUE_CONTROL_RUN_MIGRATIONS` variable is set
 to any value.
+
+Databases migrated by v4 or earlier servers record their history in
+go-migrations v2's `public.go_schema_migrations` ledger, which the v4 runner
+does not read. Before the first v4 run, stop every v4 server and migrate-only
+Job, then complete the go-migrations
+[ledger name upgrade](https://github.com/faustbrian/go-migrations/blob/v4.0.0/docs/operations.md#ledger-name-upgrade) so the existing nine versions and their checksums
+are found in `public.migrations`. Running the v4 runner against an unaligned
+database fails at the first migration because its tables already exist.
 
 ## Audit retention Job
 

@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -76,6 +77,9 @@ func TestRunProcessRejectsRemovedMigrationSettingsBeforeDependencies(t *testing.
 				}), dependencies)
 				if !errors.Is(err, ErrInvalidRuntimeConfiguration) || touched {
 					t.Fatalf("runProcess() = %v, dependency touched = %t", err, touched)
+				}
+				if !strings.Contains(err.Error(), name) || strings.Contains(err.Error(), "=") {
+					t.Fatalf("error = %q, want the removed variable name without its value", err)
 				}
 			})
 		}

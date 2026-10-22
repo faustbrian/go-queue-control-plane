@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	migrations "github.com/faustbrian/go-migrations/v4"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func TestMigrationSourceLoadsTenantScopedControlSchema(t *testing.T) {

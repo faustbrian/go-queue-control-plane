@@ -12,7 +12,6 @@ import (
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
 	"github.com/faustbrian/go-queue-control-plane/v5/server"
 	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 const (

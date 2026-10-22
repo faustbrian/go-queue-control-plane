@@ -20,7 +20,7 @@ api:
   baselines:
     - module: .
       mode: apidiff
-      path: api/control-plane-v4.api
+      path: api/control-plane-v5.api
 
 operations:
   - module: .

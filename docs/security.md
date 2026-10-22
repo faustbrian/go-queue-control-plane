@@ -55,16 +55,12 @@ the file-access implementation changes.
 
 ## Migration session and source boundary
 
-On current main, the public PostgreSQL migration helpers use Migrations v2.
-Uncertain advisory-lock acquisition or release discards the physical database
-session instead of returning it to a retained caller pool. Healthy sessions
-remain reusable. Default migration error formatting redacts private driver
-data; applications must not deliberately extract and expose private causes.
-The public helper leaves the pool caller-owned, whereas the CLI closes the
-pool it opens. Lock attempts retain a 30-second budget and statements a
-five-minute budget; the producer also applies finite operation and cleanup
-deadlines. Context cancellation is not evidence that SQL was rolled back:
-inspect the migration ledger and database before retrying an uncertain result.
+The server and its public helpers no longer execute migrations. The deploying
+application applies `postgres.MigrationSource()` with its own runner and owns
+that runner's advisory lock, lock and statement budgets, session handling and
+error redaction. Context cancellation is not evidence that SQL was rolled
+back: inspect the migration ledger and database before retrying an uncertain
+result.
 
 | Residual | Owner | Rationale | Mitigation | Review trigger |
 | --- | --- | --- | --- | --- |
