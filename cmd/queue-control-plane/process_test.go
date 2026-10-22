@@ -48,40 +48,71 @@ func TestRunProcessRejectsConfigurationBeforeDependencies(t *testing.T) {
 func TestRunProcessRejectsRemovedMigrationSettingsBeforeDependencies(t *testing.T) {
 	t.Parallel()
 
-	for _, name := range []string{"QUEUE_CONTROL_MIGRATE_ONLY", "QUEUE_CONTROL_RUN_MIGRATIONS"} {
-		for _, value := range []string{"true", "false", "1"} {
-			t.Run(name+"="+value, func(t *testing.T) {
-				t.Parallel()
+	modes := map[string]map[string]string{
+		"serving": {
+			"DATABASE_URL":              "postgres://database/control",
+			"QUEUE_CONTROL_ACCESS_FILE": "/run/secrets/access.json",
+		},
+		// The former migrate Job carried only the database URL.
+		"former migrate job": {"DATABASE_URL": "postgres://database/control"},
+		"retention": {
+			"DATABASE_URL":                 "postgres://database/control",
+			"QUEUE_CONTROL_RETENTION_ONLY": "true",
+			"QUEUE_CONTROL_RETENTION_FILE": "/etc/control/retention.json",
+		},
+	}
+	for mode, base := range modes {
+		for _, name := range []string{"QUEUE_CONTROL_MIGRATE_ONLY", "QUEUE_CONTROL_RUN_MIGRATIONS"} {
+			for _, value := range []string{"true", "false", "1"} {
+				t.Run(mode+"/"+name+"="+value, func(t *testing.T) {
+					t.Parallel()
 
-				touched := false
-				dependencies := validProcessDependencies(t)
-				dependencies.loadAccess = func(string, int64) (*server.StaticAccess, error) {
-					touched = true
+					var touched []string
+					touch := func(dependency string) { touched = append(touched, dependency) }
+					dependencies := validProcessDependencies(t)
+					dependencies.buildInfo = func() (apihttp.BuildInfo, error) {
+						touch("buildInfo")
 
-					return applicationAccess(t), nil
-				}
-				dependencies.openPool = func(context.Context, gopostgres.Config) (*gopostgres.Pool, error) {
-					touched = true
+						return apihttp.BuildInfo{}, nil
+					}
+					dependencies.buildTelemetry = func(context.Context, Config, apihttp.BuildInfo) (processTelemetry, error) {
+						touch("buildTelemetry")
 
-					return lazyProcessPool(t), nil
-				}
-				dependencies.listen = func(string, string) (net.Listener, error) {
-					touched = true
+						return nil, nil
+					}
+					dependencies.loadAccess = func(string, int64) (*server.StaticAccess, error) {
+						touch("loadAccess")
 
-					return &processListener{}, nil
-				}
-				err := runProcess(context.Background(), mapEnvironment(map[string]string{
-					"DATABASE_URL":              "postgres://database/control",
-					"QUEUE_CONTROL_ACCESS_FILE": "/run/secrets/access.json",
-					name:                        value,
-				}), dependencies)
-				if !errors.Is(err, ErrInvalidRuntimeConfiguration) || touched {
-					t.Fatalf("runProcess() = %v, dependency touched = %t", err, touched)
-				}
-				if !strings.Contains(err.Error(), name) || strings.Contains(err.Error(), value) {
-					t.Fatalf("error = %q, want the removed variable name without its value", err)
-				}
-			})
+						return applicationAccess(t), nil
+					}
+					dependencies.retain = func(context.Context, string, string, int64) error {
+						touch("retain")
+
+						return nil
+					}
+					dependencies.openPool = func(context.Context, gopostgres.Config) (*gopostgres.Pool, error) {
+						touch("openPool")
+
+						return lazyProcessPool(t), nil
+					}
+					dependencies.listen = func(string, string) (net.Listener, error) {
+						touch("listen")
+
+						return &processListener{}, nil
+					}
+					environment := map[string]string{name: value}
+					for key, setting := range base {
+						environment[key] = setting
+					}
+					err := runProcess(context.Background(), mapEnvironment(environment), dependencies)
+					if !errors.Is(err, ErrInvalidRuntimeConfiguration) || len(touched) != 0 {
+						t.Fatalf("runProcess() = %v, dependencies touched = %v", err, touched)
+					}
+					if !strings.Contains(err.Error(), name) || strings.Contains(err.Error(), value) {
+						t.Fatalf("error = %q, want the removed variable name without its value", err)
+					}
+				})
+			}
 		}
 	}
 }
