@@ -4,25 +4,14 @@
 
 ## Version and source applicability
 
-This model describes the published root `v2.0.1` contract and explicitly
-identified v3 changes in current source.
-The immutable release source is
-[`6da9d0a2`](https://github.com/faustbrian/go-queue-control-plane/tree/v2.0.1).
-This patch adopts Queue v1.1.2's management HTTP redirect protection without
-changing caller-owned clients or the Migrations v2 nominal integration.
-Common deployment responsibilities also apply to supported v1.1 deployments,
-but the Migrations v2 session and default-error protections below do not apply
-to published v1 helpers. See the [supported-version policy](../SECURITY.md)
-and [migration guidance](../COMPATIBILITY.md#queue-control-plane-v2-migration).
+This model describes the current `/v5` source, which composes Authentication
+v2, Queue v2, PostgreSQL v3, Migrations v4 and Telemetry v4 and leaves schema
+migration to the deploying application. Published earlier majors keep their
+own models at their release tags; see the
+[supported-version policy](../SECURITY.md) and the
+[v5 migration guide](../COMPATIBILITY.md#queue-control-plane-v5-migration).
 This model does not certify a deployment, caller-supplied collaborator, or
 unpublished change merely because it is on main.
-
-Current v3 source composes Authentication v2 nominal types and Queue v1.1.3.
-Authentication v2.0.0 is published. Confirm QCP v3 availability in
-[Releases](https://github.com/faustbrian/go-queue-control-plane/releases);
-main source alone does not establish release qualification. The
-[v3 migration guide](../COMPATIBILITY.md#queue-control-plane-v3-migration-on-main)
-describes adoption without implying release qualification or deployment.
 
 ## Threat model
 

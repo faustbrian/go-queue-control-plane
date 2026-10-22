@@ -79,10 +79,23 @@ Apply the embedded schema with a go-migrations v4 runner owned by your
 application, for example:
 
 ```go
-source, _ := controlpostgres.MigrationSource()
-backend, _ := migrationpostgres.New(database) // go-migrations/v4/postgres
-runner, _ := migrations.NewRunner(source, backend)
-_, err := runner.Up(ctx)
+// database is a *sql.DB opened with sql.Open("pgx", dsn) after importing
+// github.com/jackc/pgx/v5/stdlib.
+source, err := controlpostgres.MigrationSource()
+if err != nil {
+	return err
+}
+backend, err := migrationpostgres.New(database) // go-migrations/v4/postgres
+if err != nil {
+	return err
+}
+runner, err := migrations.NewRunner(source, backend)
+if err != nil {
+	return err
+}
+if _, err := runner.Up(ctx); err != nil {
+	return err
+}
 ```
 
 Then start the API:

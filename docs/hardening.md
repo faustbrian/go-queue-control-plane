@@ -153,9 +153,10 @@ export those operations.
 
 ## Unsupported upstream capabilities
 
-The published v4 capability-limited contract supports only the operations in
-the real backend matrix above. The following extensions are explicitly
-unsupported at the pinned `queue` v1.1.3 revision; they are pending scope of
+The v5 capability-limited contract supports only the operations in the real
+backend matrix above. The following extensions are explicitly unsupported at
+the pinned `queue` v2.0.0 release, whose management contract carries the same
+commands and capabilities as v1.1.3; they are pending scope of
 the broader dead-letter goal, not release blockers for that supported contract.
 The control plane does not simulate missing data-plane guarantees:
 
