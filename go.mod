@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/alicebob/miniredis/v2 v2.39.0
-	github.com/faustbrian/go-authentication/v2 v2.0.0
+	github.com/faustbrian/go-authentication/v2 v2.1.0
 	github.com/faustbrian/go-authorization v1.1.0
 	github.com/faustbrian/go-identifier v1.0.0
 	github.com/faustbrian/go-migrations/v4 v4.0.0
@@ -29,7 +29,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
-	github.com/faustbrian/go-clock v1.1.0 // indirect
+	github.com/faustbrian/go-clock v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
