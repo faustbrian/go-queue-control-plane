@@ -87,8 +87,8 @@ type DispatchOutcome struct {
 	// CapabilityAvailable optionally reports negotiated capability
 	// availability; nil means unspecified.
 	CapabilityAvailable *bool
-	// CompletedAt is the backend completion time and must not precede
-	// RequestedAt.
+	// CompletedAt is the backend completion time and must not precede the
+	// service's dispatch boundary, which follows RequestedAt.
 	CompletedAt time.Time
 }
 
@@ -279,7 +279,7 @@ func (s *Service) Execute(
 		result.Status = controlplane.CommandFailed
 		result.Failure = controlplane.FailureDispatch
 		outcome = "dispatch_failed"
-	} else if !validDispatchOutcome(command, report) {
+	} else if !validDispatchOutcome(command, dispatchedAt, report) {
 		result.Status = controlplane.CommandUnknown
 		result.Failure = controlplane.FailureInvalidDispatchResult
 		outcome = "unknown"
@@ -320,7 +320,7 @@ func (s *Service) Execute(
 	return result, nil
 }
 
-func validDispatchOutcome(command controlplane.Command, outcome DispatchOutcome) bool {
+func validDispatchOutcome(command controlplane.Command, dispatchedAt time.Time, outcome DispatchOutcome) bool {
 	switch outcome.Status {
 	case controlplane.CommandSucceeded,
 		controlplane.CommandFailed,
@@ -335,6 +335,9 @@ func validDispatchOutcome(command controlplane.Command, outcome DispatchOutcome)
 		return false
 	}
 
+	// Validate the result as the journal will record it, so a completion
+	// reported before the dispatch boundary is rejected here rather than
+	// leaving the command stuck at dispatched.
 	return (controlplane.CommandResult{
 		CommandID:           command.CommandID,
 		IdempotencyKey:      command.IdempotencyKey,
@@ -344,6 +347,8 @@ func validDispatchOutcome(command controlplane.Command, outcome DispatchOutcome)
 		WorkerID:            outcome.WorkerID,
 		Protocol:            outcome.Protocol,
 		CapabilityAvailable: outcome.CapabilityAvailable,
+		DispatchedAt:        dispatchedAt,
+		AcknowledgedAt:      outcome.CompletedAt,
 		CompletedAt:         outcome.CompletedAt,
 	}).Validate() == nil
 }

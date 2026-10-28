@@ -563,8 +563,8 @@ type processListener struct{}
 
 type managementProcessDispatcher struct{}
 
-func (managementProcessDispatcher) DispatchResult(_ context.Context, command controlplane.Command) (control.DispatchOutcome, error) {
-	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: command.RequestedAt}, nil
+func (managementProcessDispatcher) DispatchResult(context.Context, controlplane.Command) (control.DispatchOutcome, error) {
+	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: time.Now()}, nil
 }
 
 func (*processListener) Accept() (net.Conn, error) { return nil, errors.New("not used") }

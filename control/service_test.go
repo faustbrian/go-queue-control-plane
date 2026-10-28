@@ -693,7 +693,7 @@ func TestValidDispatchOutcomeRejectsStatusesThatAreNotDispatchOutcomes(t *testin
 			Status:      status,
 			CompletedAt: command.RequestedAt.Add(time.Second),
 		}
-		if validDispatchOutcome(command, outcome) {
+		if validDispatchOutcome(command, command.RequestedAt, outcome) {
 			t.Fatalf("validDispatchOutcome(%q) = true, want false", status)
 		}
 	}
@@ -741,7 +741,7 @@ func TestServiceExecutePersistsStructuredDataPlaneOutcomes(t *testing.T) {
 
 			journal := &journalStub{created: true}
 			dispatcher := &resultDispatcherStub{outcome: outcome}
-			service := NewService(&authorizerStub{}, journal, dispatcher, time.Now)
+			service := NewService(&authorizerStub{}, journal, dispatcher, func() time.Time { return command.RequestedAt })
 			result, err := service.Execute(context.Background(), command)
 			if err != nil {
 				t.Fatalf("Execute() error = %v", err)
@@ -959,8 +959,33 @@ func (s *dispatcherStub) DispatchResult(_ context.Context, command controlplane.
 
 	completedAt := s.completedAt
 	if completedAt.IsZero() {
-		completedAt = command.RequestedAt
+		completedAt = time.Now()
 	}
 
 	return DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: completedAt}, nil
+}
+
+// A completion reported before the dispatch boundary would be rejected by the
+// journal; the service records it as an invalid result instead of leaving the
+// command dispatched.
+func TestServiceRejectsCompletionBeforeDispatch(t *testing.T) {
+	t.Parallel()
+
+	command := validCommand()
+	dispatchedAt := command.RequestedAt.Add(time.Minute)
+	journal := &journalStub{created: true}
+	dispatcher := &dispatcherStub{completedAt: command.RequestedAt.Add(time.Second)}
+	service := NewService(&authorizerStub{}, journal, dispatcher, func() time.Time { return dispatchedAt })
+
+	result, err := service.Execute(context.Background(), command)
+	if err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if result.Status != controlplane.CommandUnknown || result.Failure != controlplane.FailureInvalidDispatchResult {
+		t.Fatalf("Execute() = %+v, want unknown invalid dispatch result", result)
+	}
+	if journal.acknowledgeCalls != 0 || journal.completeCalls != 1 ||
+		journal.completed.Status != controlplane.CommandUnknown || journal.completed.CompletedAt.Before(dispatchedAt) {
+		t.Fatalf("journal = acknowledged %d, completed %d %+v", journal.acknowledgeCalls, journal.completeCalls, journal.completed)
+	}
 }

@@ -548,7 +548,7 @@ func TestBuildApplicationUsesSuppliedClock(t *testing.T) {
 		t.Fatalf("LoadStaticAccess() error = %v", err)
 	}
 	handler, err := buildApplication(Config{}, applicationDependencies{
-		Access: access, Journal: journal, Dispatcher: applicationDispatcher{},
+		Access: access, Journal: journal, Dispatcher: applicationDispatcher{completedAt: now.Add(time.Second)},
 		RateLimiter: applicationRateLimiter{}, Now: func() time.Time { return now },
 	})
 	if err != nil || handler == nil {
@@ -567,8 +567,8 @@ func TestBuildApplicationUsesSuppliedClock(t *testing.T) {
 		t.Fatalf("command status = %d, body = %s", response.Code, response.Body.String())
 	}
 	// The supplied clock stamps dispatch; completion is the dispatcher's own
-	// acknowledgement time, which applicationDispatcher reports as requested_at.
-	reported := time.Unix(60, 0).UTC()
+	// acknowledgement time.
+	reported := now.Add(time.Second)
 	if !journal.dispatched.DispatchedAt.Equal(now) || !journal.completed.CompletedAt.Equal(reported) {
 		t.Fatalf("journal timestamps = dispatched %v, completed %v, want %v and %v",
 			journal.dispatched.DispatchedAt, journal.completed.CompletedAt, now, reported)

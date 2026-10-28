@@ -236,10 +236,15 @@ func (*applicationJournal) MarkAcknowledged(context.Context, controlplane.Comman
 	return nil
 }
 
-type applicationDispatcher struct{}
+type applicationDispatcher struct{ completedAt time.Time }
 
-func (applicationDispatcher) DispatchResult(_ context.Context, command controlplane.Command) (control.DispatchOutcome, error) {
-	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: command.RequestedAt}, nil
+func (dispatcher applicationDispatcher) DispatchResult(context.Context, controlplane.Command) (control.DispatchOutcome, error) {
+	completedAt := dispatcher.completedAt
+	if completedAt.IsZero() {
+		completedAt = time.Now()
+	}
+
+	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: completedAt}, nil
 }
 
 type applicationRateLimiter struct{}
