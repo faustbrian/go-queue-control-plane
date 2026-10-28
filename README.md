@@ -35,9 +35,9 @@ Telemetry v4 cohort; see the
 [v6 migration guide](COMPATIBILITY.md#queue-control-plane-v6-migration):
 
 ```sh
-go get github.com/faustbrian/go-queue-control-plane/v6@v6.0.0
-go install github.com/faustbrian/go-queue-control-plane/v6/cmd/queue-control-plane@v6.0.0
-go install github.com/faustbrian/go-queue-control-plane/v6/cmd/queue-control@v6.0.0
+go get github.com/faustbrian/go-queue-control-plane/v6@v6.0.1
+go install github.com/faustbrian/go-queue-control-plane/v6/cmd/queue-control-plane@v6.0.1
+go install github.com/faustbrian/go-queue-control-plane/v6/cmd/queue-control@v6.0.1
 ```
 
 Earlier majors remain published at their own module paths but receive no

@@ -62,6 +62,9 @@ type WorkerSource interface {
 type RemoteWorkerSource interface {
 	// SnapshotTenant honors ctx and returns an independently owned bounded
 	// tenant snapshot; errors must not masquerade as an empty healthy fleet.
+	// The handler recomputes each worker's State from its reported heartbeat
+	// against a clock read after the fetch, because remote workers stamp the
+	// heartbeat when they answer; a State derived for other reasons is not kept.
 	SnapshotTenant(
 		context.Context,
 		string,
