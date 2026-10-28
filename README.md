@@ -21,8 +21,7 @@ authenticated status, command, and record transport; endpoints supply the
 managed root `queue` as their native lifecycle controller and a native
 `management.RecordReader` for failure workflows.
 Kubernetes scale commands work only when the canonical
-`adapters/kubernetes` integration is configured. The released `kubernetes`
-path remains as a deprecated compatibility path.
+`adapters/kubernetes` integration is configured.
 Redis Streams and Valkey Streams workers can publish native worker and queue
 status through the same `queue` management HTTP handler. Managed queues can
 also consume durable desired state through the typed client. See

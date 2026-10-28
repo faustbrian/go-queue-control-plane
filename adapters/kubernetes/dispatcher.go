@@ -3,8 +3,10 @@ package kubernetes
 import (
 	"context"
 	"errors"
+	"time"
 
 	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
 )
 
 var (
@@ -44,24 +46,30 @@ func NewScaleDispatcher(resolver TenantResolver) (*ScaleDispatcher, error) {
 	return &ScaleDispatcher{resolver: resolver}, nil
 }
 
-// Dispatch resolves the tenant and updates only the workload scale
-// subresource.
-func (dispatcher *ScaleDispatcher) Dispatch(ctx context.Context, command controlplane.Command) error {
+// DispatchResult resolves the tenant and updates only the workload scale
+// subresource. Kubernetes acknowledges the accepted replica update, so a
+// returned scale reports success completed when the update returned.
+func (dispatcher *ScaleDispatcher) DispatchResult(
+	ctx context.Context,
+	command controlplane.Command,
+) (control.DispatchOutcome, error) {
 	if err := command.Validate(); err != nil {
-		return err
+		return control.DispatchOutcome{}, err
 	}
 	if command.Action != controlplane.ActionScale {
-		return ErrUnsupportedCommand
+		return control.DispatchOutcome{}, ErrUnsupportedCommand
 	}
 
 	scaler, err := dispatcher.resolver.ResolveTenant(ctx, command.TenantID)
 	if err != nil {
-		return err
+		return control.DispatchOutcome{}, err
 	}
 	if nilInterface(scaler) {
-		return ErrInvalidDispatcher
+		return control.DispatchOutcome{}, ErrInvalidDispatcher
 	}
-	_, err = scaler.Scale(ctx, command.Target.Name, command.Scale.Replicas)
+	if _, err := scaler.Scale(ctx, command.Target.Name, command.Scale.Replicas); err != nil {
+		return control.DispatchOutcome{}, err
+	}
 
-	return err
+	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: time.Now()}, nil
 }

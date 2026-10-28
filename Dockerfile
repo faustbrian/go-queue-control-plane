@@ -7,6 +7,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 COPY *.go ./
+COPY adapters ./adapters
+COPY alerts ./alerts
 COPY apihttp ./apihttp
 COPY authz ./authz
 COPY cli ./cli
@@ -16,7 +18,6 @@ COPY control ./control
 COPY dataplane ./dataplane
 COPY fleet ./fleet
 COPY history ./history
-COPY kubernetes ./kubernetes
 COPY postgres ./postgres
 COPY server ./server
 COPY ui ./ui

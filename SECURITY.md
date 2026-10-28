@@ -10,17 +10,16 @@
 Only the latest patch of the latest major receives security fixes.
 
 Security fixes are developed on the default branch and shipped in a new
-release, using a new major when public contracts require it. Release `v1.1.0`
-includes the gRPC denial-of-service fix recorded in
-the changelog. Published `v1.0.0` does not include that fix and consumers must
-upgrade to the supported `v1.1` line. An advisory will identify affected
-versions and any later change to the supported release lines.
+release of the latest major, using a new major when public contracts require
+it. An advisory will identify affected versions.
 
-Published `v2.0.0` includes the Migrations v2 integration described in
-[compatibility guidance](COMPATIBILITY.md#queue-control-plane-v2-migration).
-Published `v2.0.1` additionally adopts Queue v1.1.2, rejecting management
-HTTP redirects without changing caller-owned clients. Prefer this patch
-when adopting the supported v2 line.
+The following history describes published releases that now receive no
+further releases. Release `v1.1.0` includes the gRPC denial-of-service fix
+recorded in the changelog; published `v1.0.0` does not. Published `v2.0.0`
+includes the Migrations v2 integration described in
+[compatibility guidance](COMPATIBILITY.md#queue-control-plane-v2-migration),
+and `v2.0.1` additionally adopts Queue v1.1.2, rejecting management HTTP
+redirects without changing caller-owned clients.
 The published v1 helper still composes Migrations v1: with a caller-retained
 database pool, an uncertain advisory-lock acquisition or release can return a
 physical session that still owns the lock to that pool, and default migration

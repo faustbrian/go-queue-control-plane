@@ -9,7 +9,6 @@ import (
 	"time"
 
 	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
-	"github.com/faustbrian/go-queue-control-plane/v6/control"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 
@@ -32,11 +31,7 @@ func TestManagementRuntimeDispatchesTenantCommandsThroughRemoteClient(t *testing
 		t.Fatalf("loadManagementRuntime() = (%+v, %v)", runtime, err)
 	}
 	requestedAt := time.Now().UTC()
-	resultDispatcher, ok := runtime.Dispatcher.(control.ResultDispatcher)
-	if !ok {
-		t.Fatalf("Dispatcher = %T, want control.ResultDispatcher", runtime.Dispatcher)
-	}
-	outcome, err := resultDispatcher.DispatchResult(context.Background(), controlplane.Command{
+	outcome, err := runtime.Dispatcher.DispatchResult(context.Background(), controlplane.Command{
 		CommandID:      "command-1-id",
 		IdempotencyKey: "command-1", TenantID: "tenant-1", Actor: "operator-1",
 		Reason: "drain before deployment", Action: controlplane.ActionDrain,
@@ -50,7 +45,7 @@ func TestManagementRuntimeDispatchesTenantCommandsThroughRemoteClient(t *testing
 		client.command.Deadline.Sub(client.command.RequestedAt) != managementCommandTimeout {
 		t.Fatalf("remote command = %+v", client.command)
 	}
-	_, err = resultDispatcher.DispatchResult(context.Background(), controlplane.Command{
+	_, err = runtime.Dispatcher.DispatchResult(context.Background(), controlplane.Command{
 		CommandID:      "command-2-id",
 		IdempotencyKey: "command-2", TenantID: "tenant-2", Actor: "operator-1",
 		Reason: "drain before deployment", Action: controlplane.ActionDrain,

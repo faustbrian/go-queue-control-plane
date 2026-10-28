@@ -25,8 +25,6 @@ var (
 	ErrControllerUnavailable = errors.New("dataplane: controller unavailable")
 	// ErrUnsupportedCommand reports a command outside queue management.
 	ErrUnsupportedCommand = errors.New("dataplane: unsupported command")
-	// ErrCommandNotAcknowledged supports legacy error-only dispatch consumers.
-	ErrCommandNotAcknowledged = errors.New("dataplane: command not acknowledged")
 )
 
 // ControllerResolver selects a tenant-scoped queue management controller.
@@ -65,23 +63,6 @@ func NewControllerDispatcher(
 		timeout:  timeout,
 		now:      now,
 	}, nil
-}
-
-// Dispatch supports the existing error-only control boundary. Result-aware
-// callers should use DispatchResult so unknown outcomes are not flattened.
-func (d *ControllerDispatcher) Dispatch(
-	ctx context.Context,
-	command controlplane.Command,
-) error {
-	outcome, err := d.DispatchResult(ctx, command)
-	if err != nil {
-		return err
-	}
-	if outcome.Status != controlplane.CommandSucceeded {
-		return ErrCommandNotAcknowledged
-	}
-
-	return nil
 }
 
 // DispatchResult executes through a tenant-scoped queue Controller.

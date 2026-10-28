@@ -28,6 +28,12 @@ command identifiers are unchanged. Identifier v2 reports entropy failures as
 `identifier.ErrEntropy` without the reader's cause. The deprecated top-level
 `kubernetes` package is removed; import `adapters/kubernetes`.
 
+Custom journals must implement `MarkDispatched` and `MarkAcknowledged` on
+`control.Journal`; `LifecycleJournal` no longer exists. Custom dispatchers
+implement `DispatchResult` and report a terminal `DispatchOutcome`, including
+its completion time; the error-only `Dispatch` contract, `ResultDispatcher`
+and `dataplane.ErrCommandNotAcknowledged` are removed.
+
 ## Queue control plane v5 migration
 
 Version 5 selected `github.com/faustbrian/go-queue-control-plane/v5`. Move all
@@ -118,7 +124,7 @@ This source change alone is not a published control-plane release.
 
 ## Queue control plane v2 migration
 
-Release `v2.0.1` is published and supported. It retains the v2.0.0 nominal
+Release `v2.0.1` is published and receives no further releases. It retains the v2.0.0 nominal
 migration and adopts Queue v1.1.2's management HTTP redirect protection.
 Use the root module `github.com/faustbrian/go-queue-control-plane/v2` and add
 `/v2` to all control-plane package imports. The source remains at the repository

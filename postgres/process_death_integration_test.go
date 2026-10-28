@@ -246,12 +246,12 @@ type processDeathDispatcher struct {
 	ready string
 }
 
-func (d processDeathDispatcher) Dispatch(context.Context, controlplane.Command) error {
+func (d processDeathDispatcher) DispatchResult(context.Context, controlplane.Command) (control.DispatchOutcome, error) {
 	if d.ready == "" {
-		return nil
+		return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: time.Now()}, nil
 	}
 	if err := os.WriteFile(d.ready, []byte("ready"), 0o600); err != nil {
-		return err
+		return control.DispatchOutcome{}, err
 	}
 	select {}
 }

@@ -86,7 +86,7 @@ func TestProductionDependenciesUseBoundedImplementations(t *testing.T) {
 	if err != nil || process == nil {
 		t.Fatalf("buildServer() = (%v, %v), want server and nil", process, err)
 	}
-	if err := dependencies.dispatcher.Dispatch(context.Background(), controlplane.Command{}); !errors.Is(err, control.ErrDataPlaneUnavailable) {
+	if _, err := dependencies.dispatcher.DispatchResult(context.Background(), controlplane.Command{}); !errors.Is(err, control.ErrDataPlaneUnavailable) {
 		t.Fatalf("dispatcher error = %v, want unavailable", err)
 	}
 }

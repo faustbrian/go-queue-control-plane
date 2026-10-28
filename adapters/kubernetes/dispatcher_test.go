@@ -32,8 +32,9 @@ func TestScaleDispatcherResolvesTenantAndScalesWorkload(t *testing.T) {
 	}
 	command := scaleCommand()
 
-	if err := dispatcher.Dispatch(context.Background(), command); err != nil {
-		t.Fatalf("Dispatch() error = %v", err)
+	outcome, err := dispatcher.DispatchResult(context.Background(), command)
+	if err != nil || outcome.Status != controlplane.CommandSucceeded || outcome.CompletedAt.Before(command.RequestedAt) {
+		t.Fatalf("DispatchResult() = (%+v, %v), want succeeded", outcome, err)
 	}
 	if resolver.tenant != command.TenantID || scaler.name != command.Target.Name || scaler.replicas != 5 {
 		t.Fatalf("dispatch = tenant %q workload %q replicas %d", resolver.tenant, scaler.name, scaler.replicas)
@@ -91,11 +92,11 @@ func TestScaleDispatcherFailsClosed(t *testing.T) {
 			if err != nil {
 				t.Fatalf("NewScaleDispatcher() error = %v", err)
 			}
-			err = dispatcher.Dispatch(context.Background(), test.command)
+			_, err = dispatcher.DispatchResult(context.Background(), test.command)
 			if test.wantErr == nil {
 				var validationError *controlplane.ValidationError
 				if !errors.As(err, &validationError) {
-					t.Fatalf("Dispatch() error = %v, want ValidationError", err)
+					t.Fatalf("DispatchResult() error = %v, want ValidationError", err)
 				}
 			} else if !errors.Is(err, test.wantErr) {
 				t.Fatalf("Dispatch() error = %v, want %v", err, test.wantErr)

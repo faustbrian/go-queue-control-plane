@@ -124,8 +124,7 @@ delivery because workers remain independent of the control plane.
 - `fleet`: bounded worker registry and protocol compatibility.
 - `history`: tamper-evident audit model and verification.
 - `postgres`: migrations and durable repositories.
-- `adapters/kubernetes`: namespace-scoped Deployment status and scale adapter;
-  `kubernetes` remains its deprecated compatibility path.
+- `adapters/kubernetes`: namespace-scoped Deployment status and scale adapter.
 - `client` and `cli`: typed automation client and command workflows.
 - `server`: authentication composition and bounded HTTP lifecycle.
 - `ui`: embedded administrative web assets and their HTTP handler.

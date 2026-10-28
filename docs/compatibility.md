@@ -19,9 +19,9 @@ unchanged; the deploying application now owns migration execution.
 
 The control plane composes Authentication's canonical HTTP adapter, Queue's
 canonical Redis Streams adapter, and PostgreSQL's explicit `Connect` and
-bounded `Shutdown` lifecycle. Authentication v2 retains type-identical
-`authhttp` aliases within that major. Authentication v1 aliases are not v2
-types; migrate all nominal imports together rather than mixing those cohorts.
+bounded `Shutdown` lifecycle through Authentication v3. Types from earlier
+Authentication majors are distinct; migrate all nominal imports together
+rather than mixing those cohorts.
 
 | Capability | Status | Notes |
 | --- | --- | --- |

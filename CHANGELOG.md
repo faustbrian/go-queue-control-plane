@@ -22,6 +22,16 @@ Versioning.
 - Remove the deprecated top-level `kubernetes` package; import
   `adapters/kubernetes`, which now owns the implementation with unchanged
   types, sentinels and behaviour.
+- `control.Journal` now includes `MarkDispatched` and `MarkAcknowledged`;
+  `control.LifecycleJournal` and `ErrLifecycleJournalUnavailable` are removed,
+  so a journal without durable dispatch boundaries no longer compiles instead of
+  failing at runtime.
+- `control.Dispatcher` is the result-reporting contract
+  (`DispatchResult` returning `DispatchOutcome`); `control.ResultDispatcher`,
+  every error-only `Dispatch` method and `dataplane.ErrCommandNotAcknowledged`
+  are removed. The Kubernetes scale dispatcher reports success with its own
+  completion time, so a command's completion time is the dispatcher's
+  acknowledgement rather than the service clock.
 
 ## 5.0.0 - 2026-10-22
 

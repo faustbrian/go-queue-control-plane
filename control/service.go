@@ -23,10 +23,6 @@ var ErrOutcomeUnknown = errors.New("control: command outcome unknown")
 // ErrCommandIDUnavailable reports failure to allocate a durable operation ID.
 var ErrCommandIDUnavailable = errors.New("control: command ID unavailable")
 
-// ErrLifecycleJournalUnavailable reports a journal that cannot durably record
-// dispatch and acknowledgement recovery boundaries.
-var ErrLifecycleJournalUnavailable = errors.New("control: lifecycle journal unavailable")
-
 // Authorizer enforces actor permissions at the target-resource boundary.
 type Authorizer interface {
 	// Authorize must fail closed for the tenant, authenticated actor,
@@ -55,12 +51,6 @@ type Journal interface {
 	// Complete must atomically persist the terminal result and corresponding
 	// audit; errors do not undo external dispatch.
 	Complete(context.Context, controlplane.CommandResult) error
-}
-
-// LifecycleJournal adds durable dispatch and acknowledgement boundaries while
-// leaving the original Journal interface source-compatible.
-type LifecycleJournal interface {
-	Journal
 	// MarkDispatched must durably record the pre-dispatch recovery boundary and
 	// audit before backend I/O.
 	MarkDispatched(context.Context, controlplane.CommandResult) error
@@ -70,11 +60,13 @@ type LifecycleJournal interface {
 }
 
 // Dispatcher sends a validated, authorized, and durably accepted command to
-// its explicitly selected data-plane or workload adapter.
+// its explicitly selected data-plane or workload adapter and reports an honest
+// terminal acknowledgement.
 type Dispatcher interface {
-	// Dispatch synchronously enforces the borrowed command; failure may follow
-	// partial or accepted external work.
-	Dispatch(context.Context, controlplane.Command) error
+	// DispatchResult synchronously enforces the borrowed command and returns
+	// terminal acknowledgement detail; errors may follow partial or accepted
+	// external work and must not fabricate certainty.
+	DispatchResult(context.Context, controlplane.Command) (DispatchOutcome, error)
 }
 
 // DispatchOutcome is a terminal, redacted data-plane acknowledgement. It
@@ -100,17 +92,9 @@ type DispatchOutcome struct {
 	CompletedAt time.Time
 }
 
-// ResultDispatcher reports an honest terminal data-plane acknowledgement.
-// Legacy Dispatcher implementations remain supported for workload adapters.
-type ResultDispatcher interface {
-	// DispatchResult returns terminal acknowledgement detail; errors may leave
-	// external effects and must not fabricate certainty.
-	DispatchResult(context.Context, controlplane.Command) (DispatchOutcome, error)
-}
-
 // Service sequences authorization, idempotency, audit, dispatch, and outcome
 // persistence without implementing worker/backend semantics or owning shutdown.
-// Construct before use with nonnil collaborators and a LifecycleJournal. Panics
+// Construct before use with nonnil collaborators. Panics
 // and blocking calls are not isolated; safe shared use follows collaborators.
 type Service struct {
 	authorizer   Authorizer
@@ -127,8 +111,7 @@ type serviceTelemetry struct {
 }
 
 // NewService retains borrowed dependencies without validating the whole graph.
-// Execute refuses journals without LifecycleJournal before dispatch; other
-// missing or unusable collaborators can panic when invoked.
+// Missing or unusable collaborators can panic when invoked.
 func NewService(
 	authorizer Authorizer,
 	journal Journal,
@@ -186,10 +169,6 @@ func (s *Service) Execute(
 	ctx context.Context,
 	command controlplane.Command,
 ) (controlplane.CommandResult, error) {
-	lifecycle, ok := s.journal.(LifecycleJournal)
-	if !ok {
-		return controlplane.CommandResult{}, ErrLifecycleJournalUnavailable
-	}
 	started := time.Now()
 	outcome := "validation_error"
 	if s.telemetry != nil {
@@ -280,7 +259,7 @@ func (s *Service) Execute(
 		TenantID: command.TenantID, Status: controlplane.CommandDispatched,
 		DispatchedAt: dispatchedAt,
 	}
-	if err := lifecycle.MarkDispatched(ctx, dispatched); err != nil {
+	if err := s.journal.MarkDispatched(ctx, dispatched); err != nil {
 		return controlplane.CommandResult{}, err
 	}
 	dispatchContext, cancelDispatch := context.WithDeadline(ctx, command.Deadline)
@@ -295,33 +274,24 @@ func (s *Service) Execute(
 		CompletedAt:    s.now(),
 	}
 	acknowledgedOutcome := false
-	if dispatcher, structured := s.dispatcher.(ResultDispatcher); structured {
-		dispatched, dispatchErr := dispatcher.DispatchResult(dispatchContext, command)
-		if dispatchErr != nil {
-			result.Status = controlplane.CommandFailed
-			result.Failure = controlplane.FailureDispatch
-			outcome = "dispatch_failed"
-		} else if !validDispatchOutcome(command, dispatched) {
-			result.Status = controlplane.CommandUnknown
-			result.Failure = controlplane.FailureInvalidDispatchResult
-			outcome = "unknown"
-		} else {
-			acknowledgedOutcome = true
-			result.Status = dispatched.Status
-			result.Failure = dispatched.Failure
-			result.WorkerID = dispatched.WorkerID
-			result.Protocol = dispatched.Protocol
-			result.CapabilityAvailable = dispatched.CapabilityAvailable
-			result.CompletedAt = dispatched.CompletedAt
-			outcome = dispatchTelemetryOutcome(dispatched.Status)
-		}
-	} else if dispatchErr := s.dispatcher.Dispatch(dispatchContext, command); dispatchErr != nil {
+	report, dispatchErr := s.dispatcher.DispatchResult(dispatchContext, command)
+	if dispatchErr != nil {
 		result.Status = controlplane.CommandFailed
 		result.Failure = controlplane.FailureDispatch
 		outcome = "dispatch_failed"
+	} else if !validDispatchOutcome(command, report) {
+		result.Status = controlplane.CommandUnknown
+		result.Failure = controlplane.FailureInvalidDispatchResult
+		outcome = "unknown"
 	} else {
 		acknowledgedOutcome = true
-		outcome = "succeeded"
+		result.Status = report.Status
+		result.Failure = report.Failure
+		result.WorkerID = report.WorkerID
+		result.Protocol = report.Protocol
+		result.CapabilityAvailable = report.CapabilityAvailable
+		result.CompletedAt = report.CompletedAt
+		outcome = dispatchTelemetryOutcome(report.Status)
 	}
 
 	if acknowledgedOutcome {
@@ -331,7 +301,7 @@ func (s *Service) Execute(
 		acknowledged := result
 		acknowledged.Status = controlplane.CommandAcknowledged
 		acknowledged.CompletedAt = time.Time{}
-		if err := lifecycle.MarkAcknowledged(ctx, acknowledged); err != nil {
+		if err := s.journal.MarkAcknowledged(ctx, acknowledged); err != nil {
 			result.Status = controlplane.CommandUnknown
 			result.Failure = controlplane.FailureOutcomeUnknown
 

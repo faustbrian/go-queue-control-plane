@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"reflect"
-	"time"
 
 	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 )
@@ -19,9 +18,9 @@ var (
 // UnavailableDispatcher explicitly represents a disconnected data plane.
 type UnavailableDispatcher struct{}
 
-// Dispatch fails closed without issuing any backend operation.
-func (UnavailableDispatcher) Dispatch(context.Context, controlplane.Command) error {
-	return ErrDataPlaneUnavailable
+// DispatchResult fails closed without issuing any backend operation.
+func (UnavailableDispatcher) DispatchResult(context.Context, controlplane.Command) (DispatchOutcome, error) {
+	return DispatchOutcome{}, ErrDataPlaneUnavailable
 }
 
 // RoutingDispatcher keeps Kubernetes scaling separate from queue control
@@ -49,30 +48,13 @@ func nilDispatcher(dispatcher Dispatcher) bool {
 	return reflected.Kind() == reflect.Pointer && reflected.IsNil()
 }
 
-// Dispatch routes scaling to Kubernetes and every data-plane command to its
-// queue adapter.
-func (dispatcher *RoutingDispatcher) Dispatch(ctx context.Context, command controlplane.Command) error {
-	return dispatcher.selected(command).Dispatch(ctx, command)
-}
-
-// DispatchResult preserves structured queue acknowledgements while
-// assigning an orchestration completion time to legacy workload adapters.
+// DispatchResult routes scaling to Kubernetes and every data-plane command to
+// its queue adapter.
 func (dispatcher *RoutingDispatcher) DispatchResult(
 	ctx context.Context,
 	command controlplane.Command,
 ) (DispatchOutcome, error) {
-	selected := dispatcher.selected(command)
-	if resultDispatcher, ok := selected.(ResultDispatcher); ok {
-		return resultDispatcher.DispatchResult(ctx, command)
-	}
-	if err := selected.Dispatch(ctx, command); err != nil {
-		return DispatchOutcome{}, err
-	}
-
-	return DispatchOutcome{
-		Status:      controlplane.CommandSucceeded,
-		CompletedAt: time.Now(),
-	}, nil
+	return dispatcher.selected(command).DispatchResult(ctx, command)
 }
 
 func (dispatcher *RoutingDispatcher) selected(command controlplane.Command) Dispatcher {

@@ -14,6 +14,7 @@ import (
 	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v6/adapters/kubernetes"
 	"github.com/faustbrian/go-queue-control-plane/v6/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
 	"github.com/faustbrian/go-queue-control-plane/v6/fleet"
 	controlpostgres "github.com/faustbrian/go-queue-control-plane/v6/postgres"
 	"github.com/faustbrian/go-queue-control-plane/v6/server"
@@ -237,7 +238,9 @@ func (*applicationJournal) MarkAcknowledged(context.Context, controlplane.Comman
 
 type applicationDispatcher struct{}
 
-func (applicationDispatcher) Dispatch(context.Context, controlplane.Command) error { return nil }
+func (applicationDispatcher) DispatchResult(_ context.Context, command controlplane.Command) (control.DispatchOutcome, error) {
+	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: command.RequestedAt}, nil
+}
 
 type applicationRateLimiter struct{}
 

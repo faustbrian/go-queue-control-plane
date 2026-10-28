@@ -12,6 +12,10 @@
 !client/**
 !cmd/
 !cmd/**
+!adapters/
+!adapters/**
+!alerts/
+!alerts/**
 !control/
 !control/**
 !dataplane/
@@ -20,8 +24,6 @@
 !fleet/**
 !history/
 !history/**
-!kubernetes/
-!kubernetes/**
 !postgres/
 !postgres/**
 !server/

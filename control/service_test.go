@@ -135,7 +135,7 @@ func TestServiceExecuteSequencesAuthorizedIdempotentMutation(t *testing.T) {
 	command := validCommand()
 	completedAt := command.RequestedAt.Add(time.Second)
 	journal := &journalStub{created: true}
-	dispatcher := &dispatcherStub{}
+	dispatcher := &dispatcherStub{completedAt: completedAt}
 	authorizer := &authorizerStub{}
 	service := NewService(authorizer, journal, dispatcher, func() time.Time { return completedAt })
 
@@ -259,22 +259,6 @@ func TestServiceExecuteDefaultsOnlyMissingCommandMetadata(t *testing.T) {
 				)
 			}
 		})
-	}
-}
-
-func TestServiceExecuteFailsClosedWithoutLifecycleJournal(t *testing.T) {
-	t.Parallel()
-
-	authorizer := &authorizerStub{}
-	dispatcher := &dispatcherStub{}
-	service := NewService(authorizer, legacyJournalStub{}, dispatcher, time.Now)
-
-	result, err := service.Execute(context.Background(), validCommand())
-	if result != (controlplane.CommandResult{}) || !errors.Is(err, ErrLifecycleJournalUnavailable) {
-		t.Fatalf("Execute() = (%+v, %v), want lifecycle journal failure", result, err)
-	}
-	if authorizer.calls != 0 || dispatcher.calls != 0 {
-		t.Fatalf("calls = authorize:%d dispatch:%d, want 0:0", authorizer.calls, dispatcher.calls)
 	}
 }
 
@@ -766,8 +750,8 @@ func TestServiceExecutePersistsStructuredDataPlaneOutcomes(t *testing.T) {
 				result.CompletedAt != completedAt || journal.completed != result {
 				t.Fatalf("Execute() result = %+v, outcome = %+v", result, outcome)
 			}
-			if dispatcher.resultCalls != 1 || dispatcher.legacyCalls != 0 {
-				t.Fatalf("dispatch calls = result:%d legacy:%d", dispatcher.resultCalls, dispatcher.legacyCalls)
+			if dispatcher.resultCalls != 1 {
+				t.Fatalf("dispatch calls = %d, want 1", dispatcher.resultCalls)
 			}
 		})
 	}
@@ -887,19 +871,6 @@ type journalStub struct {
 	acknowledgeCalls int
 }
 
-type legacyJournalStub struct{}
-
-func (legacyJournalStub) Accept(
-	context.Context,
-	controlplane.Command,
-) (controlplane.CommandResult, bool, error) {
-	return controlplane.CommandResult{}, false, nil
-}
-
-func (legacyJournalStub) Complete(context.Context, controlplane.CommandResult) error {
-	return nil
-}
-
 func (s *journalStub) Accept(
 	_ context.Context,
 	command controlplane.Command,
@@ -938,22 +909,16 @@ func (s *journalStub) MarkAcknowledged(
 }
 
 type dispatcherStub struct {
-	err     error
-	calls   int
-	command controlplane.Command
+	err         error
+	calls       int
+	command     controlplane.Command
+	completedAt time.Time
 }
 
 type resultDispatcherStub struct {
 	outcome     DispatchOutcome
 	err         error
 	resultCalls int
-	legacyCalls int
-}
-
-func (s *resultDispatcherStub) Dispatch(context.Context, controlplane.Command) error {
-	s.legacyCalls++
-
-	return errors.New("legacy dispatch must not be used")
 }
 
 func (s *resultDispatcherStub) DispatchResult(
@@ -985,9 +950,17 @@ func (m failingMeter) Float64Histogram(name string, options ...otelmetric.Float6
 	return m.Meter.Float64Histogram(name, options...)
 }
 
-func (s *dispatcherStub) Dispatch(_ context.Context, command controlplane.Command) error {
+func (s *dispatcherStub) DispatchResult(_ context.Context, command controlplane.Command) (DispatchOutcome, error) {
 	s.calls++
 	s.command = command
+	if s.err != nil {
+		return DispatchOutcome{}, s.err
+	}
 
-	return s.err
+	completedAt := s.completedAt
+	if completedAt.IsZero() {
+		completedAt = command.RequestedAt
+	}
+
+	return DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: completedAt}, nil
 }

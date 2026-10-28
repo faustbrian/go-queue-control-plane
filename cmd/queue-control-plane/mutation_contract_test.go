@@ -566,9 +566,12 @@ func TestBuildApplicationUsesSuppliedClock(t *testing.T) {
 	if response.Code != http.StatusOK {
 		t.Fatalf("command status = %d, body = %s", response.Code, response.Body.String())
 	}
-	if !journal.dispatched.DispatchedAt.Equal(now) || !journal.completed.CompletedAt.Equal(now) {
-		t.Fatalf("journal timestamps = dispatched %v, completed %v, want %v",
-			journal.dispatched.DispatchedAt, journal.completed.CompletedAt, now)
+	// The supplied clock stamps dispatch; completion is the dispatcher's own
+	// acknowledgement time, which applicationDispatcher reports as requested_at.
+	reported := time.Unix(60, 0).UTC()
+	if !journal.dispatched.DispatchedAt.Equal(now) || !journal.completed.CompletedAt.Equal(reported) {
+		t.Fatalf("journal timestamps = dispatched %v, completed %v, want %v and %v",
+			journal.dispatched.DispatchedAt, journal.completed.CompletedAt, now, reported)
 	}
 }
 

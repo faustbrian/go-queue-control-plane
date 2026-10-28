@@ -332,27 +332,6 @@ func TestControllerDispatcherFailsClosedAtEveryBoundary(t *testing.T) {
 	}
 }
 
-func TestControllerDispatcherSupportsLegacyAcknowledgementBoundary(t *testing.T) {
-	t.Parallel()
-
-	command := validControlCommand()
-	controller := &controllerStub{result: acknowledgedResult(command)}
-	dispatcher := newDispatcher(t, &controllerResolverStub{controller: controller}, command.RequestedAt)
-	if err := dispatcher.Dispatch(context.Background(), command); err != nil {
-		t.Fatalf("Dispatch() error = %v", err)
-	}
-	controller.result.Status = queue.CommandFailed
-	controller.result.FailureCode = "failed"
-	if err := dispatcher.Dispatch(context.Background(), command); !errors.Is(err, ErrCommandNotAcknowledged) {
-		t.Fatalf("failed Dispatch() error = %v", err)
-	}
-	resolverErr := errors.New("unavailable")
-	dispatcher = newDispatcher(t, &controllerResolverStub{err: resolverErr}, command.RequestedAt)
-	if err := dispatcher.Dispatch(context.Background(), command); !errors.Is(err, resolverErr) {
-		t.Fatalf("unavailable Dispatch() error = %v", err)
-	}
-}
-
 func TestNewControllerDispatcherRejectsIncompleteConfiguration(t *testing.T) {
 	t.Parallel()
 

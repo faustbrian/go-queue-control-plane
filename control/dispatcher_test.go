@@ -35,15 +35,15 @@ func TestRoutingDispatcherSeparatesDataPlaneAndWorkloadCommands(t *testing.T) {
 	}
 
 	drain := validCommand()
-	if err := dispatcher.Dispatch(context.Background(), drain); err != nil {
-		t.Fatalf("Dispatch(drain) error = %v", err)
+	if _, err := dispatcher.DispatchResult(context.Background(), drain); err != nil {
+		t.Fatalf("DispatchResult(drain) error = %v", err)
 	}
 	scale := drain
 	scale.Action = controlplane.ActionScale
 	scale.Target = controlplane.Target{Kind: controlplane.TargetWorkload, Name: "billing-workers"}
 	scale.Scale = &controlplane.Scale{Replicas: 5}
-	if err := dispatcher.Dispatch(context.Background(), scale); err != nil {
-		t.Fatalf("Dispatch(scale) error = %v", err)
+	if _, err := dispatcher.DispatchResult(context.Background(), scale); err != nil {
+		t.Fatalf("DispatchResult(scale) error = %v", err)
 	}
 
 	if dataPlane.calls != 1 || dataPlane.command.Action != controlplane.ActionDrain {
@@ -57,9 +57,9 @@ func TestRoutingDispatcherSeparatesDataPlaneAndWorkloadCommands(t *testing.T) {
 func TestUnavailableDispatcherFailsClosed(t *testing.T) {
 	t.Parallel()
 
-	err := (UnavailableDispatcher{}).Dispatch(context.Background(), controlplane.Command{})
-	if !errors.Is(err, ErrDataPlaneUnavailable) {
-		t.Fatalf("Dispatch() error = %v, want ErrDataPlaneUnavailable", err)
+	outcome, err := (UnavailableDispatcher{}).DispatchResult(context.Background(), controlplane.Command{})
+	if outcome != (DispatchOutcome{}) || !errors.Is(err, ErrDataPlaneUnavailable) {
+		t.Fatalf("DispatchResult() = (%+v, %v), want ErrDataPlaneUnavailable", outcome, err)
 	}
 }
 
@@ -81,50 +81,7 @@ func TestRoutingDispatcherPreservesStructuredDataPlaneResults(t *testing.T) {
 	if err != nil || outcome != dataPlane.outcome {
 		t.Fatalf("DispatchResult() = (%+v, %v), want %+v", outcome, err, dataPlane.outcome)
 	}
-	if dataPlane.resultCalls != 1 || dataPlane.legacyCalls != 0 || workloads.calls != 0 {
-		t.Fatalf(
-			"calls = result:%d legacy:%d workload:%d",
-			dataPlane.resultCalls,
-			dataPlane.legacyCalls,
-			workloads.calls,
-		)
-	}
-}
-
-func TestRoutingDispatcherWrapsLegacyResultsWithCompletionTime(t *testing.T) {
-	t.Parallel()
-
-	dataPlane := &dispatcherStub{}
-	workloads := &dispatcherStub{}
-	dispatcher, err := NewRoutingDispatcher(dataPlane, workloads)
-	if err != nil {
-		t.Fatalf("NewRoutingDispatcher() error = %v", err)
-	}
-
-	command := validCommand()
-	startedAt := time.Now()
-	outcome, err := dispatcher.DispatchResult(context.Background(), command)
-	finishedAt := time.Now()
-	if err != nil || outcome.Status != controlplane.CommandSucceeded ||
-		outcome.CompletedAt.Before(startedAt) || outcome.CompletedAt.After(finishedAt) {
-		t.Fatalf("data-plane DispatchResult() = (%+v, %v)", outcome, err)
-	}
-	command.Action = controlplane.ActionScale
-	command.Target = controlplane.Target{Kind: controlplane.TargetWorkload, Name: "workers"}
-	command.Scale = &controlplane.Scale{Replicas: 2}
-	startedAt = time.Now()
-	outcome, err = dispatcher.DispatchResult(context.Background(), command)
-	finishedAt = time.Now()
-	if err != nil || outcome.Status != controlplane.CommandSucceeded ||
-		outcome.CompletedAt.Before(startedAt) || outcome.CompletedAt.After(finishedAt) {
-		t.Fatalf("workload DispatchResult() = (%+v, %v)", outcome, err)
-	}
-	if dataPlane.calls != 1 || workloads.calls != 1 {
-		t.Fatalf("legacy calls = data plane:%d workloads:%d", dataPlane.calls, workloads.calls)
-	}
-
-	dataPlane.err = errors.New("unavailable")
-	if _, err := dispatcher.DispatchResult(context.Background(), validCommand()); !errors.Is(err, dataPlane.err) {
-		t.Fatalf("failed DispatchResult() error = %v", err)
+	if dataPlane.resultCalls != 1 || workloads.calls != 0 {
+		t.Fatalf("calls = data plane:%d workload:%d", dataPlane.resultCalls, workloads.calls)
 	}
 }

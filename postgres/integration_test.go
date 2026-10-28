@@ -187,8 +187,8 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 		t.Fatalf("Ready() error = %v", err)
 	}
 
-	dispatcher := &integrationDispatcher{}
 	completedAt := time.Date(2026, 7, 16, 8, 0, 1, 0, time.UTC)
+	dispatcher := &integrationDispatcher{now: func() time.Time { return completedAt }}
 	service := control.NewService(
 		integrationAuthorizer{},
 		runtime.Journal,
@@ -250,7 +250,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 	historyService := control.NewService(
 		integrationAuthorizer{},
 		runtime.Journal,
-		&integrationDispatcher{},
+		&integrationDispatcher{now: func() time.Time { return historyCompletedAt }},
 		func() time.Time { return historyCompletedAt },
 	)
 	older := command
@@ -290,7 +290,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 	oldService := control.NewService(
 		integrationAuthorizer{},
 		runtime.Journal,
-		&integrationDispatcher{},
+		&integrationDispatcher{now: func() time.Time { return time.Unix(20, 0).UTC() }},
 		func() time.Time { return time.Unix(20, 0).UTC() },
 	)
 	oldRetry := command
@@ -320,7 +320,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 	recentService := control.NewService(
 		integrationAuthorizer{},
 		runtime.Journal,
-		&integrationDispatcher{},
+		&integrationDispatcher{now: func() time.Time { return time.Unix(100, 0).UTC() }},
 		func() time.Time { return time.Unix(100, 0).UTC() },
 	)
 	if _, err := recentService.Execute(ctx, recentRetry); err != nil {
@@ -391,7 +391,7 @@ func TestPostgresRuntimeIntegration(t *testing.T) {
 	retentionService := control.NewService(
 		integrationAuthorizer{},
 		runtime.Journal,
-		&integrationDispatcher{},
+		&integrationDispatcher{now: func() time.Time { return retentionTime }},
 		func() time.Time { return retentionTime },
 	)
 	retentionCommand := command
@@ -518,17 +518,20 @@ func (integrationAuthorizer) Authorize(
 	return nil
 }
 
+// integrationDispatcher reports completion from the same fixed clock as the
+// service under test, as a real dispatcher reports its own acknowledgement.
 type integrationDispatcher struct {
 	mu    sync.Mutex
 	calls int
+	now   func() time.Time
 }
 
-func (dispatcher *integrationDispatcher) Dispatch(context.Context, controlplane.Command) error {
+func (dispatcher *integrationDispatcher) DispatchResult(context.Context, controlplane.Command) (control.DispatchOutcome, error) {
 	dispatcher.mu.Lock()
 	defer dispatcher.mu.Unlock()
 	dispatcher.calls++
 
-	return nil
+	return control.DispatchOutcome{Status: controlplane.CommandSucceeded, CompletedAt: dispatcher.now()}, nil
 }
 
 func (dispatcher *integrationDispatcher) Calls() int {

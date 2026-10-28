@@ -65,11 +65,11 @@ SQL and ledger formats remain unchanged; no history reset is required.
 
 ## Authentication and key handling
 
-Current v3 source uses Authentication v2's finite principal and static
+Current v6 source uses Authentication v3's finite principal and static
 API-key admission policy. Oversized startup identities and keys fail rather
 than being truncated; review access documents before migration. Its principal,
-credential, challenge and canonical HTTP adapter types must all use the v2
-module. Published QCP v2 retains its existing Authentication v1 composition.
+credential, challenge and canonical HTTP adapter types must all use the v3
+module, because the principal context key differs between majors.
 
 The production server uses the static API-key implementation from
 `authentication`. A request supplies a public key ID and secret in separate
