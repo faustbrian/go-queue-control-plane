@@ -8,11 +8,12 @@ data-plane transport exists; that does not make the operation operational.
 
 ## Current production wiring
 
-Current source is the `/v5` module with Authentication v2, Queue v2,
-PostgreSQL v3, Migrations v4 and Telemetry v4. Confirm the version in
+Current source is the `/v6` module with Authentication v3, Authorization v4,
+Identifier v2, Queue v2, PostgreSQL v3, Migrations v4 and Telemetry v4. Confirm
+the version in
 [Releases](https://github.com/faustbrian/go-queue-control-plane/releases)
 before adoption; see the
-[v5 migration guide](../COMPATIBILITY.md#queue-control-plane-v5-migration).
+[v6 migration guide](../COMPATIBILITY.md#queue-control-plane-v6-migration).
 SQL history, checksums, the HTTP protocol and caller-owned resources are
 unchanged; the deploying application now owns migration execution.
 

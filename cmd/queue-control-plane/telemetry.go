@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v6/apihttp"
 	telemetry "github.com/faustbrian/go-telemetry/v4"
 )
 

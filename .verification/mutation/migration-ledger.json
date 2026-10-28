@@ -117,15 +117,6 @@
     },
     {
       "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
-      "gate_input_digest": "0620cba59dcfd0241dd6c6e23e114c5723f519bb0a981c08a225add63097505b",
-      "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
-      "gremlins_version": "v0.6.0",
-      "module": ".",
-      "package": "kubernetes",
-      "report_sha256": "853688a97dbab227ae230152f790ac2fc0725e532c0c229f9de3816c4eb36ef3"
-    },
-    {
-      "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
       "gate_input_digest": "b224a9468045be08f65dfa1488ab45eb71c248058df4a012e315b83642830739",
       "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
       "gremlins_version": "v0.6.0",
@@ -421,24 +412,6 @@
     },
     {
       "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
-      "gate_input_digest": "b77d57d82cb7c3fdef8588a39f009f44786a163c53bc0ab550fc4011e95178d6",
-      "gremlins_version": "v0.6.0",
-      "migration_reason": "go-patch-toolchain-migration",
-      "module": ".",
-      "package": "kubernetes",
-      "replacement_gate_input_digest": "0620cba59dcfd0241dd6c6e23e114c5723f519bb0a981c08a225add63097505b",
-      "report_sha256": "853688a97dbab227ae230152f790ac2fc0725e532c0c229f9de3816c4eb36ef3"
-    },
-    {
-      "execution_revision": "8cb85e2f184a5fd013396bdb6521ecead1a61cc4",
-      "gate_input_digest": "7164a2c05acb51ea48941fa10cd86035192bc6487a89b04b1f76f3b3a87984bc",
-      "gremlins_version": "v0.6.0",
-      "module": ".",
-      "package": "kubernetes",
-      "report_sha256": "ed2529f8103cb6a1b120a2cb216fe5169985d10543611e09fa69a7cc842707e1"
-    },
-    {
-      "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
       "gate_input_digest": "2333d2b08d76ac9bf2e7e11ce4d9936294d54af7981cc843a3f7b771984bbeb4",
       "gremlins_version": "v0.6.0",
       "migration_reason": "owned-module-version-locator-canonicalization",
@@ -633,16 +606,6 @@
     },
     {
       "module": ".",
-      "package": "kubernetes",
-      "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
-      "gate_input_digest": "0620cba59dcfd0241dd6c6e23e114c5723f519bb0a981c08a225add63097505b",
-      "replacement_gate_input_digest": "7d1c850511d2a2ec099148e024cdbae6a7cf9f5b56f6a2e2065799653860b7a8",
-      "gremlins_version": "v0.6.0",
-      "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
-      "report_sha256": "853688a97dbab227ae230152f790ac2fc0725e532c0c229f9de3816c4eb36ef3"
-    },
-    {
-      "module": ".",
       "package": "postgres",
       "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
       "gate_input_digest": "b224a9468045be08f65dfa1488ab45eb71c248058df4a012e315b83642830739",
@@ -802,17 +765,6 @@
       "package": "history",
       "replacement_gate_input_digest": "57ecb57ffb28be2679fa40c36ca8ddf068ac55b7538478da1009a96c75316ca2",
       "report_sha256": "01d7c39fcf0a7793d41ac429e35449d5fd5d1638e45d88bfa3ca05042ef90cb6"
-    },
-    {
-      "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",
-      "gate_input_digest": "0620cba59dcfd0241dd6c6e23e114c5723f519bb0a981c08a225add63097505b",
-      "gremlins_verifier_sha256": "9a9499ff68a8dfd49a0be7995590297a8ee563a1aa226bfd8b9361dc53058108",
-      "gremlins_version": "v0.6.0",
-      "migration_reason": "go-library-tools-v1-migration",
-      "module": ".",
-      "package": "kubernetes",
-      "replacement_gate_input_digest": "7fa7294890bab0abb653fc52583af8ab403a43ba6ed0bb8bd3a1b6b37ac43a5a",
-      "report_sha256": "853688a97dbab227ae230152f790ac2fc0725e532c0c229f9de3816c4eb36ef3"
     },
     {
       "execution_revision": "350a565dff8d9a0d42b870af80adccba4b9f65a9",

@@ -1,12 +1,12 @@
 package server
 
 import (
-	authentication "github.com/faustbrian/go-authentication/v2"
-	authhttp "github.com/faustbrian/go-authentication/v2/adapters/http"
-	"github.com/faustbrian/go-authentication/v2/apikey"
-	authorization "github.com/faustbrian/go-authorization"
-	"github.com/faustbrian/go-authorization/acl"
-	controlauthz "github.com/faustbrian/go-queue-control-plane/v5/authz"
+	authentication "github.com/faustbrian/go-authentication/v3"
+	authhttp "github.com/faustbrian/go-authentication/v3/adapters/http"
+	"github.com/faustbrian/go-authentication/v3/apikey"
+	authorization "github.com/faustbrian/go-authorization/v4"
+	"github.com/faustbrian/go-authorization/v4/acl"
+	controlauthz "github.com/faustbrian/go-queue-control-plane/v6/authz"
 )
 
 const (

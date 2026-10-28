@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
+	authentication "github.com/faustbrian/go-authentication/v3"
 )
 
 func TestSecurityMiddlewareAddsDefensiveHeaders(t *testing.T) {

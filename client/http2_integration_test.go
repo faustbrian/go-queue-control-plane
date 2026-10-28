@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 )
 
 func TestTypedClientHTTP2RoundTripAndCancellation(t *testing.T) {

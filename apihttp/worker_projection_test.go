@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v6/fleet"
 )
 
 func TestWorkerResponsePreservesSourceCollectionsAndOrdering(t *testing.T) {

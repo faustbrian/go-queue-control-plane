@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## 6.0.0 - 2026-10-28
+
+### Changed
+
+- Move the module to `github.com/faustbrian/go-queue-control-plane/v6` and
+  adopt `go-authentication/v3`, `go-authorization/v4` and `go-identifier/v2`.
+  Server options take their `apikey.Entry` and `acl.Entry` types. Persistence,
+  SQL, migrations, HTTP API versions and command identifiers are unchanged.
+- Command identifier entropy failures report `identifier.ErrEntropy` without
+  the reader's cause.
+- Only the latest major receives security fixes; v1 to v5 remain published
+  but receive no further releases.
+
+### Removed
+
+- Remove the deprecated top-level `kubernetes` package; import
+  `adapters/kubernetes`, which now owns the implementation with unchanged
+  types, sentinels and behaviour.
+
 ## 5.0.0 - 2026-10-22
 
 ### Changed

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	authentication "github.com/faustbrian/go-authentication/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/fleet"
 )
 
 const (

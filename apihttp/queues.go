@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	authentication "github.com/faustbrian/go-authentication/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

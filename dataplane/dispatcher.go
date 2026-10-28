@@ -13,8 +13,8 @@ import (
 	"reflect"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

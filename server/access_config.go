@@ -8,10 +8,10 @@ import (
 	"os"
 	"strings"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
-	"github.com/faustbrian/go-authentication/v2/apikey"
-	authorization "github.com/faustbrian/go-authorization"
-	"github.com/faustbrian/go-authorization/acl"
+	authentication "github.com/faustbrian/go-authentication/v3"
+	"github.com/faustbrian/go-authentication/v3/apikey"
+	authorization "github.com/faustbrian/go-authorization/v4"
+	"github.com/faustbrian/go-authorization/v4/acl"
 )
 
 // ErrInvalidAccessDocument is a secret-safe static access configuration error.

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 )

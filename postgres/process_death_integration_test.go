@@ -14,8 +14,8 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres/v3"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

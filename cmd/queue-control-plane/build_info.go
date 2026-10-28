@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/apihttp"
 )
 
 // ErrInvalidBuildInfo reports malformed release metadata.

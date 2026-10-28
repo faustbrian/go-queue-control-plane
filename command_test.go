@@ -6,15 +6,18 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	identifier "github.com/faustbrian/go-identifier/v2"
 )
 
 func TestNewCommandIDPropagatesEntropyFailure(t *testing.T) {
 	t.Parallel()
 
-	want := errors.New("entropy failed")
-	if identifier, err := newCommandID(failingReader{err: want}); identifier != "" ||
-		!errors.Is(err, want) {
-		t.Fatalf("newCommandID() = (%q, %v), want entropy failure", identifier, err)
+	// go-identifier/v2 classifies entropy failures and redacts the reader cause.
+	cause := errors.New("private entropy detail")
+	if id, err := newCommandID(failingReader{err: cause}); id != "" ||
+		!errors.Is(err, identifier.ErrEntropy) || strings.Contains(err.Error(), cause.Error()) {
+		t.Fatalf("newCommandID() = (%q, %v), want redacted entropy failure", id, err)
 	}
 }
 

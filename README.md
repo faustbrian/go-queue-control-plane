@@ -3,7 +3,7 @@
 [![CI](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-required-blue)](https://github.com/faustbrian/go-queue-control-plane/actions/workflows/ci.yml)
 [![Documentation](https://img.shields.io/badge/docs-structural_checks_in_CI-blue)](docs/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v5.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v5)
+[![Go Reference](https://pkg.go.dev/badge/github.com/faustbrian/go-queue-control-plane/v6.svg)](https://pkg.go.dev/github.com/faustbrian/go-queue-control-plane/v6)
 [![Release](https://img.shields.io/github/v/release/faustbrian/go-queue-control-plane?sort=semver)](https://github.com/faustbrian/go-queue-control-plane/releases)
 [![Go](https://img.shields.io/badge/go-1.27.0-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -30,18 +30,19 @@ also consume durable desired state through the typed client. See
 
 ## Install
 
-The current major is `/v5`. It adopts Queue v2, PostgreSQL v3, Migrations v4
-and Telemetry v4 and no longer applies schema migrations itself; see the
-[v5 migration guide](COMPATIBILITY.md#queue-control-plane-v5-migration):
+The current major is `/v6`. It adopts Authentication v3, Authorization v4 and
+Identifier v2 on top of the v5 Queue v2, PostgreSQL v3, Migrations v4 and
+Telemetry v4 cohort; see the
+[v6 migration guide](COMPATIBILITY.md#queue-control-plane-v6-migration):
 
 ```sh
-go get github.com/faustbrian/go-queue-control-plane/v5@v5.0.0
-go install github.com/faustbrian/go-queue-control-plane/v5/cmd/queue-control-plane@v5.0.0
-go install github.com/faustbrian/go-queue-control-plane/v5/cmd/queue-control@v5.0.0
+go get github.com/faustbrian/go-queue-control-plane/v6@v6.0.0
+go install github.com/faustbrian/go-queue-control-plane/v6/cmd/queue-control-plane@v6.0.0
+go install github.com/faustbrian/go-queue-control-plane/v6/cmd/queue-control@v6.0.0
 ```
 
-Earlier majors remain published at their own module paths; the
-[security policy](SECURITY.md) lists the supported lines.
+Earlier majors remain published at their own module paths but receive no
+further releases; only the latest major receives security fixes.
 
 The Go-installed server does not carry the release pipeline's commit and build
 time metadata, so its `/version` response uses the development build identity.

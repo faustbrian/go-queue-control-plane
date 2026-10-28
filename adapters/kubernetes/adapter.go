@@ -1,20 +1,17 @@
-// Package kubernetes preserves the released path for the deliberately narrow
-// Kubernetes integration.
+// Package kubernetes is the narrow Kubernetes Deployment integration.
 //
 // New borrows a namespace-scoped apps/v1 Deployment client, with
 // autoscaling/v1 scale access. The pinned Kubernetes SDK owns transport;
 // providers must honor scope, pagination and context. This package creates no
-// watch, cluster client, HPA/KEDA controller or shutdown loop. It preserves
-// released type identities through the canonical adapter aliases.
-//
-// Deprecated: use github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes.
+// watch, cluster client, HPA/KEDA controller or shutdown loop. Direct scale
+// callers must authorize and confirm destructive requests themselves.
 package kubernetes
 
 import (
 	"context"
 	"errors"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

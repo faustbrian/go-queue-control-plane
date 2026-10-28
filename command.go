@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	identifierulid "github.com/faustbrian/go-identifier/ulid"
+	identifierulid "github.com/faustbrian/go-identifier/v2/ulid"
 )
 
 // NewCommandID allocates one opaque lowercase ULID operation identifier.

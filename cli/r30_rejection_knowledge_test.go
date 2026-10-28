@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v6/apihttp"
 )
 
 func TestR30CLIWorkerViewsPreserveRejectionKnowledge(t *testing.T) {

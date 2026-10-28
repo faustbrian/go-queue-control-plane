@@ -17,9 +17,20 @@ Specification-backed modules MUST NOT diverge from their declared standards.
 Ambiguities require documented decisions and stable tests. Deprecated APIs
 follow [`DEPRECATION.md`](DEPRECATION.md).
 
+## Queue control plane v6 migration
+
+The current major is `github.com/faustbrian/go-queue-control-plane/v6`. Move all
+control-plane imports together to `/v6` and move go-authentication to `/v3`,
+go-authorization to `/v4` and go-identifier to `/v2` with them: the server
+options take Authentication v3 `apikey.Entry` values and Authorization v4
+`acl.Entry` values. Persistence, SQL, migrations, HTTP API versions and
+command identifiers are unchanged. Identifier v2 reports entropy failures as
+`identifier.ErrEntropy` without the reader's cause. The deprecated top-level
+`kubernetes` package is removed; import `adapters/kubernetes`.
+
 ## Queue control plane v5 migration
 
-Current main selects `github.com/faustbrian/go-queue-control-plane/v5`. Move all
+Version 5 selected `github.com/faustbrian/go-queue-control-plane/v5`. Move all
 control-plane imports together to `/v5`; published v4 remains a distinct
 nominal Go API.
 

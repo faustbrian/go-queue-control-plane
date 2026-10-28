@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v5/history"
+	"github.com/faustbrian/go-queue-control-plane/v6/history"
 )
 
 // Unkeyed chain integrity is distinct from a protected externally recorded head.

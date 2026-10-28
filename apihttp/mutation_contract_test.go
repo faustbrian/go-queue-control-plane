@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	authentication "github.com/faustbrian/go-authentication/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v6/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v6/fleet"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

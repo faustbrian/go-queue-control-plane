@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
 	goqueue "github.com/faustbrian/go-queue/v2"
 	redisstream "github.com/faustbrian/go-queue/v2/adapters/redisstream"
 	"github.com/faustbrian/go-queue/v2/core"

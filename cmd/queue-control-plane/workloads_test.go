@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v6/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
 	kubernetesclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"

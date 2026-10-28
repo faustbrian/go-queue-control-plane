@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	appsv1 "k8s.io/api/apps/v1"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

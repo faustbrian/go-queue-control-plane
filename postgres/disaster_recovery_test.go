@@ -10,10 +10,10 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres/v3"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
-	"github.com/faustbrian/go-queue-control-plane/v5/history"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
+	"github.com/faustbrian/go-queue-control-plane/v6/history"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v6/postgres"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

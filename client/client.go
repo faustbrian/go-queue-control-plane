@@ -21,10 +21,10 @@ import (
 	"strings"
 	"time"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v5/adapters/kubernetes"
-	"github.com/faustbrian/go-queue-control-plane/v5/apihttp"
-	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	controlkubernetes "github.com/faustbrian/go-queue-control-plane/v6/adapters/kubernetes"
+	"github.com/faustbrian/go-queue-control-plane/v6/apihttp"
+	"github.com/faustbrian/go-queue-control-plane/v6/fleet"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

@@ -10,8 +10,8 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres/v3"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v6/postgres"
 )
 
 // A real row lock causes cooperative completion timeout before result/audit

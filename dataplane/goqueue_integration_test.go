@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	goqueue "github.com/faustbrian/go-queue/v2"
 	redisstream "github.com/faustbrian/go-queue/v2/adapters/redisstream"
 	"github.com/faustbrian/go-queue/v2/core"

@@ -4,12 +4,10 @@
 
 | Release line | Status | End of support |
 | --- | --- | --- |
-| `v5.x` | Supported; first release `v5.0.0` | Not scheduled |
-| `v4.x` | Supported; latest patch `v4.0.1` | Not scheduled |
-| `v3.x` | Supported; first release `v3.0.0` | Not scheduled |
-| `v2.0.x` | Supported; latest patch `v2.0.1` | Not scheduled |
-| `v1.1.x` | Supported | Not scheduled |
-| `v1.0.x` | Unsupported; security update required | 2026-09-09 |
+| `v6.x` | Supported; first release `v6.0.0` | Not scheduled |
+| `v1.x` to `v5.x` | Published, no further releases | 2026-10-28 |
+
+Only the latest patch of the latest major receives security fixes.
 
 Security fixes are developed on the default branch and shipped in a new
 release, using a new major when public contracts require it. Release `v1.1.0`
@@ -34,10 +32,9 @@ that lifecycle differs from the public helper's caller-owned pool.
 
 ## Current source and new major releases
 
-Current main is the `/v5` line. Source on main alone does not establish
+Current main is the `/v6` line. Source on main alone does not establish
 publication or security qualification; confirm each version in
-[Releases](https://github.com/faustbrian/go-queue-control-plane/releases). The
-supported historical lines above remain unchanged.
+[Releases](https://github.com/faustbrian/go-queue-control-plane/releases).
 
 ## Reporting a vulnerability
 

@@ -4,12 +4,12 @@
 
 ## Version and source applicability
 
-This model describes the current `/v5` source, which composes Authentication
-v2, Queue v2, PostgreSQL v3, Migrations v4 and Telemetry v4 and leaves schema
-migration to the deploying application. Published earlier majors keep their
+This model describes the current `/v6` source, which composes Authentication
+v3, Authorization v4, Identifier v2, Queue v2, PostgreSQL v3, Migrations v4 and
+Telemetry v4 and leaves schema migration to the deploying application. Published earlier majors keep their
 own models at their release tags; see the
 [supported-version policy](../SECURITY.md) and the
-[v5 migration guide](../COMPATIBILITY.md#queue-control-plane-v5-migration).
+[v6 migration guide](../COMPATIBILITY.md#queue-control-plane-v6-migration).
 This model does not certify a deployment, caller-supplied collaborator, or
 unpublished change merely because it is on main.
 

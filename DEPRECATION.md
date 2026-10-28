@@ -15,19 +15,8 @@ review.
 
 ## Kubernetes adapter import path
 
-The released `github.com/faustbrian/go-queue-control-plane/kubernetes` package
-is deprecated in favor of
-`github.com/faustbrian/go-queue-control-plane/adapters/kubernetes`. The new
-path makes the external target explicit and aligns package selection with the
-rest of Golib without changing the adapter's narrow Deployment contract.
-
-Migration requires only changing the import path; exported types, constants,
-error sentinels, constructors, and behavior remain compatible. The legacy path
-will not be removed before `v2.0.0`.
-
-Current main retains both paths under the root `/v3` module.
-Within v3, prefer
-`github.com/faustbrian/go-queue-control-plane/v3/adapters/kubernetes`;
-the `/v3/kubernetes` facade aliases those same v3 types. Across module majors,
-update all control-plane imports consistently: v1, v2 and v3 nominal types and
-sentinel values are not interchangeable.
+Version 6 removed the deprecated top-level `kubernetes` package. Import
+`github.com/faustbrian/go-queue-control-plane/v6/adapters/kubernetes`, which now
+owns the implementation; exported types, constants, error sentinels,
+constructors and behaviour are unchanged. Published v1 to v5 keep the old path
+and receive no further releases.

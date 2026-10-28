@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

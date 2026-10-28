@@ -8,7 +8,7 @@ import (
 	"time"
 
 	gopostgres "github.com/faustbrian/go-postgres/v3"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v6/postgres"
 )
 
 type retentionFileOpener func(string) (io.ReadCloser, error)

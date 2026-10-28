@@ -2,7 +2,7 @@ package apihttp
 
 import (
 	"encoding/json"
-	"github.com/faustbrian/go-queue-control-plane/v5/fleet"
+	"github.com/faustbrian/go-queue-control-plane/v6/fleet"
 	"net/http"
 	"net/http/httptest"
 	"testing"

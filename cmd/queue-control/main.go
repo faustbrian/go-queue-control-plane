@@ -13,8 +13,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/faustbrian/go-queue-control-plane/v5/cli"
-	"github.com/faustbrian/go-queue-control-plane/v5/client"
+	"github.com/faustbrian/go-queue-control-plane/v6/cli"
+	"github.com/faustbrian/go-queue-control-plane/v6/client"
 )
 
 var processExit = os.Exit

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
-	"github.com/faustbrian/go-queue-control-plane/v5/dataplane"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
+	"github.com/faustbrian/go-queue-control-plane/v6/dataplane"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

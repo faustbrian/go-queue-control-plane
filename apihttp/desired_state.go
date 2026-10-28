@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
-	controlplane "github.com/faustbrian/go-queue-control-plane/v5"
-	"github.com/faustbrian/go-queue-control-plane/v5/control"
-	controlpostgres "github.com/faustbrian/go-queue-control-plane/v5/postgres"
+	authentication "github.com/faustbrian/go-authentication/v3"
+	controlplane "github.com/faustbrian/go-queue-control-plane/v6"
+	"github.com/faustbrian/go-queue-control-plane/v6/control"
+	controlpostgres "github.com/faustbrian/go-queue-control-plane/v6/postgres"
 	queue "github.com/faustbrian/go-queue/v2/management"
 )
 

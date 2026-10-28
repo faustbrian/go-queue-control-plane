@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	authentication "github.com/faustbrian/go-authentication/v2"
+	authentication "github.com/faustbrian/go-authentication/v3"
 )
 
 // ErrInvalidSecurityConfiguration reports an invalid exact-origin or admission
