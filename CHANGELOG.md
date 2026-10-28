@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file. The
 format follows Keep a Changelog, and releases use Semantic
 Versioning.
 
+## 6.0.1 - 2026-10-28
+
+### Fixed
+
+- Classify remote workers against a clock read after their status is
+  retrieved. go-queue workers stamp their heartbeat when answering, so a
+  clock sampled before the fetch reported every live worker as `unknown`.
+  Version 2.0.2 carried this fix; it is now restored on the current major.
+
 ## 6.0.0 - 2026-10-28
 
 ### Changed

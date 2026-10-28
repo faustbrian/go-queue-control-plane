@@ -119,6 +119,13 @@ func (h *handler) listWorkers(writer http.ResponseWriter, request *http.Request)
 		snapshot = h.workers.SnapshotTenant(tenant, h.now(), h.staleAfter)
 	}
 	workers := append([]fleet.WorkerSnapshot(nil), snapshot.Workers...)
+	if h.remoteWorkers != nil {
+		// Remote retrieval can produce heartbeats newer than the request clock.
+		now := h.now()
+		for index := range workers {
+			workers[index].State = workers[index].EffectiveState(now, h.staleAfter)
+		}
+	}
 	sort.SliceStable(workers, func(i, j int) bool {
 		return workerComesBefore(workers[i], workers[j])
 	})
