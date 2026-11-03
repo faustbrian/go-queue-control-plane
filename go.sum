@@ -60,8 +60,8 @@ github.com/faustbrian/go-jsonrpc v1.1.1 h1:vxUzoj5o2CvlXtQDRKbyb8aP9FXvE+j937jEW
 github.com/faustbrian/go-jsonrpc v1.1.1/go.mod h1:thOSBE3KGGNbPHY/OcreIcDPwusQ273v61n6TlmJdxE=
 github.com/faustbrian/go-migrations/v4 v4.0.0 h1:8F2o0DaBvKTobUM+rZZSOzVky4boP6MkRh4wVdNUnWQ=
 github.com/faustbrian/go-migrations/v4 v4.0.0/go.mod h1:au9tuA0oVpQ/n6c8eEYLAkLpkkEqNJLFjZq+eFfmKOE=
-github.com/faustbrian/go-postgres/v3 v3.0.0 h1:DZiYCka5MNqyZ7WdIT+nWWfaWN9D5VXJ48ngJpRuWD8=
-github.com/faustbrian/go-postgres/v3 v3.0.0/go.mod h1:9fA5QiCyfsEFMIoOihINnOsnnPGT4EgU6qXVp4d0bwE=
+github.com/faustbrian/go-postgres/v3 v3.2.0 h1:UFuWp0WFq1KoVUGgc7wzgTY9RibdlD0B7s6DUj7VVZI=
+github.com/faustbrian/go-postgres/v3 v3.2.0/go.mod h1:9fA5QiCyfsEFMIoOihINnOsnnPGT4EgU6qXVp4d0bwE=
 github.com/faustbrian/go-queue/v2 v2.0.0 h1:39FH8kwtf9b/wQKUiUrJJpSp9Y/e8QVrNq99Y8btrDg=
 github.com/faustbrian/go-queue/v2 v2.0.0/go.mod h1:p/XYnQ8i6M0MGpA2NGA0JD4Oe9bkmIgPNV7Sye14NTY=
 github.com/faustbrian/go-telemetry/v4 v4.0.0 h1:e3Xzy++AmZIJLB9M1FFJT3lgMM4M+h9KmvLzK2mIBZo=

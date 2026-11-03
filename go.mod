@@ -8,7 +8,7 @@ require (
 	github.com/faustbrian/go-authorization/v4 v4.0.0
 	github.com/faustbrian/go-identifier/v2 v2.1.0
 	github.com/faustbrian/go-migrations/v4 v4.0.0
-	github.com/faustbrian/go-postgres/v3 v3.0.0
+	github.com/faustbrian/go-postgres/v3 v3.2.0
 	github.com/faustbrian/go-queue/v2 v2.0.0
 	github.com/faustbrian/go-telemetry/v4 v4.0.0
 	github.com/jackc/pgx/v5 v5.11.0
