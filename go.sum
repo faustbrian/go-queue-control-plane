@@ -64,8 +64,8 @@ github.com/faustbrian/go-postgres/v3 v3.0.0 h1:DZiYCka5MNqyZ7WdIT+nWWfaWN9D5VXJ4
 github.com/faustbrian/go-postgres/v3 v3.0.0/go.mod h1:9fA5QiCyfsEFMIoOihINnOsnnPGT4EgU6qXVp4d0bwE=
 github.com/faustbrian/go-queue/v2 v2.0.0 h1:39FH8kwtf9b/wQKUiUrJJpSp9Y/e8QVrNq99Y8btrDg=
 github.com/faustbrian/go-queue/v2 v2.0.0/go.mod h1:p/XYnQ8i6M0MGpA2NGA0JD4Oe9bkmIgPNV7Sye14NTY=
-github.com/faustbrian/go-telemetry/v4 v4.0.0 h1:e3Xzy++AmZIJLB9M1FFJT3lgMM4M+h9KmvLzK2mIBZo=
-github.com/faustbrian/go-telemetry/v4 v4.0.0/go.mod h1:fFpvq29hNXfpPGcfhZ7HuS4KsguUEQe4NJ9DLmy0tpU=
+github.com/faustbrian/go-telemetry/v4 v4.3.0 h1:NbkmtwB9m6bjCzzoWfQAURnR6UfIzsoXFOLsn3iAB2Q=
+github.com/faustbrian/go-telemetry/v4 v4.3.0/go.mod h1:KTd2wRKubANMY6WCSLK5Z+O+CADaSY8e3bX3r+Pw1tg=
 github.com/felixge/httpsnoop v1.1.0 h1:3YtUj32ZZkqZtt3sZZsClsymw/QDuVfpNhoA31zeORc=
 github.com/felixge/httpsnoop v1.1.0/go.mod h1:Zqxgdd+1Rkcz8euOqdr7lqgCRJztwr5hp9vDSi5UZCE=
 github.com/fxamacker/cbor/v2 v2.9.1 h1:2rWm8B193Ll4VdjsJY28jxs70IdDsHRWgQYAI80+rMQ=
