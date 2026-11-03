@@ -10,7 +10,7 @@ require (
 	github.com/faustbrian/go-migrations/v4 v4.0.0
 	github.com/faustbrian/go-postgres/v3 v3.0.0
 	github.com/faustbrian/go-queue/v2 v2.0.0
-	github.com/faustbrian/go-telemetry/v4 v4.0.0
+	github.com/faustbrian/go-telemetry/v4 v4.3.0
 	github.com/jackc/pgx/v5 v5.11.0
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/metric v1.47.0
