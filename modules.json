@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "repository": "github.com/faustbrian/go-queue-control-plane",
-  "go_version": "1.27.3",
+  "go_version": "1.27.4",
   "modules": [
     {
       "directory": ".",
@@ -209,7 +209,7 @@
       "family_label": "Persistence And Durability",
       "family_description": "Durable state, delivery, coordination, recovery, and operational lifecycle.",
       "family_order": 4,
-      "version": "6.0.1",
+      "version": "6.0.2",
       "tag_prefix": "v",
       "owned_dependencies": [
         "github.com/faustbrian/go-authentication/v3",
